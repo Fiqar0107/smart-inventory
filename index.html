@@ -624,7 +624,7 @@
       const found = Object.values(demoAccounts).find(a => a.email === email && a.pass === pass);
       if (found) {
         sessionStorage.setItem('si_user', JSON.stringify({ email, role: found.role }));
-        document.getElementById('btn-login-txt').textContent = '✅ Berhasil!';
+        setBtnSuccess('btn-login', '✅ Berhasil!');
         setTimeout(() => { window.location.href = found.page; }, 600);
       } else {
         setLoading('btn-login', 'btn-login-txt', false, 'Masuk ke Dashboard');
@@ -736,7 +736,7 @@
   }
   function setLoading(btnId, txtId, loading, defaultTxt) {
     const btn = document.getElementById(btnId);
-    const txt = document.getElementById(txtId);
+    if (!btn) return;
     if (loading) {
       btn.disabled = true;
       btn.innerHTML = '<div class="btn-spinner"></div><span>Memproses...</span>';
@@ -744,6 +744,14 @@
       btn.disabled = false;
       btn.innerHTML = `<span id="${txtId}">${defaultTxt}</span>`;
     }
+  }
+
+  function setBtnSuccess(btnId, text) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    const span = btn.querySelector('span:last-child');
+    if (span) span.textContent = text;
+    else btn.innerHTML = `<span>${text}</span>`;
   }
 
   /* ── ENTER KEY ── */
