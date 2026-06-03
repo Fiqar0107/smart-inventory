@@ -15,7 +15,7 @@
 /* ── KONFIGURASI ─────────────────────────────────── */
 const API_CONFIG = {
   // Ganti setelah Apps Script di-deploy (Langkah 3 panduan)
-  url: "ISI_URL_APPS_SCRIPT_DISINI",
+  url: "https://script.google.com/macros/s/AKfycbxBVwfqCUx2LodQuRx1NCL63nKXfg_52jGnhkFJ85vlEPwYG6WlUgJ-fmc4Wg9zsrwslg/exec",
 
   // Jika true → pakai data lokal (DEMO_DATA) tanpa panggil API
   // Otomatis aktif jika url belum diisi
