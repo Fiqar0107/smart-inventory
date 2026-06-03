@@ -228,6 +228,8 @@
     @media(max-width:1100px) { .stats-row { grid-template-columns: repeat(2,1fr); } .two-col,.three-col { grid-template-columns: 1fr; } }
     @media(max-width:768px)  { .sb { transform: translateX(-100%); } .sb.open { transform: translateX(0); } .mob-ov.open { display: block; } .main { margin-left: 0; } .mob-tog { display: grid; place-items: center; } .page { padding: 14px; } }
   </style>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
 </head>
 <body>
 
@@ -626,8 +628,31 @@
   function doLogout() { if(confirm('Keluar dari akun Dinas Koperasi?')) window.location.href = 'index.html'; }
 
   /* ── INIT ── */
-  renderToko(); renderKec(); renderTopToko();
-  renderChart(); renderStok(); renderLaporan(); renderUnduh();
+  async function loadDinasData() {
+    const res = await API.getGlobalStats();
+    if (res.success) {
+      const d = res.data;
+      // Update stat cards
+      const cards = document.querySelectorAll('.stat-val');
+      if (cards[0]) cards[0].textContent = d.totalToko;
+      if (cards[2]) cards[2].textContent = d.totalTransaksi;
+      if (cards[3]) cards[3].textContent = d.itemKritis;
+      // Isi tokoData dari API
+      tokoData.length = 0;
+      d.tokoList.forEach(t => tokoData.push({
+        nama: t.nama, kec: t.kecamatan, barang: t.jumlahBarang,
+        tx: t.txBulanIni, kritis: t.itemKritis, status: t.status,
+      }));
+      // Hitung kecamatan
+      const kecCount = {};
+      d.tokoList.forEach(t => { kecCount[t.kecamatan] = (kecCount[t.kecamatan]||0)+1; });
+      kecData.length = 0;
+      Object.entries(kecCount).forEach(([kec,n]) => kecData.push({ kec, n }));
+    }
+    renderToko(); renderKec(); renderTopToko();
+    renderChart(); renderStok(); renderLaporan(); renderUnduh();
+  }
+  loadDinasData();
 </script>
 </body>
 </html>

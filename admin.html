@@ -437,6 +437,8 @@
       .page { padding: 14px; }
     }
   </style>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
 </head>
 <body>
 
@@ -929,12 +931,16 @@
     if (!e || e.target === document.getElementById('modal-bg'))
       document.getElementById('modal-bg').classList.remove('open');
   }
-  function approveModal() {
+  async function approveModal() {
     if (!activeId) return;
-    alert(`✅ Toko berhasil disetujui!\nNotifikasi WhatsApp akan dikirim ke pemilik.`);
-    pendaftaranData.splice(pendaftaranData.findIndex(x => x.id === activeId), 1);
-    renderPendaftaran();
-    document.getElementById('modal-bg').classList.remove('open');
+    const catatan = document.getElementById('modal-note').value;
+    const res = await API.approveToko(activeId, catatan);
+    if (res.success) {
+      alert('✅ Toko berhasil disetujui!\nNotifikasi WhatsApp akan dikirim ke pemilik.');
+      pendaftaranData.splice(pendaftaranData.findIndex(x => x.id === activeId), 1);
+      renderPendaftaran();
+      document.getElementById('modal-bg').classList.remove('open');
+    }
   }
   function rejectModal() {
     if (!activeId) return;
@@ -950,10 +956,18 @@
   function quickReject(id)  { activeId = id; if (confirm('Tolak pendaftaran ini?')) { pendaftaranData.splice(pendaftaranData.findIndex(x=>x.id===id),1); renderPendaftaran(); } }
 
   /* ── SIMPAN EOQ ── */
-  function simpanEoq() {
+  async function simpanEoq() {
+    const params = {
+      biayaPesan:  parseFloat(document.getElementById('eoq-s').value)||15000,
+      biayaSimpan: parseFloat(document.getElementById('eoq-h').value)||20,
+      leadTime:    parseFloat(document.getElementById('eoq-lt').value)||3,
+      safetyStock: parseFloat(document.getElementById('eoq-ss').value)||10,
+      periode:     parseFloat(document.getElementById('eoq-period').value)||30,
+    };
+    const res = await API.saveEoqParams(params);
     const btn = document.querySelector('.btn-primary');
-    btn.innerHTML = '✅ Parameter Tersimpan!';
-    btn.style.background = 'var(--emerald-500)';
+    btn.innerHTML = res.success ? '✅ Parameter Tersimpan!' : '❌ Gagal Simpan';
+    btn.style.background = res.success ? 'var(--emerald-500)' : '#ef4444';
     setTimeout(() => { btn.innerHTML = '💾 Simpan Parameter Default'; btn.style.background = ''; }, 2000);
   }
   function resetEoq() {
@@ -988,13 +1002,28 @@
   function doLogout() { if(confirm('Keluar dari panel admin?')) window.location.href = 'index.html'; }
 
   /* ── INIT ── */
-  renderPendaftaran();
-  renderToko();
-  renderLog();
-  renderEoqParams();
-  renderChart();
-  renderNotif();
-  renderActivity();
+  async function loadAdminData() {
+    const [resPend, resToko, resLog] = await Promise.all([
+      API.getPendaftaran(),
+      API.getAllToko(),
+      API.getLog(12),
+    ]);
+    if (resPend.success) { pendaftaranData.length = 0; resPend.data.forEach(p => pendaftaranData.push(p)); }
+    if (resToko.success) {
+      tokoData.length = 0;
+      resToko.data.forEach(t => tokoData.push({ nama:t.nama, kec:t.kecamatan, pengguna:2, tx:0, status:t.status }));
+      kecData.length = 0;
+      const kecCount = {};
+      resToko.data.forEach(t => { kecCount[t.kecamatan] = (kecCount[t.kecamatan]||0)+1; });
+      Object.entries(kecCount).forEach(([kec,n]) => kecData.push({ kec, n }));
+    }
+    if (resLog.success) {
+      logData.length = 0;
+      resLog.data.forEach(l => logData.push({ waktu: l.waktu.split(' ')[1]||'—', tipe:l.tipe, pesan:l.pesan, toko:'Sistem' }));
+    }
+    renderPendaftaran(); renderToko(); renderLog(); renderEoqParams(); renderChart(); renderNotif(); renderActivity();
+  }
+  loadAdminData();
 </script>
 </body>
 </html>

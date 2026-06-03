@@ -903,6 +903,8 @@
       .stats-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
 </head>
 <body>
 
@@ -1032,7 +1034,7 @@
           <span class="stat-trend up">↑ 2</span>
         </div>
         <div>
-          <div class="stat-value">47</div>
+          <div class="stat-value" id="stat-total-barang">47</div>
           <div class="stat-label">Total Jenis Barang</div>
         </div>
         <div class="stat-sub">Diperbarui hari ini</div>
@@ -1044,7 +1046,7 @@
           <span class="stat-trend down">Perlu Tindakan</span>
         </div>
         <div>
-          <div class="stat-value" style="color:var(--red-500)">3</div>
+          <div class="stat-value" style="color:var(--red-500)" id="stat-stok-kritis">3</div>
           <div class="stat-label">Barang Stok Kritis</div>
         </div>
         <div class="stat-sub">Di bawah batas ROP</div>
@@ -1056,7 +1058,7 @@
           <span class="stat-trend flat">Hari ini</span>
         </div>
         <div>
-          <div class="stat-value">12</div>
+          <div class="stat-value" id="stat-tx-masuk">12</div>
           <div class="stat-label">Transaksi Masuk</div>
         </div>
         <div class="stat-sub">+320 unit total</div>
@@ -1068,7 +1070,7 @@
           <span class="stat-trend up">↑ 8%</span>
         </div>
         <div>
-          <div class="stat-value">28</div>
+          <div class="stat-value" id="stat-tx-keluar">28</div>
           <div class="stat-label">Transaksi Keluar</div>
         </div>
         <div class="stat-sub">-148 unit total</div>
@@ -1233,38 +1235,84 @@
 
 <!-- ═══ SCRIPT ═══ -->
 <script>
-  /* ── DATA DUMMY ── */
-  const barangData = [
-    { nama: 'Minyak Goreng Bimoli 1L', sku: 'MGB-001', stok: 8,  rop: 20, eoq: 45, satuan: 'botol' },
-    { nama: 'Gula Pasir 1Kg',          sku: 'GP-002',  stok: 5,  rop: 15, eoq: 30, satuan: 'kg'    },
-    { nama: 'Tepung Terigu 1Kg',       sku: 'TT-003',  stok: 12, rop: 25, eoq: 50, satuan: 'kg'    },
-    { nama: 'Beras Premium 5Kg',       sku: 'BP-004',  stok: 60, rop: 30, eoq: 100, satuan: 'sak'  },
-    { nama: 'Sabun Lifebuoy',          sku: 'SL-005',  stok: 35, rop: 20, eoq: 60, satuan: 'biji'  },
-    { nama: 'Indomie Goreng',          sku: 'IG-006',  stok: 120,rop: 50, eoq: 200, satuan: 'biji' },
-  ];
+  /* ── DATA (dari API / DEMO_DATA) ── */
+  let barangData   = [];
+  let notifData    = [];
+  let eoqData      = [];
+  let activityData = [];
 
-  const notifData = [
-    { icon: '⚠️', bg: 'var(--red-100)',   color: 'var(--red-500)',   judul: 'Stok Kritis: Minyak Goreng',  ket: 'Stok 8 botol, ROP = 20 botol', waktu: '10 mnt lalu', unread: true  },
-    { icon: '⚠️', bg: 'var(--red-100)',   color: 'var(--red-500)',   judul: 'Stok Kritis: Gula Pasir',     ket: 'Stok 5 kg, ROP = 15 kg',       waktu: '10 mnt lalu', unread: true  },
-    { icon: '📦', bg: 'var(--teal-100)',  color: 'var(--teal-600)',  judul: 'Pesanan EOQ Disarankan',      ket: 'Pesan 45 botol Minyak Goreng',  waktu: '1 jam lalu',  unread: true  },
-    { icon: '✅', bg: 'var(--green-100)', color: 'var(--green-500)', judul: 'Transaksi Tersimpan',         ket: '120 Indomie Goreng masuk stok', waktu: '2 jam lalu',  unread: false },
-    { icon: '🔄', bg: 'var(--slate-100)', color: 'var(--slate-500)', judul: 'EOQ/ROP Dihitung Ulang',     ket: 'Pembaruan otomatis pukul 00:00', waktu: 'Kemarin',    unread: false },
-  ];
+  async function loadDashboardData() {
+    const user    = JSON.parse(sessionStorage.getItem('si_user') || '{}');
+    const tokoId  = user.tokoId || 'TOKO-001';
 
-  const eoqData = [
-    { nama: 'Minyak Goreng', eoq: 45, rop: 20, stok: 8,  kritis: true  },
-    { nama: 'Gula Pasir',    eoq: 30, rop: 15, stok: 5,  kritis: true  },
-    { nama: 'Tepung Terigu', eoq: 50, rop: 25, stok: 12, kritis: true  },
-    { nama: 'Beras Premium', eoq: 100,rop: 30, stok: 60, kritis: false },
-  ];
+    // Paralel: ambil semua data sekaligus
+    const [resBarang, resDash, resNotif, resTx] = await Promise.all([
+      API.getBarang(tokoId),
+      API.getDashboard(tokoId),
+      API.getNotifikasi(tokoId),
+      API.getTransaksi(tokoId, 10),
+    ]);
 
-  const activityData = [
-    { type: 'masuk',  text: '120 Indomie Goreng masuk',     sub: 'oleh Karyawan Andi · 14:22', qty: '+120' },
-    { type: 'keluar', text: '5 botol Minyak Goreng keluar', sub: 'oleh Karyawan Sari · 13:45', qty: '-5'   },
-    { type: 'sistem', text: 'EOQ/ROP dihitung ulang',       sub: 'Otomatis · 00:00',           qty: '—'    },
-    { type: 'masuk',  text: '50 Sabun Lifebuoy masuk',      sub: 'oleh Karyawan Andi · Kemarin',qty: '+50' },
-    { type: 'keluar', text: '10 kg Gula Pasir keluar',      sub: 'oleh Pemilik · Kemarin',     qty: '-10'  },
-  ];
+    if (resBarang.success) {
+      barangData = resBarang.data;
+      eoqData = barangData
+        .filter(b => b.stok <= b.rop * 1.5)
+        .slice(0, 4)
+        .map(b => ({ nama: b.nama.split(' ').slice(0,2).join(' '), eoq: b.eoq, rop: b.rop, stok: b.stok, kritis: b.stok <= b.rop }));
+    }
+
+    if (resNotif.success) {
+      notifData = resNotif.data.map(n => {
+        const tipeMap = {
+          kritis:    { icon:'⚠️', bg:'var(--red-100)',   color:'var(--red-500)'   },
+          perhatian: { icon:'🟡', bg:'var(--amber-100)', color:'#b45309'          },
+          sistem:    { icon:'🔄', bg:'var(--slate-100)', color:'var(--slate-500)' },
+        };
+        const t = tipeMap[n.tipe] || tipeMap.sistem;
+        return { icon:t.icon, bg:t.bg, color:t.color, judul:n.pesan.slice(0,50), ket:n.pesan, waktu:n.waktu.split(' ')[1]||'—', unread:n.tipe==='kritis'||n.tipe==='perhatian' };
+      });
+    }
+
+    if (resTx.success) {
+      activityData = resTx.data.slice(0, 5).map(t => {
+        const brg = barangData.find(b => b.id === t.barangId);
+        return {
+          type: t.jenis,
+          text: `${t.jumlah} ${brg ? brg.satuan : ''} ${brg ? brg.nama : t.barangId} ${t.jenis}`,
+          sub: `${t.keterangan || ''} · ${t.tanggal}`,
+          qty: (t.jenis==='masuk' ? '+' : '-') + t.jumlah,
+        };
+      });
+    }
+
+    if (resDash.success) {
+      const d = resDash.data;
+      document.getElementById('stat-total-barang').textContent  = d.totalBarang || barangData.length;
+      document.getElementById('stat-stok-kritis').textContent   = d.stokKritis  || eoqData.filter(e=>e.kritis).length;
+      document.getElementById('stat-tx-masuk').textContent      = d.txMasuk     || 0;
+      document.getElementById('stat-tx-keluar').textContent     = d.txKeluar    || 0;
+    }
+
+    // Update nama toko di topbar
+    const resToko = await API.getToko(tokoId);
+    if (resToko.success && resToko.data[0]) {
+      const toko = resToko.data[0];
+      document.querySelectorAll('.store-meta strong').forEach(el => el.textContent = toko.nama);
+      document.getElementById('page-sub').textContent = `Selamat datang, ${user.nama || 'Pemilik'} · ${toko.nama}`;
+    }
+
+    renderTabel(); renderNotif(); renderEoq(); renderActivity();
+    checkSetupBanner();
+    populateTxBarang();
+  }
+
+  // Isi dropdown pilih barang di form transaksi dari data API
+  function populateTxBarang() {
+    const sel = document.getElementById('tx-barang');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— pilih barang —</option>' +
+      barangData.map(b => `<option value="${b.id}" data-stok="${b.stok}" data-sat="${b.satuan}">${b.nama}</option>`).join('');
+  }
 
   /* ── HARI INI ── */
   const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -1398,20 +1446,36 @@
   }
 
   /* ── SIMPAN TRANSAKSI ── */
-  function simpanTransaksi() {
-    const barang  = document.getElementById('tx-barang').value;
-    const jumlah  = document.getElementById('tx-jumlah').value;
-    if (!barang || !jumlah) { alert('Lengkapi nama barang dan jumlah dulu ya!'); return; }
-    const btn = document.querySelector('.btn-submit');
-    btn.innerHTML = '✅ Tersimpan!';
-    btn.style.background = 'var(--green-500)';
-    setTimeout(() => {
-      btn.innerHTML = '💾 Simpan Transaksi';
-      btn.style.background = '';
-      document.getElementById('tx-barang').value = '';
-      document.getElementById('tx-jumlah').value = '';
-      document.getElementById('tx-ket').value = '';
-    }, 2000);
+  async function simpanTransaksi() {
+    const selBarang = document.getElementById('tx-barang');
+    const jumlah    = document.getElementById('tx-jumlah').value;
+    const ket       = document.getElementById('tx-ket').value;
+    if (!selBarang.value || !jumlah) { alert('Lengkapi pilihan barang dan jumlah dulu ya!'); return; }
+
+    const user   = JSON.parse(sessionStorage.getItem('si_user') || '{}');
+    const tokoId = user.tokoId || 'TOKO-001';
+    const btn    = document.querySelector('.btn-submit');
+    btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite"></span> Menyimpan...';
+    btn.disabled = true;
+
+    const res = await API.simpanTransaksi(tokoId, selBarang.value, txType, Number(jumlah), ket);
+    btn.disabled = false;
+    if (res.success) {
+      btn.innerHTML = '✅ Tersimpan!';
+      btn.style.background = 'var(--green-500)';
+      setTimeout(async () => {
+        btn.innerHTML = '💾 Simpan Transaksi';
+        btn.style.background = '';
+        selBarang.value = '';
+        document.getElementById('tx-jumlah').value = '';
+        document.getElementById('tx-ket').value = '';
+        await loadDashboardData();
+      }, 1500);
+    } else {
+      btn.innerHTML = '❌ Gagal — coba lagi';
+      btn.style.background = 'var(--red-500)';
+      setTimeout(() => { btn.innerHTML = '💾 Simpan Transaksi'; btn.style.background = ''; }, 2000);
+    }
   }
 
   /* ── NAV ── */
@@ -1473,12 +1537,8 @@
   }
 
   /* ── INIT ── */
-  renderTabel();
-  renderNotif();
-  renderEoq();
-  renderActivity();
   renderChart();
-  checkSetupBanner();
+  loadDashboardData();
 </script>
 </body>
 </html>

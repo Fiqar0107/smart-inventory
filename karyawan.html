@@ -290,6 +290,8 @@
       .form-body { padding: 18px 20px; }
     }
   </style>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
 </head>
 <body>
 
@@ -478,21 +480,52 @@
 
 <!-- ═══ SCRIPT ═══ -->
 <script>
-  /* ── DATA ── */
-  const barangList = [
-    { sku:'MGB-001', nama:'Minyak Goreng Bimoli 1L', stok:8,  rop:20, sat:'botol', ico:'🫙' },
-    { sku:'GP-002',  nama:'Gula Pasir 1Kg',          stok:5,  rop:15, sat:'kg',    ico:'🍬' },
-    { sku:'TT-003',  nama:'Tepung Terigu 1Kg',       stok:12, rop:25, sat:'kg',    ico:'🌾' },
-    { sku:'BP-004',  nama:'Beras Premium 5Kg',        stok:60, rop:30, sat:'sak',   ico:'🍚' },
-    { sku:'SL-005',  nama:'Sabun Lifebuoy',           stok:35, rop:20, sat:'biji',  ico:'🧼' },
-    { sku:'IG-006',  nama:'Indomie Goreng',           stok:120,rop:50, sat:'biji',  ico:'🍜' },
-  ];
+  /* ── DATA (dari API) ── */
+  let barangList     = [];
+  let riwayatHariIni = [];
 
-  let riwayatHariIni = [
-    { type:'masuk',  nama:'Indomie Goreng',     qty:120, sat:'biji', waktu:'14:22', ket:'dari supplier' },
-    { type:'keluar', nama:'Minyak Goreng',       qty:5,  sat:'botol',waktu:'13:45', ket:'' },
-    { type:'keluar', nama:'Gula Pasir',          qty:3,  sat:'kg',   waktu:'11:20', ket:'pelanggan' },
-  ];
+  const KAT_ICO = {
+    sembako:'🛒', minuman:'🥤', snack:'🍪', sabun:'🧴', bumbu:'🧂', rokok:'🚬', atk:'✏️'
+  };
+
+  async function loadKaryawanData() {
+    const user   = JSON.parse(sessionStorage.getItem('si_user') || '{}');
+    const tokoId = user.tokoId || 'TOKO-001';
+
+    const [resB, resTx] = await Promise.all([
+      API.getBarang(tokoId),
+      API.getTransaksi(tokoId, 20),
+    ]);
+
+    if (resB.success) {
+      barangList = resB.data.map(b => ({
+        id: b.id, sku: b.sku, nama: b.nama,
+        stok: b.stok, rop: b.rop, sat: b.satuan,
+        ico: KAT_ICO[b.kategori] || '📦',
+      }));
+      // isi dropdown
+      const sel = document.getElementById('sel-barang');
+      sel.innerHTML = '<option value="">— pilih barang —</option>' +
+        barangList.map(b => `<option value="${b.id}" data-stok="${b.stok}" data-rop="${b.rop}" data-sat="${b.sat}">${b.nama}</option>`).join('');
+    }
+
+    if (resTx.success) {
+      const today = new Date().toISOString().split('T')[0];
+      riwayatHariIni = resTx.data
+        .filter(t => t.tanggal === today)
+        .map(t => {
+          const brg = barangList.find(b => b.id === t.barangId);
+          return { type:t.jenis, nama: brg ? brg.nama : t.barangId, qty:t.jumlah, sat: brg ? brg.sat:'unit', waktu: t.waktu||'—', ket:t.keterangan||'' };
+        });
+      txCount = riwayatHariIni.length;
+      document.getElementById('tx-today').textContent = txCount;
+      const badge = document.getElementById('bn-badge');
+      badge.textContent = txCount;
+      badge.style.display = txCount > 0 ? 'grid' : 'none';
+    }
+
+    renderStok(); renderKritis(); renderRiwayat();
+  }
 
   let txCount = riwayatHariIni.length;
   let txType  = 'masuk';
@@ -523,9 +556,10 @@
     const opt = sel.options[sel.selectedIndex];
     const box = document.getElementById('stok-info');
     if (!sel.value) { box.classList.remove('show'); return; }
-    const s   = parseInt(opt.dataset.stok);
-    const r   = parseInt(opt.dataset.rop);
-    const sat = opt.dataset.sat;
+    const brg = barangList.find(b => b.id === sel.value) || {};
+    const s   = parseInt(opt.dataset.stok || brg.stok || 0);
+    const r   = parseInt(opt.dataset.rop  || brg.rop  || 0);
+    const sat = opt.dataset.sat || brg.sat || 'unit';
     document.getElementById('si-stok').textContent = s;
     document.getElementById('si-rop').textContent  = r;
     document.getElementById('si-sat').textContent  = sat;
@@ -539,48 +573,40 @@
   }
 
   /* ── SIMPAN ── */
-  function simpan() {
-    const barang = document.getElementById('sel-barang');
-    const jumlah = document.getElementById('inp-jumlah').value;
-    const ket    = document.getElementById('inp-ket').value;
-    if (!barang.value || !jumlah || parseInt(jumlah) < 1) {
+  async function simpan() {
+    const selBarang = document.getElementById('sel-barang');
+    const jumlah    = document.getElementById('inp-jumlah').value;
+    const ket       = document.getElementById('inp-ket').value;
+    if (!selBarang.value || !jumlah || parseInt(jumlah) < 1) {
       alert('Lengkapi pilihan barang dan jumlah dulu ya! 😊');
       return;
     }
-    const namaBarang = barang.options[barang.selectedIndex].text;
-    const satBarang  = barang.options[barang.selectedIndex].dataset.sat;
-    const jam = new Date().toTimeString().slice(0,5);
 
-    riwayatHariIni.unshift({ type: txType, nama: namaBarang, qty: parseInt(jumlah), sat: satBarang, waktu: jam, ket });
-    txCount++;
-    document.getElementById('tx-today').textContent = txCount;
-    document.getElementById('bn-badge').textContent = txCount;
-    document.getElementById('bn-badge').style.display = 'grid';
+    const user    = JSON.parse(sessionStorage.getItem('si_user') || '{}');
+    const tokoId  = user.tokoId || 'TOKO-001';
+    const btn     = document.getElementById('btn-submit');
+    btn.innerHTML = '⏳ Menyimpan...';
+    btn.disabled  = true;
 
-    // Update stok di data
-    const idx = barangList.findIndex(b => b.sku === barang.value);
-    if (idx >= 0) {
-      if (txType === 'masuk') barangList[idx].stok += parseInt(jumlah);
-      else                     barangList[idx].stok  = Math.max(0, barangList[idx].stok - parseInt(jumlah));
+    const res = await API.simpanTransaksi(tokoId, selBarang.value, txType, parseInt(jumlah), ket);
+    btn.disabled = false;
+
+    if (res.success) {
+      btn.innerHTML = '✅ Tersimpan!';
+      btn.classList.add('success');
+      setTimeout(async () => {
+        btn.innerHTML = '💾 Simpan Transaksi';
+        btn.classList.remove('success');
+        selBarang.value = '';
+        document.getElementById('inp-jumlah').value = '';
+        document.getElementById('inp-ket').value    = '';
+        document.getElementById('stok-info').classList.remove('show');
+        await loadKaryawanData();
+      }, 1500);
+    } else {
+      btn.innerHTML = '❌ Gagal';
+      setTimeout(() => { btn.innerHTML = '💾 Simpan Transaksi'; }, 2000);
     }
-
-    // Feedback
-    const btn = document.getElementById('btn-submit');
-    btn.innerHTML = '✅ Tersimpan!';
-    btn.classList.add('success');
-    setTimeout(() => {
-      btn.innerHTML  = '💾 Simpan Transaksi';
-      btn.classList.remove('success');
-    }, 2000);
-
-    // Reset form
-    barang.value = '';
-    document.getElementById('inp-jumlah').value = '';
-    document.getElementById('inp-ket').value    = '';
-    document.getElementById('stok-info').classList.remove('show');
-
-    // Re-render
-    renderStok(); renderRiwayat(); renderKritis();
   }
 
   /* ── RENDER STOK ── */
@@ -687,9 +713,7 @@
   }
 
   /* ── INIT ── */
-  renderStok();
-  renderKritis();
-  renderRiwayat();
+  loadKaryawanData();
 </script>
 </body>
 </html>

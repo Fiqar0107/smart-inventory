@@ -331,6 +331,8 @@
       .lp-title { font-size: 2rem; }
     }
   </style>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
 </head>
 <body>
 
@@ -619,16 +621,15 @@
 
     setLoading('btn-login', 'btn-login-txt', true);
 
-    setTimeout(() => {
-      // Cek akun demo
-      const found = Object.values(demoAccounts).find(a => a.email === email && a.pass === pass);
-      if (found) {
-        sessionStorage.setItem('si_user', JSON.stringify({ email, role: found.role }));
+    API.login(email, pass).then(res => {
+      if (res.success) {
+        const ROLE_PAGE = { pemilik:'dashboard.html', karyawan:'karyawan.html', admin:'admin.html', dinas:'dinas.html' };
+        sessionStorage.setItem('si_user', JSON.stringify({ email, role:res.role, nama:res.nama, tokoId:res.tokoId }));
         setBtnSuccess('btn-login', '✅ Berhasil!');
-        setTimeout(() => { window.location.href = found.page; }, 600);
+        setTimeout(() => { window.location.href = ROLE_PAGE[res.role] || 'dashboard.html'; }, 600);
       } else {
         setLoading('btn-login', 'btn-login-txt', false, 'Masuk ke Dashboard');
-        showMsg('login-error', 'Email atau password salah. Coba akun demo di bawah.');
+        showMsg('login-error', res.msg || 'Email atau password salah.');
         document.getElementById('login-email').style.borderColor = 'var(--rose-500)';
         document.getElementById('login-pass').style.borderColor  = 'var(--rose-500)';
         setTimeout(() => {
@@ -636,7 +637,7 @@
           document.getElementById('login-pass').style.borderColor  = '';
         }, 1500);
       }
-    }, 900);
+    });
   }
 
   /* ── DAFTAR ── */
@@ -673,8 +674,9 @@
 
     setLoading('btn-daftar', 'btn-daftar-txt', true);
 
-    setTimeout(() => {
+    API.register({ namaToko:nama, namaPemilik:pemilik, noHp:hp, kecamatan:kec, jenis, email, password:pass }).then(res => {
       setLoading('btn-daftar', 'btn-daftar-txt', false, 'Kirim Pendaftaran');
+      if (!res.success) { showMsg('daftar-error', res.msg||'Pendaftaran gagal.'); return; }
       showMsg('daftar-success');
       // reset form
       ['d-nama-toko','d-nama-pemilik','d-hp','d-email','d-pass'].forEach(id => document.getElementById(id).value = '');
@@ -685,7 +687,7 @@
       document.getElementById('terms-check').classList.remove('checked');
       document.getElementById('terms-check').textContent = '';
       checkStrength('');
-    }, 1200);
+    });
   }
 
   /* ── JENIS USAHA ── */
