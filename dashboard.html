@@ -273,6 +273,111 @@
       gap: 24px;
     }
 
+    /* ─── BANNER SETUP STOK AWAL ─── */
+    .setup-banner {
+      background: linear-gradient(135deg, var(--teal-900) 0%, #0a1628 60%, var(--teal-800) 100%);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+      animation: slideDown .4s ease;
+    }
+    .setup-banner::before {
+      content: '';
+      position: absolute;
+      width: 260px; height: 260px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,171,171,.15) 0%, transparent 70%);
+      top: -80px; right: 60px; pointer-events: none;
+    }
+    .setup-banner::after {
+      content: '📦';
+      position: absolute;
+      right: 24px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 4rem;
+      opacity: .08;
+      pointer-events: none;
+    }
+    .setup-banner-ico {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--teal-400), var(--teal-600));
+      border-radius: var(--radius-md);
+      display: grid; place-items: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      position: relative; z-index: 1;
+      box-shadow: 0 4px 14px rgba(26,171,171,.3);
+    }
+    .setup-banner-body {
+      flex: 1;
+      position: relative; z-index: 1;
+    }
+    .setup-banner-body strong {
+      display: block;
+      font-size: .95rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 3px;
+    }
+    .setup-banner-body span {
+      font-size: .78rem;
+      color: rgba(255,255,255,.6);
+      line-height: 1.5;
+    }
+    .setup-banner-steps {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .sbs-chip {
+      font-size: .68rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.75);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .setup-banner-actions {
+      display: flex; flex-direction: column; gap: 8px;
+      flex-shrink: 0; position: relative; z-index: 1;
+    }
+    .setup-btn-main {
+      background: linear-gradient(135deg, var(--teal-400), var(--teal-600));
+      color: white; border: none; border-radius: var(--radius-md);
+      padding: 10px 20px; font-family: inherit;
+      font-size: .83rem; font-weight: 700;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+      white-space: nowrap; text-decoration: none;
+      display: flex; align-items: center; gap: 7px;
+      box-shadow: 0 4px 14px rgba(26,171,171,.35);
+    }
+    .setup-btn-main:hover  { opacity: .9; }
+    .setup-btn-main:active { transform: scale(.97); }
+    .setup-btn-dismiss {
+      background: transparent; color: rgba(255,255,255,.45);
+      border: none; font-family: inherit; font-size: .72rem;
+      font-weight: 600; cursor: pointer; text-align: center;
+      transition: color .14s; padding: 2px;
+    }
+    .setup-btn-dismiss:hover { color: rgba(255,255,255,.75); }
+
+    /* nav item setup — warna amber supaya menonjol */
+    .nav-item.setup-link {
+      background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(251,191,36,.08));
+      color: var(--amber-400) !important;
+      border: 1px solid rgba(251,191,36,.2);
+      margin-top: 4px;
+    }
+    .nav-item.setup-link:hover {
+      background: linear-gradient(135deg, rgba(251,191,36,.28), rgba(251,191,36,.14));
+      color: #fde68a !important;
+    }
+    .nav-item.setup-link .nav-icon { color: var(--amber-400); }
+
     /* ─── ALERT BANNER ─── */
     .alert-banner {
       background: linear-gradient(135deg, #fff7ed, #fffbeb);
@@ -819,6 +924,10 @@
     <a class="nav-item active" onclick="setPage('dashboard')">
       <span class="nav-icon">🏠</span> Dashboard
     </a>
+    <a class="nav-item setup-link" href="setup-stok.html" title="Input stok barang pertama kali">
+      <span class="nav-icon">📦</span> Setup Stok Awal
+      <span class="nav-badge" style="background:var(--amber-500)">Baru</span>
+    </a>
     <a class="nav-item" onclick="setPage('barang')">
       <span class="nav-icon">📋</span> Data Barang
     </a>
@@ -881,6 +990,28 @@
 
   <!-- PAGE CONTENT -->
   <main class="page-content">
+
+    <!-- BANNER SETUP STOK AWAL (tampil jika belum ada data) -->
+    <div class="setup-banner" id="setup-banner">
+      <div class="setup-banner-ico">📦</div>
+      <div class="setup-banner-body">
+        <strong>Selamat datang! Mulai dengan memasukkan stok barang Anda 👋</strong>
+        <span>Sistem belum memiliki data barang. Input stok awal sekarang agar EOQ &amp; ROP bisa dihitung otomatis.</span>
+        <div class="setup-banner-steps">
+          <span class="sbs-chip">1️⃣ Input nama &amp; jumlah stok</span>
+          <span class="sbs-chip">2️⃣ Sistem hitung EOQ &amp; ROP</span>
+          <span class="sbs-chip">3️⃣ Notifikasi WA aktif otomatis</span>
+        </div>
+      </div>
+      <div class="setup-banner-actions">
+        <a href="setup-stok.html" class="setup-btn-main">
+          🚀 Mulai Setup Stok
+        </a>
+        <button class="setup-btn-dismiss" onclick="dismissSetupBanner()">
+          Lewati dulu
+        </button>
+      </div>
+    </div>
 
     <!-- ALERT -->
     <div class="alert-banner" id="alert-stok">
@@ -1320,12 +1451,34 @@
     }
   }
 
+  /* ── SETUP BANNER ── */
+  function checkSetupBanner() {
+    // Sembunyikan banner jika sudah punya data stok (barangData > 0)
+    // atau jika pernah di-dismiss
+    const dismissed = sessionStorage.getItem('setup_banner_dismissed');
+    const punya_data = barangData.length > 0;
+    const banner = document.getElementById('setup-banner');
+    if (punya_data || dismissed) {
+      banner.style.display = 'none';
+    }
+  }
+
+  function dismissSetupBanner() {
+    sessionStorage.setItem('setup_banner_dismissed', '1');
+    const banner = document.getElementById('setup-banner');
+    banner.style.transition = 'opacity .3s, transform .3s';
+    banner.style.opacity = '0';
+    banner.style.transform = 'translateY(-8px)';
+    setTimeout(() => banner.style.display = 'none', 300);
+  }
+
   /* ── INIT ── */
   renderTabel();
   renderNotif();
   renderEoq();
   renderActivity();
   renderChart();
+  checkSetupBanner();
 </script>
 </body>
 </html>

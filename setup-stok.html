@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup Stok Awal — Smart Inventory UMKM Pangkep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --teal-900:#0a2e2e;--teal-800:#0d3b3b;--teal-700:#0f4a4a;--teal-600:#136b6b;
+      --teal-500:#178a8a;--teal-400:#1aabab;--teal-300:#3ec9c9;--teal-200:#8ee8e8;
+      --teal-100:#d0f5f5;--teal-50:#edfafa;
+      --amber-500:#f59e0b;--amber-100:#fef3c7;--amber-50:#fffbeb;
+      --rose-500:#ef4444;--rose-100:#fee2e2;
+      --green-500:#22c55e;--green-400:#4ade80;--green-100:#dcfce7;--green-50:#f0fdf4;
+      --slate-900:#0f172a;--slate-800:#1e293b;--slate-700:#334155;--slate-600:#475569;
+      --slate-500:#64748b;--slate-400:#94a3b8;--slate-300:#cbd5e1;--slate-200:#e2e8f0;
+      --slate-100:#f1f5f9;--slate-50:#f8fafc;--white:#ffffff;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{font-size:15px;scroll-behavior:smooth;}
+    body{font-family:'Geist',sans-serif;background:var(--slate-50);color:var(--slate-800);min-height:100vh;}
+
+    /* TOPBAR */
+    .topbar{background:var(--teal-900);padding:0 24px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.08);}
+    .tb-brand{display:flex;align-items:center;gap:9px;}
+    .tb-ico{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--teal-400),var(--teal-600));display:grid;place-items:center;font-size:.9rem;}
+    .tb-brand strong{font-size:.88rem;font-weight:700;color:var(--white);}
+    .tb-brand span{font-size:.7rem;color:var(--teal-300);}
+    .tb-sep{width:1px;height:20px;background:rgba(255,255,255,.15);}
+    .tb-ttl{font-size:.83rem;font-weight:600;color:rgba(255,255,255,.7);}
+    .tb-r{margin-left:auto;}
+    .tb-store{font-size:.72rem;font-weight:700;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);}
+
+    /* PROGRESS HEADER */
+    .ph{background:var(--white);border-bottom:1px solid var(--slate-200);padding:16px 24px;}
+    .ph-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;}
+    .sp{display:flex;align-items:center;gap:8px;flex:1;position:relative;}
+    .sp::after{content:'';position:absolute;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:var(--slate-200);top:16px;z-index:0;}
+    .sp:last-child::after{display:none;}
+    .sp-c{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:.78rem;font-weight:800;flex-shrink:0;position:relative;z-index:1;transition:all .3s;}
+    .sp-c.done{background:var(--teal-500);color:white;}
+    .sp-c.active{background:var(--teal-900);color:white;box-shadow:0 0 0 4px var(--teal-100);}
+    .sp-c.pending{background:var(--slate-200);color:var(--slate-500);}
+    .sp-l{font-size:.75rem;font-weight:600;color:var(--slate-500);}
+    .sp-l.active{color:var(--teal-700);}
+    .sp-l.done{color:var(--slate-400);}
+
+    /* MAIN */
+    .main{max-width:860px;margin:0 auto;padding:28px 20px 80px;}
+    .panel{display:none;animation:up .3s ease both;}
+    .panel.active{display:block;}
+    @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* INTRO CARD */
+    .intro{background:linear-gradient(135deg,var(--teal-900),var(--teal-800));border-radius:18px;padding:28px;color:white;margin-bottom:20px;position:relative;overflow:hidden;}
+    .intro::before{content:'';position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(26,171,171,.15) 0%,transparent 70%);top:-70px;right:-50px;pointer-events:none;}
+    .intro h2{font-size:1.2rem;font-weight:800;margin-bottom:6px;}
+    .intro p{font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.6;max-width:520px;}
+    .intro-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
+    .ichip{font-size:.7rem;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);}
+
+    /* METHOD GRID */
+    .method-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;}
+    .mc{background:var(--white);border:2px solid var(--slate-200);border-radius:14px;padding:20px 18px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:10px;}
+    .mc:hover{border-color:var(--teal-300);box-shadow:0 4px 16px rgba(26,171,171,.08);}
+    .mc.sel{border-color:var(--teal-400);background:var(--teal-50);box-shadow:0 4px 20px rgba(26,171,171,.12);}
+    .mc-ico{font-size:2rem;}
+    .mc-ttl{font-size:.9rem;font-weight:800;color:var(--slate-800);}
+    .mc-desc{font-size:.76rem;color:var(--slate-500);line-height:1.55;}
+    .mc-badge{font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:20px;align-self:flex-start;margin-top:auto;}
+    .mb-easy{background:var(--green-100);color:#15803d;}
+    .mb-mid{background:var(--amber-100);color:#b45309;}
+    .mb-fast{background:var(--teal-100);color:var(--teal-700);}
+
+    /* CARD */
+    .card{background:var(--white);border-radius:16px;border:1px solid var(--slate-200);box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;margin-bottom:16px;}
+    .ch{padding:14px 20px;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;gap:10px;}
+    .ch h3{flex:1;font-size:.9rem;font-weight:700;color:var(--slate-800);}
+    .ch p{font-size:.72rem;color:var(--slate-400);}
+    .cb{padding:16px 20px;}
+
+    /* FORM */
+    .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+    .fl{font-size:.7rem;font-weight:700;color:var(--slate-600);text-transform:uppercase;letter-spacing:.5px;}
+    .fc{width:100%;padding:10px 13px;border:1.5px solid var(--slate-200);border-radius:10px;font-family:inherit;font-size:.87rem;color:var(--slate-800);background:var(--white);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;}
+    .fc:focus{border-color:var(--teal-400);box-shadow:0 0 0 3px rgba(26,171,171,.1);}
+    .fc::placeholder{color:var(--slate-300);}
+
+    /* INPUT TABLE */
+    .tw{overflow-x:auto;}
+    .it{width:100%;border-collapse:collapse;min-width:580px;}
+    .it thead th{background:var(--slate-50);padding:9px 10px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--slate-500);text-align:left;white-space:nowrap;}
+    .it thead th.req::after{content:' *';color:var(--rose-500);}
+    .it tbody tr{border-top:1px solid var(--slate-100);}
+    .it tbody tr:hover{background:var(--slate-50);}
+    .it tbody td{padding:5px 6px;}
+    .tc{width:100%;padding:7px 10px;border:1.5px solid var(--slate-200);border-radius:8px;font-family:'Geist Mono',monospace;font-size:.78rem;color:var(--slate-800);background:var(--white);outline:none;transition:border-color .12s;}
+    .tc:focus{border-color:var(--teal-400);background:var(--teal-50);}
+    .tc-no{text-align:center;width:44px;}
+    .rd{width:30px;height:30px;border-radius:7px;border:1px solid var(--slate-200);background:transparent;cursor:pointer;display:grid;place-items:center;font-size:.85rem;color:var(--slate-400);transition:all .12s;}
+    .rd:hover{background:var(--rose-100);border-color:#fecdd3;color:var(--rose-500);}
+    .add-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:9px;border:1.5px dashed var(--teal-300);background:transparent;font-family:inherit;font-size:.8rem;font-weight:700;color:var(--teal-600);cursor:pointer;transition:all .14s;width:100%;margin-top:8px;}
+    .add-btn:hover{background:var(--teal-50);border-style:solid;}
+
+    /* TEMPLATE */
+    .qcats{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+    .qc{padding:5px 13px;border-radius:20px;border:1.5px solid var(--slate-200);background:var(--white);font-family:inherit;font-size:.76rem;font-weight:600;color:var(--slate-600);cursor:pointer;transition:all .13s;}
+    .qc:hover,.qc.on{border-color:var(--teal-400);color:var(--teal-700);background:var(--teal-50);}
+    .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+    .ti{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:9px;border:1.5px solid var(--slate-200);background:var(--white);cursor:pointer;transition:all .13s;}
+    .ti:hover{border-color:var(--teal-300);background:var(--teal-50);}
+    .ti.on{border-color:var(--green-400);background:var(--green-50);}
+    .ti-ico{font-size:1rem;flex-shrink:0;}
+    .ti-name{font-size:.76rem;font-weight:600;color:var(--slate-700);}
+    .ti-sat{font-size:.65rem;color:var(--slate-400);font-family:'Geist Mono',monospace;}
+    .ti-ck{margin-left:auto;font-size:.75rem;color:var(--green-500);display:none;}
+    .ti.on .ti-ck{display:block;}
+
+    /* DROP ZONE */
+    .dz{border:2px dashed var(--teal-300);border-radius:14px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--teal-50);}
+    .dz:hover,.dz.drag{border-color:var(--teal-500);background:var(--teal-100);}
+    .dz-ico{font-size:2.5rem;margin-bottom:10px;}
+    .dz-ttl{font-size:.92rem;font-weight:700;color:var(--teal-700);margin-bottom:4px;}
+    .dz-sub{font-size:.76rem;color:var(--teal-600);}
+    .dz-btn{display:inline-block;margin-top:12px;padding:8px 20px;border-radius:9px;background:var(--teal-600);color:white;font-family:inherit;font-size:.8rem;font-weight:700;cursor:pointer;border:none;transition:opacity .14s;}
+    .dz-btn:hover{opacity:.88;}
+    #file-input{display:none;}
+    .tpl-link{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;color:var(--teal-600);cursor:pointer;margin-top:10px;text-decoration:underline;}
+
+    /* PREVIEW TABLE */
+    .ptbl{width:100%;border-collapse:collapse;font-size:.78rem;}
+    .ptbl th{background:var(--teal-50);padding:8px 12px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--teal-700);text-align:left;}
+    .ptbl td{padding:8px 12px;border-top:1px solid var(--slate-100);color:var(--slate-700);}
+    .ptbl tr:hover td{background:var(--slate-50);}
+    .ok{color:var(--green-500);font-weight:700;}
+    .er{color:var(--rose-500);font-weight:700;}
+
+    /* REVIEW STATS */
+    .rstats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+    .rsc{background:var(--white);border-radius:12px;padding:14px 16px;border:1px solid var(--slate-200);text-align:center;}
+    .rsc-v{font-size:1.5rem;font-weight:900;color:var(--teal-700);line-height:1;}
+    .rsc-l{font-size:.7rem;color:var(--slate-500);margin-top:4px;}
+
+    /* UPLOAD PROGRESS */
+    .up{display:none;background:var(--white);border-radius:14px;border:1px solid var(--slate-200);padding:28px 24px;text-align:center;}
+    .up.show{display:block;}
+    .up-spin{width:48px;height:48px;border-radius:50%;border:4px solid var(--teal-100);border-top-color:var(--teal-500);animation:spin .8s linear infinite;margin:0 auto 16px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .up-ttl{font-size:1rem;font-weight:700;color:var(--slate-700);margin-bottom:6px;}
+    .up-sub{font-size:.8rem;color:var(--slate-500);}
+    .up-bw{height:8px;background:var(--slate-200);border-radius:20px;overflow:hidden;margin:16px 0 6px;}
+    .up-b{height:100%;background:linear-gradient(90deg,var(--teal-400),var(--teal-600));border-radius:20px;width:0;transition:width .4s ease;}
+    .up-pct{font-size:.76rem;font-family:'Geist Mono',monospace;color:var(--slate-500);}
+
+    /* SUCCESS */
+    .suc{display:none;text-align:center;padding:40px 24px;}
+    .suc.show{display:block;animation:up .4s ease both;}
+    .suc-ico{font-size:3.5rem;margin-bottom:14px;}
+    .suc h2{font-size:1.3rem;font-weight:800;color:var(--slate-800);margin-bottom:6px;}
+    .suc p{font-size:.85rem;color:var(--slate-500);margin-bottom:20px;}
+    .suc-next{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:10px;border:1.5px solid transparent;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .14s;text-decoration:none;white-space:nowrap;}
+    .btn:active{transform:scale(.97);}
+    .btn:disabled{opacity:.55;cursor:not-allowed;}
+    .bp{background:linear-gradient(135deg,var(--teal-500),var(--teal-800));color:white;box-shadow:0 4px 14px rgba(15,74,74,.2);}
+    .bp:hover{opacity:.9;}
+    .bs{background:transparent;color:var(--teal-600);border-color:var(--teal-300);}
+    .bs:hover{background:var(--teal-50);}
+    .bg{background:transparent;color:var(--slate-600);border-color:var(--slate-200);}
+    .bg:hover{background:var(--slate-100);}
+    .bsuc{background:var(--green-500);color:white;}
+    .bsuc:hover{opacity:.9;}
+    .blg{padding:12px 28px;font-size:.9rem;border-radius:12px;}
+
+    /* INFO BOX */
+    .ib{border-radius:10px;padding:11px 14px;margin:12px 0;display:flex;gap:9px;font-size:.79rem;}
+    .ib-ico{font-size:1rem;flex-shrink:0;}
+    .it1{background:var(--teal-50);border-left:3px solid var(--teal-400);color:#134e4a;}
+    .it2{background:var(--amber-50);border-left:3px solid var(--amber-500);color:#78350f;}
+    .it3{background:var(--slate-100);border-left:3px solid var(--slate-400);color:var(--slate-700);}
+
+    /* NAV ROW */
+    .nr{display:flex;align-items:center;justify-content:space-between;margin-top:24px;}
+    .nr-r{display:flex;gap:10px;margin-left:auto;}
+
+    /* BADGE */
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:.66rem;font-weight:700;}
+    .b-g{background:var(--green-100);color:#15803d;}
+    .b-a{background:var(--amber-100);color:#b45309;}
+    .b-r{background:var(--rose-100);color:var(--rose-500);}
+
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:20px;}
+
+    @media(max-width:760px){
+      .method-grid,.tgrid{grid-template-columns:1fr 1fr;}
+      .rstats{grid-template-columns:1fr 1fr;}
+      .main{padding:16px 14px 60px;}
+    }
+    @media(max-width:480px){
+      .method-grid{grid-template-columns:1fr;}
+      .tgrid{grid-template-columns:1fr 1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="tb-brand">
+    <div class="tb-ico">📦</div>
+    <div><strong>Smart Inventory</strong><span style="display:block;line-height:1">UMKM Pangkep</span></div>
+  </div>
+  <div class="tb-sep"></div>
+  <span class="tb-ttl">Setup Stok Awal</span>
+  <div class="tb-r"><span class="tb-store" id="lbl-toko">🏪 Toko Anda</span></div>
+</header>
+
+<!-- PROGRESS -->
+<div class="ph"><div class="ph-inner" id="ph-steps"></div></div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- STEP 1: PILIH METODE -->
+  <div class="panel active" id="p1">
+    <div class="intro">
+      <h2>📦 Selamat Datang di Setup Stok Awal</h2>
+      <p>Sebelum sistem bisa menghitung EOQ &amp; ROP otomatis, masukkan <strong>stok barang yang ada di toko sekarang</strong>. Pilih cara termudah untuk Anda.</p>
+      <div class="intro-chips">
+        <span class="ichip">⏱ Estimasi 10–30 menit</span>
+        <span class="ichip">📱 Bisa dari HP</span>
+        <span class="ichip">💾 Draf tersimpan otomatis</span>
+      </div>
+    </div>
+
+    <div style="font-size:.88rem;font-weight:700;color:var(--slate-700);margin-bottom:12px">Pilih cara memasukkan data stok:</div>
+
+    <div class="method-grid">
+      <div class="mc" onclick="pilihMetode('manual',this)">
+        <div class="mc-ico">✍️</div>
+        <div class="mc-ttl">Input Manual</div>
+        <div class="mc-desc">Ketik nama dan jumlah stok barang satu per satu di tabel. Cocok untuk toko dengan barang tidak terlalu banyak.</div>
+        <span class="mc-badge mb-easy">😊 Paling Mudah</span>
+      </div>
+      <div class="mc" onclick="pilihMetode('template',this)">
+        <div class="mc-ico">📋</div>
+        <div class="mc-ttl">Pilih dari Template</div>
+        <div class="mc-desc">Pilih nama barang dari daftar yang sudah tersedia (sembako, kelontong, dll), lalu isi jumlah stok saja.</div>
+        <span class="mc-badge mb-mid">⚡ Lebih Cepat</span>
+      </div>
+      <div class="mc" onclick="pilihMetode('csv',this)">
+        <div class="mc-ico">📊</div>
+        <div class="mc-ttl">Upload File CSV/Excel</div>
+        <div class="mc-desc">Punya data di Excel? Upload langsung. Tersedia template yang bisa langsung diisi dan diupload kembali.</div>
+        <span class="mc-badge mb-fast">🚀 Banyak Barang</span>
+      </div>
+    </div>
+
+    <div class="ib it1"><span class="ib-ico">💡</span><div><strong>Tips untuk pemula:</strong> Gunakan <strong>Pilih dari Template</strong> — sudah ada 30+ nama barang umum yang tinggal dipilih dan diisi stoknya saja.</div></div>
+
+    <div class="nr">
+      <div></div>
+      <button class="btn bp blg" onclick="keStep(2)" id="btn-next1" disabled>Lanjut →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: INPUT DATA -->
+  <div class="panel" id="p2">
+
+    <!-- 2A: MANUAL -->
+    <div id="sub-manual" style="display:none">
+      <div class="card">
+        <div class="ch"><h3>✍️ Input Stok Barang Manual</h3><p id="cnt-manual">0 barang</p></div>
+        <div class="cb">
+          <div class="ib it3"><span class="ib-ico">ℹ️</span><div>Kolom <strong>Nama Barang</strong> dan <strong>Stok Sekarang</strong> wajib diisi. Kolom lain boleh dikosongkan.</div></div>
+          <div class="tw">
+            <table class="it">
+              <thead><tr>
+                <th style="width:36px">#</th>
+                <th class="req">Nama Barang</th>
+                <th class="req">Stok Sekarang</th>
+                <th>Satuan</th>
+                <th>Harga Beli (Rp)</th>
+                <th>Kategori</th>
+                <th style="width:36px"></th>
+              </tr></thead>
+              <tbody id="tbody-manual"></tbody>
+            </table>
+          </div>
+          <button class="add-btn" onclick="addRow()">＋ Tambah Baris Barang</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2B: TEMPLATE -->
+    <div id="sub-template" style="display:none">
+      <div class="card">
+        <div class="ch"><h3>📋 Pilih Barang dari Template</h3><p id="cnt-tpl">0 dipilih</p></div>
+        <div class="cb">
+          <div class="ib it1"><span class="ib-ico">💡</span><div>Klik barang yang ada di toko Anda → isi jumlah stok di tabel yang muncul di bawah.</div></div>
+          <div style="font-size:.7rem;font-weight:700;color:var(--slate-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">Filter Kategori</div>
+          <div class="qcats" id="qcats"></div>
+          <div class="tgrid" id="tgrid"></div>
+        </div>
+      </div>
+      <div class="card" id="tpl-stok-card" style="display:none">
+        <div class="ch"><h3>📝 Isi Jumlah Stok Barang Terpilih</h3></div>
+        <div class="cb">
+          <div class="tw">
+            <table class="it">
+              <thead><tr>
+                <th style="width:36px">#</th>
+                <th>Nama Barang</th>
+                <th class="req">Stok Sekarang</th>
+                <th>Satuan</th>
+                <th>Harga Beli (Rp)</th>
+                <th style="width:36px"></th>
+              </tr></thead>
+              <tbody id="tbody-tpl"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2C: CSV -->
+    <div id="sub-csv" style="display:none">
+      <div class="card">
+        <div class="ch"><h3>📊 Upload File CSV / Excel</h3></div>
+        <div class="cb">
+          <div class="ib it2"><span class="ib-ico">⚠️</span><div><strong>Pastikan format file sesuai template.</strong> Download template, isi di Excel/Google Sheets, simpan sebagai CSV, lalu upload.</div></div>
+          <div class="dz" id="dz"
+               ondragover="dzDrag(event,true)" ondragleave="dzDrag(event,false)" ondrop="dzDrop(event)"
+               onclick="document.getElementById('file-input').click()">
+            <div class="dz-ico">📂</div>
+            <div class="dz-ttl">Seret file ke sini, atau klik untuk pilih</div>
+            <div class="dz-sub">Format: .csv (simpan dari Excel sebagai CSV) · Maks 2MB</div>
+            <label class="dz-btn">📥 Pilih File</label>
+          </div>
+          <input type="file" id="file-input" accept=".csv" onchange="handleFile(this)" />
+          <div style="text-align:center">
+            <span class="tpl-link" onclick="downloadTemplate()">⬇ Download Template CSV</span>
+          </div>
+          <div class="card" id="csv-preview" style="display:none;margin-top:12px">
+            <div class="ch"><h3>👀 Preview Data</h3><p id="csv-cnt"></p></div>
+            <div style="overflow-x:auto">
+              <table class="ptbl">
+                <thead><tr><th>#</th><th>Nama Barang</th><th>Stok</th><th>Satuan</th><th>Harga Beli</th><th>Kategori</th><th>Status</th></tr></thead>
+                <tbody id="tbody-csv"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nr">
+      <button class="btn bg" onclick="keStep(1)">← Kembali</button>
+      <div class="nr-r">
+        <button class="btn bs" onclick="simpanDraf()">💾 Simpan Draf</button>
+        <button class="btn bp blg" onclick="keStep(3)">Review &amp; Simpan →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: REVIEW -->
+  <div class="panel" id="p3">
+    <div class="rstats" id="rstats"></div>
+    <div class="card">
+      <div class="ch"><h3>📋 Ringkasan Data Stok Awal</h3><p>Periksa sebelum disimpan</p></div>
+      <div style="overflow-x:auto">
+        <table class="ptbl">
+          <thead><tr><th>#</th><th>Nama Barang</th><th>Stok</th><th>Satuan</th><th>Harga Beli</th><th>Kategori</th></tr></thead>
+          <tbody id="tbody-review"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ib it2"><span class="ib-ico">⚠️</span><div>Setelah disimpan, data ini menjadi <strong>stok awal</strong> di sistem. Pastikan jumlah sesuai kondisi toko saat ini.</div></div>
+
+    <!-- Upload progress -->
+    <div class="up card" id="up-panel">
+      <div class="up-spin"></div>
+      <div class="up-ttl">Menyimpan data ke Google Sheets...</div>
+      <div class="up-sub" id="up-sub">Mempersiapkan data</div>
+      <div class="up-bw"><div class="up-b" id="up-bar"></div></div>
+      <div class="up-pct" id="up-pct">0%</div>
+    </div>
+
+    <!-- Success -->
+    <div class="suc card" id="suc-panel">
+      <div class="suc-ico">🎉</div>
+      <h2>Stok Awal Berhasil Disimpan!</h2>
+      <p id="suc-desc">Data stok sudah tersimpan dan siap digunakan.</p>
+      <div class="suc-next">
+        <a href="dashboard.html" class="btn bp blg">🏠 Buka Dashboard</a>
+        <button class="btn bs" onclick="tambahLagi()">➕ Tambah Barang Lagi</button>
+      </div>
+    </div>
+
+    <div class="nr" id="review-nav">
+      <button class="btn bg" onclick="keStep(2)">← Edit Data</button>
+      <button class="btn bsuc blg" onclick="simpanPermanen()">💾 Simpan ke Sistem</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ── DATA ── */
+let metode='', allData=[], tplPilihan={}, csvRows=[], stepNow=1;
+let rowId=0, katAktif='semua';
+
+const STEPS=[{n:1,l:'Pilih Cara Input'},{n:2,l:'Input Data Stok'},{n:3,l:'Review & Simpan'}];
+
+const KATS={semua:'Semua',sembako:'🛒 Sembako',minuman:'🥤 Minuman',snack:'🍪 Snack',sabun:'🧴 Sabun',bumbu:'🧂 Bumbu',rokok:'🚬 Rokok',atk:'✏️ ATK'};
+
+const BARANG=[
+  {ico:'🛢',nama:'Minyak Goreng Bimoli 1L',sat:'botol',kat:'sembako'},
+  {ico:'🍚',nama:'Beras Premium 5Kg',sat:'sak',kat:'sembako'},
+  {ico:'🍬',nama:'Gula Pasir 1Kg',sat:'kg',kat:'sembako'},
+  {ico:'🌾',nama:'Tepung Terigu 1Kg',sat:'bungkus',kat:'sembako'},
+  {ico:'🥚',nama:'Telur Ayam',sat:'butir',kat:'sembako'},
+  {ico:'🍜',nama:'Indomie Goreng',sat:'biji',kat:'sembako'},
+  {ico:'🍜',nama:'Indomie Kuah Ayam',sat:'biji',kat:'sembako'},
+  {ico:'📦',nama:'Kantong Plastik 1/4 Kg',sat:'pack',kat:'sembako'},
+  {ico:'🥛',nama:'Susu Kental Manis 385g',sat:'kaleng',kat:'minuman'},
+  {ico:'☕',nama:'Kopi Kapal Api Sachet',sat:'renceng',kat:'minuman'},
+  {ico:'🥤',nama:'Aqua Gelas 240ml',sat:'dus',kat:'minuman'},
+  {ico:'🥤',nama:'Aqua Botol 600ml',sat:'botol',kat:'minuman'},
+  {ico:'🥤',nama:'Teh Botol Sosro 450ml',sat:'botol',kat:'minuman'},
+  {ico:'🥤',nama:'Teh Gelas 200ml',sat:'dus',kat:'minuman'},
+  {ico:'🍪',nama:'Biscuit Oreo',sat:'bungkus',kat:'snack'},
+  {ico:'🍞',nama:'Roti Sari Roti Tawar',sat:'bungkus',kat:'snack'},
+  {ico:'🍫',nama:'Wafer Tango Coklat',sat:'bungkus',kat:'snack'},
+  {ico:'🍟',nama:'Chiki Snack',sat:'bungkus',kat:'snack'},
+  {ico:'🧴',nama:'Sabun Mandi Lifebuoy',sat:'biji',kat:'sabun'},
+  {ico:'🧴',nama:'Shampo Sunsilk Sachet',sat:'renceng',kat:'sabun'},
+  {ico:'🧴',nama:'Deterjen Rinso 1Kg',sat:'bungkus',kat:'sabun'},
+  {ico:'🧴',nama:'Sabun Cuci Piring Sunlight',sat:'botol',kat:'sabun'},
+  {ico:'🪥',nama:'Pasta Gigi Pepsodent',sat:'biji',kat:'sabun'},
+  {ico:'🧺',nama:'Pewangi Pakaian Molto',sat:'botol',kat:'sabun'},
+  {ico:'🧂',nama:'Kecap Manis Bango 220ml',sat:'botol',kat:'bumbu'},
+  {ico:'🍅',nama:'Saus Sambal ABC',sat:'botol',kat:'bumbu'},
+  {ico:'🧄',nama:'Bumbu Masak Indofood',sat:'sachet',kat:'bumbu'},
+  {ico:'🧂',nama:'Garam Halus 500g',sat:'bungkus',kat:'bumbu'},
+  {ico:'🚬',nama:'Rokok Gudang Garam Filter',sat:'bungkus',kat:'rokok'},
+  {ico:'🚬',nama:'Rokok Sampoerna Mild',sat:'bungkus',kat:'rokok'},
+  {ico:'✏️',nama:'Buku Tulis 38 Lembar',sat:'biji',kat:'atk'},
+  {ico:'🖊',nama:'Pulpen Standard',sat:'biji',kat:'atk'},
+];
+
+/* ── RENDER STEPS ── */
+function renderSteps(){
+  document.getElementById('ph-steps').innerHTML=STEPS.map(s=>{
+    const c=s.n<stepNow?'done':s.n===stepNow?'active':'pending';
+    return`<div class="sp"><div class="sp-c ${c}">${s.n<stepNow?'✓':s.n}</div><span class="sp-l ${c}">${s.l}</span></div>`;
+  }).join('');
+}
+
+/* ── NAVIGASI ── */
+function keStep(n){
+  if(n===2&&!metode){alert('Pilih cara input dulu ya!');return;}
+  if(n===3){collectData();if(!allData.length){alert('Belum ada data barang. Tambahkan minimal 1 barang.');return;}renderReview();}
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`p${n}`).classList.add('active');
+  stepNow=n; renderSteps();
+  if(n===2) showSub();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── PILIH METODE ── */
+function pilihMetode(m,el){
+  metode=m;
+  document.querySelectorAll('.mc').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('btn-next1').disabled=false;
+}
+
+/* ── TAMPILKAN SUB ── */
+function showSub(){
+  ['manual','template','csv'].forEach(m=>{
+    document.getElementById(`sub-${m}`).style.display=m===metode?'block':'none';
+  });
+  if(metode==='manual'&&!document.getElementById('tbody-manual').children.length){
+    for(let i=0;i<5;i++)addRow();
+  }
+  if(metode==='template'){renderKats();renderTpl('semua');}
+}
+
+/* ─── MANUAL ─── */
+function addRow(d={}){
+  rowId++;
+  const id=`r${rowId}`;
+  const tbody=document.getElementById('tbody-manual');
+  const cats=Object.entries(KATS).filter(([k])=>k!=='semua');
+  const tr=document.createElement('tr');
+  tr.id=id;
+  tr.innerHTML=`
+    <td><input class="tc tc-no" value="${tbody.children.length+1}" readonly/></td>
+    <td><input class="tc" placeholder="cth: Minyak Goreng" value="${d.nama||''}" style="min-width:160px" oninput="updCntManual()"/></td>
+    <td><input class="tc" type="number" min="0" placeholder="0" value="${d.stok||''}" style="width:80px"/></td>
+    <td><input class="tc" placeholder="botol/kg/biji" value="${d.satuan||''}" style="width:80px"/></td>
+    <td><input class="tc" type="number" min="0" placeholder="0" value="${d.harga||''}" style="width:110px"/></td>
+    <td><select class="tc" style="width:110px">
+      <option value="">—</option>
+      ${cats.map(([k,v])=>`<option value="${k}"${d.kategori===k?' selected':''}>${v}</option>`).join('')}
+    </select></td>
+    <td><button class="rd" onclick="delRow('${id}')">🗑</button></td>`;
+  tbody.appendChild(tr);
+  updCntManual();
+}
+function delRow(id){document.getElementById(id)?.remove();renum();updCntManual();}
+function renum(){document.querySelectorAll('#tbody-manual tr').forEach((tr,i)=>{const el=tr.querySelector('.tc-no');if(el)el.value=i+1;});}
+function updCntManual(){
+  let n=0;
+  document.querySelectorAll('#tbody-manual tr').forEach(tr=>{const i=tr.querySelectorAll('input')[1];if(i&&i.value.trim())n++;});
+  document.getElementById('cnt-manual').textContent=`${n} barang`;
+}
+
+/* ─── TEMPLATE ─── */
+function renderKats(){
+  document.getElementById('qcats').innerHTML=Object.entries(KATS).map(([k,v])=>
+    `<button class="qc${k==='semua'?' on':''}" onclick="filterKat('${k}',this)">${v}</button>`
+  ).join('');
+}
+function filterKat(kat,el){
+  katAktif=kat;
+  document.querySelectorAll('.qc').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderTpl(kat);
+}
+function renderTpl(kat){
+  const list=kat==='semua'?BARANG:BARANG.filter(b=>b.kat===kat);
+  document.getElementById('tgrid').innerHTML=list.map(b=>{
+    const on=!!tplPilihan[b.nama];
+    return`<div class="ti${on?' on':''}" onclick="toggleTpl('${b.nama}',this)">
+      <span class="ti-ico">${b.ico}</span>
+      <div><div class="ti-name">${b.nama}</div><div class="ti-sat">${b.sat}</div></div>
+      <span class="ti-ck">✓</span>
+    </div>`;
+  }).join('');
+}
+function toggleTpl(nama,el){
+  const b=BARANG.find(x=>x.nama===nama);
+  if(tplPilihan[nama]){delete tplPilihan[nama];el.classList.remove('on');}
+  else{tplPilihan[nama]={nama,satuan:b.sat,kategori:b.kat,stok:'',harga:''};el.classList.add('on');}
+  updTplTable();
+  document.getElementById('cnt-tpl').textContent=`${Object.keys(tplPilihan).length} dipilih`;
+}
+function updTplTable(){
+  const entries=Object.values(tplPilihan);
+  const card=document.getElementById('tpl-stok-card');
+  card.style.display=entries.length?'block':'none';
+  document.getElementById('tbody-tpl').innerHTML=entries.map((b,i)=>`
+    <tr>
+      <td><input class="tc tc-no" value="${i+1}" readonly style="width:36px"/></td>
+      <td><span style="font-size:.82rem;font-weight:600">${b.nama}</span></td>
+      <td><input class="tc" type="number" min="0" placeholder="0" style="width:90px" data-n="${b.nama}" data-f="stok" value="${b.stok||''}" oninput="updTplF(this)"/></td>
+      <td><input class="tc" value="${b.satuan}" style="width:80px" data-n="${b.nama}" data-f="satuan" oninput="updTplF(this)"/></td>
+      <td><input class="tc" type="number" min="0" placeholder="0" style="width:110px" data-n="${b.nama}" data-f="harga" value="${b.harga||''}" oninput="updTplF(this)"/></td>
+      <td><button class="rd" onclick="rmTpl('${b.nama}')">🗑</button></td>
+    </tr>`).join('');
+}
+function updTplF(inp){const n=inp.dataset.n,f=inp.dataset.f;if(tplPilihan[n])tplPilihan[n][f]=inp.value;}
+function rmTpl(nama){delete tplPilihan[nama];renderTpl(katAktif);updTplTable();document.getElementById('cnt-tpl').textContent=`${Object.keys(tplPilihan).length} dipilih`;}
+
+/* ─── CSV ─── */
+function dzDrag(e,a){e.preventDefault();document.getElementById('dz').classList.toggle('drag',a);}
+function dzDrop(e){e.preventDefault();dzDrag(e,false);const f=e.dataTransfer.files[0];if(f)parseCSV(f);}
+function handleFile(inp){if(inp.files[0])parseCSV(inp.files[0]);}
+function parseCSV(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    csvRows=lines.slice(1).map(l=>{
+      const c=l.split(',').map(x=>x.replace(/"/g,'').trim());
+      return{nama:c[0]||'',stok:c[1]||'',satuan:c[2]||'pcs',harga:c[3]||'',kategori:c[4]||''};
+    }).filter(r=>r.nama);
+    document.getElementById('tbody-csv').innerHTML=csvRows.map((row,i)=>{
+      const ok=row.nama&&!isNaN(parseFloat(row.stok));
+      return`<tr><td>${i+1}</td><td>${row.nama}</td>
+        <td class="${ok?'ok':'er'}">${row.stok||'—'}</td>
+        <td>${row.satuan}</td>
+        <td>${row.harga?'Rp '+parseInt(row.harga).toLocaleString('id'):'—'}</td>
+        <td>${row.kategori||'—'}</td>
+        <td>${ok?'<span class="badge b-g">✓ OK</span>':'<span class="badge b-r">⚠ Cek</span>'}</td>
+      </tr>`;
+    }).join('');
+    const valid=csvRows.filter(r=>r.nama&&!isNaN(parseFloat(r.stok))).length;
+    document.getElementById('csv-cnt').textContent=`${csvRows.length} baris · ${valid} valid`;
+    document.getElementById('csv-preview').style.display='block';
+  };
+  r.readAsText(file);
+}
+function downloadTemplate(){
+  const csv='Nama Barang,Stok Sekarang,Satuan,Harga Beli,Kategori\n'+
+    'Minyak Goreng Bimoli 1L,24,botol,15000,sembako\n'+
+    'Gula Pasir 1Kg,12,kg,14000,sembako\n'+
+    'Indomie Goreng,60,biji,3000,sembako\n';
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='template-stok-barang.csv'; a.click();
+}
+
+/* ─── COLLECT ─── */
+function collectData(){
+  allData=[];
+  if(metode==='manual'){
+    document.querySelectorAll('#tbody-manual tr').forEach(tr=>{
+      const inputs=tr.querySelectorAll('input,select');
+      const nama=inputs[1]?.value.trim();
+      if(nama)allData.push({
+        nama,stok:parseFloat(inputs[2]?.value)||0,
+        satuan:inputs[3]?.value.trim()||'pcs',
+        harga:parseFloat(inputs[4]?.value)||0,
+        kategori:inputs[5]?.value||''
+      });
+    });
+  }else if(metode==='template'){
+    allData=Object.values(tplPilihan).map(b=>({
+      nama:b.nama,stok:parseFloat(b.stok)||0,
+      satuan:b.satuan||'pcs',harga:parseFloat(b.harga)||0,kategori:b.kategori
+    }));
+  }else{
+    allData=csvRows.filter(r=>r.nama).map(r=>({
+      nama:r.nama,stok:parseFloat(r.stok)||0,
+      satuan:r.satuan||'pcs',harga:parseFloat(r.harga)||0,kategori:r.kategori
+    }));
+  }
+}
+
+/* ─── RENDER REVIEW ─── */
+function renderReview(){
+  const total=allData.length,
+        totalStok=allData.reduce((s,b)=>s+b.stok,0),
+        dengHarga=allData.filter(b=>b.harga>0).length,
+        kats=[...new Set(allData.map(b=>b.kategori).filter(Boolean))].length;
+  document.getElementById('rstats').innerHTML=`
+    <div class="rsc"><div class="rsc-v">${total}</div><div class="rsc-l">Jenis Barang</div></div>
+    <div class="rsc"><div class="rsc-v">${totalStok.toLocaleString('id')}</div><div class="rsc-l">Total Unit Stok</div></div>
+    <div class="rsc"><div class="rsc-v">${dengHarga}</div><div class="rsc-l">Ada Data Harga</div></div>
+    <div class="rsc"><div class="rsc-v">${kats}</div><div class="rsc-l">Kategori</div></div>`;
+  document.getElementById('tbody-review').innerHTML=allData.map((b,i)=>`
+    <tr>
+      <td style="color:var(--slate-400);font-size:.72rem">${i+1}</td>
+      <td style="font-weight:600">${b.nama}</td>
+      <td><span style="font-family:'Geist Mono',monospace;font-weight:700">${b.stok}</span></td>
+      <td>${b.satuan}</td>
+      <td>${b.harga?'Rp '+b.harga.toLocaleString('id'):'<span style="color:var(--slate-400)">—</span>'}</td>
+      <td>${b.kategori?`<span class="badge b-g">${b.kategori}</span>`:'—'}</td>
+    </tr>`).join('');
+}
+
+/* ─── SIMPAN DRAF ─── */
+function simpanDraf(){
+  collectData();
+  localStorage.setItem('si_draft',JSON.stringify({metode,allData,tplPilihan,ts:new Date().toISOString()}));
+  alert('✅ Draf tersimpan! Anda bisa lanjutkan nanti di perangkat yang sama.');
+}
+
+/* ─── SIMPAN PERMANEN ─── */
+async function simpanPermanen(){
+  const up=document.getElementById('up-panel'),
+        nav=document.getElementById('review-nav'),
+        bar=document.getElementById('up-bar'),
+        pct=document.getElementById('up-pct'),
+        sub=document.getElementById('up-sub');
+  up.classList.add('show'); nav.style.display='none';
+  const steps=[[10,'Memvalidasi data...'],[30,'Menghubungi Google Sheets...'],[55,`Menyimpan ${allData.length} barang...`],[80,'Menghitung EOQ & ROP awal...'],[100,'Selesai! ✅']];
+  for(const[p,m]of steps){await delay(700);bar.style.width=p+'%';pct.textContent=p+'%';sub.textContent=m;}
+  await delay(500);
+  up.classList.remove('show');
+  document.getElementById('suc-panel').classList.add('show');
+  document.getElementById('suc-desc').textContent=`${allData.length} jenis barang dengan total ${allData.reduce((s,b)=>s+b.stok,0).toLocaleString('id')} unit berhasil disimpan sebagai stok awal.`;
+  localStorage.removeItem('si_draft');
+}
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+
+function tambahLagi(){
+  document.getElementById('suc-panel').classList.remove('show');
+  document.getElementById('review-nav').style.display='';
+  keStep(2);
+}
+
+/* ─── INIT ─── */
+function init(){
+  renderSteps();
+  // nama toko
+  try{const s=JSON.parse(sessionStorage.getItem('si_user')||'{}');if(s.nama)document.getElementById('lbl-toko').textContent='🏪 '+s.nama;}catch{}
+  // load draf
+  const raw=localStorage.getItem('si_draft');
+  if(raw){try{
+    const d=JSON.parse(raw);
+    if(confirm(`Ada draf tersimpan dari ${new Date(d.ts).toLocaleString('id')} (${d.allData?.length||0} barang).\nLanjutkan dari draf?`)){
+      metode=d.metode;allData=d.allData||[];tplPilihan=d.tplPilihan||{};
+      if(d.allData?.length){
+        // prefill manual rows
+        if(metode==='manual'){d.allData.forEach(b=>addRow(b));}
+      }
+    }
+  }catch{}}
+}
+init();
+</script>
+</body>
+</html>
