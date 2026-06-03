@@ -15,7 +15,7 @@
 /* ── KONFIGURASI ─────────────────────────────────── */
 const API_CONFIG = {
   // Ganti setelah Apps Script di-deploy (Langkah 3 panduan)
-  url: "https://script.google.com/macros/s/AKfycbxBVwfqCUx2LodQuRx1NCL63nKXfg_52jGnhkFJ85vlEPwYG6WlUgJ-fmc4Wg9zsrwslg/exec",
+  url: "https://script.google.com/macros/s/AKfycbwoqRUaWoZMdRVl9tmRagqRv0YAvtuR1m0AJNrkl7_7Tk_BwSnigg0JqJFU1Xz5p9uxNw/exec",
 
   // Jika true → pakai data lokal (DEMO_DATA) tanpa panggil API
   // Otomatis aktif jika url belum diisi
@@ -124,15 +124,21 @@ const _state = {
 async function _apiFetch(action, payload = {}) {
   if (API_CONFIG.demoMode) return _demoHandler(action, payload);
   try {
+    // Google Apps Script hanya mendukung CORS bebas melalui GET + doGet
+    // Kirim seluruh payload sebagai query parameter JSON-encoded
+    const params = new URLSearchParams({
+      action,
+      payload: JSON.stringify(payload),
+    });
+    const url  = `${API_CONFIG.url}?${params.toString()}`;
     const ctrl = new AbortController();
     const tid  = setTimeout(() => ctrl.abort(), API_CONFIG.timeout);
-    const res  = await fetch(API_CONFIG.url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, ...payload }),
-      signal: ctrl.signal,
+    const res  = await fetch(url, {
+      method: "GET",
+      redirect: "follow",         // Apps Script sering redirect ke /exec
     });
     clearTimeout(tid);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
     console.warn("[API] Gagal, fallback demo mode:", err.message);
