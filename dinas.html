@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dinas Koperasi — Smart Inventory UMKM Pangkep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pine-950: #071a12;
+      --pine-900: #0a2118;
+      --pine-800: #0d2e21;
+      --pine-700: #134a36;
+      --pine-600: #166534;
+      --pine-500: #15803d;
+      --pine-400: #22c55e;
+      --pine-300: #4ade80;
+      --pine-200: #bbf7d0;
+      --pine-100: #dcfce7;
+      --pine-50:  #f0fdf4;
+
+      --teal-500: #0d9488;
+      --teal-100: #ccfbf1;
+      --teal-50:  #f0fdfa;
+
+      --sky-500:  #0ea5e9;
+      --sky-100:  #e0f2fe;
+      --sky-50:   #f0f9ff;
+
+      --amber-500: #f59e0b;
+      --amber-100: #fef3c7;
+      --amber-50:  #fffbeb;
+
+      --rose-500:  #f43f5e;
+      --rose-100:  #ffe4e6;
+
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50:  #f8fafc;
+      --white:     #ffffff;
+
+      --sw: 256px;
+      --th: 64px;
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+      --shd-sm: 0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+      --shd-md: 0 4px 12px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--slate-100); color: var(--slate-800); min-height: 100vh; display: flex; }
+
+    /* ── SIDEBAR ── */
+    .sb { width: var(--sw); min-height: 100vh; background: var(--pine-950); position: fixed; top: 0; left: 0; z-index: 100; display: flex; flex-direction: column; transition: transform .3s; }
+    .sb-brand { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,.07); display: flex; align-items: center; gap: 10px; }
+    .sb-ico { width: 38px; height: 38px; background: linear-gradient(135deg, var(--pine-500), var(--teal-500)); border-radius: var(--r-sm); display: grid; place-items: center; font-size: 1.1rem; flex-shrink: 0; }
+    .sb-brand-t strong { display: block; font-size: .87rem; font-weight: 700; color: var(--white); font-family: 'Bitter', serif; }
+    .sb-brand-t span   { font-size: .67rem; color: var(--pine-300); font-weight: 500; }
+
+    .sb-nav { flex: 1; padding: 14px 10px; display: flex; flex-direction: column; gap: 1px; overflow-y: auto; }
+    .sb-sec { font-size: .6rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pine-400); padding: 12px 8px 5px; }
+    .sb-link { display: flex; align-items: center; gap: 10px; padding: 9px 11px; border-radius: var(--r-sm); color: rgba(255,255,255,.6); font-size: .83rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: background .15s, color .15s; position: relative; }
+    .sb-link:hover { background: rgba(255,255,255,.06); color: var(--white); }
+    .sb-link.active { background: linear-gradient(90deg, rgba(21,128,61,.3), rgba(21,128,61,.1)); color: var(--pine-200); }
+    .sb-link.active::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 3px; background: var(--pine-400); border-radius: 0 2px 2px 0; }
+    .sb-link-ico { font-size: .95rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .sb-readonly-tag { margin-left: auto; font-size: .6rem; padding: 2px 6px; border-radius: 20px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.4); font-weight: 600; }
+
+    .sb-foot { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.07); }
+    .sb-user { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: var(--r-sm); background: rgba(255,255,255,.05); cursor: default; }
+    .sb-uavatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--pine-500), var(--teal-500)); display: grid; place-items: center; font-size: .85rem; flex-shrink: 0; }
+    .sb-umeta { flex: 1; min-width: 0; }
+    .sb-umeta strong { display: block; font-size: .78rem; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-umeta span   { font-size: .65rem; color: var(--pine-400); }
+    .sb-role { font-size: .6rem; font-weight: 700; padding: 2px 7px; background: rgba(21,128,61,.3); color: var(--pine-200); border-radius: 20px; white-space: nowrap; }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sw); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── TOPBAR ── */
+    .topbar { height: var(--th); background: var(--white); border-bottom: 1px solid var(--slate-200); display: flex; align-items: center; padding: 0 24px; gap: 14px; position: sticky; top: 0; z-index: 50; }
+    .tb-ttl { flex: 1; }
+    .tb-ttl h1 { font-size: 1rem; font-weight: 700; color: var(--slate-900); font-family: 'Bitter', serif; }
+    .tb-ttl p  { font-size: .7rem; color: var(--slate-500); margin-top: 1px; }
+    .tb-r { display: flex; align-items: center; gap: 10px; }
+    .tb-chip { font-size: .7rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--pine-200); background: var(--pine-50); color: var(--pine-600); }
+    .readonly-banner { display: flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 600; color: var(--slate-500); background: var(--slate-100); border: 1px solid var(--slate-200); padding: 5px 12px; border-radius: 20px; }
+    .tb-btn { width: 36px; height: 36px; border-radius: var(--r-sm); border: 1px solid var(--slate-200); background: transparent; cursor: pointer; display: grid; place-items: center; font-size: .95rem; color: var(--slate-500); transition: background .14s; }
+    .tb-btn:hover { background: var(--slate-50); }
+
+    /* ── PAGE ── */
+    .page { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+
+    /* ── STATS ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .stat { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--slate-200); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shd-sm); transition: box-shadow .2s, transform .2s; animation: up .4s ease both; }
+    .stat:nth-child(1){animation-delay:.05s} .stat:nth-child(2){animation-delay:.10s} .stat:nth-child(3){animation-delay:.15s} .stat:nth-child(4){animation-delay:.20s}
+    .stat:hover { box-shadow: var(--shd-md); transform: translateY(-2px); }
+    @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .stat-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .s-ico { width: 38px; height: 38px; border-radius: var(--r-sm); display: grid; place-items: center; font-size: 1rem; flex-shrink: 0; }
+    .ico-g  { background: var(--pine-100); color: var(--pine-600); }
+    .ico-t  { background: var(--teal-100); color: var(--teal-500); }
+    .ico-s  { background: var(--sky-100);  color: var(--sky-500);  }
+    .ico-a  { background: var(--amber-100); color: #b45309; }
+    .stat-val { font-size: 1.55rem; font-weight: 800; color: var(--slate-900); line-height: 1; font-family: 'Bitter', serif; }
+    .stat-lbl { font-size: .73rem; color: var(--slate-500); margin-top: 3px; }
+    .stat-sub { font-size: .68rem; color: var(--slate-400); font-family: 'DM Mono',monospace; }
+    .chip { font-size: .67rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+    .ch-g { background: var(--pine-100); color: var(--pine-600); }
+    .ch-t { background: var(--teal-100); color: var(--teal-500); }
+    .ch-s { background: var(--sky-100);  color: var(--sky-500); }
+    .ch-a { background: var(--amber-100); color: #b45309; }
+
+    /* ── LAYOUT ── */
+    .two-col   { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+    .three-col { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+
+    /* ── CARD ── */
+    .card { background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--slate-200); box-shadow: var(--shd-sm); overflow: hidden; animation: up .45s ease both; animation-delay: .22s; }
+    .card-h { padding: 15px 20px; border-bottom: 1px solid var(--slate-100); display: flex; align-items: center; gap: 10px; }
+    .card-h h3 { flex: 1; font-size: .88rem; font-weight: 700; color: var(--slate-800); font-family: 'Bitter', serif; }
+    .card-h p  { font-size: .7rem; color: var(--slate-400); }
+    .c-badge { font-size: .67rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+
+    /* ── DOWNLOAD BTN ── */
+    .dl-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: var(--r-sm); font-size: .75rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .14s; text-decoration: none; border: none; }
+    .dl-green  { background: var(--pine-500); color: white; }
+    .dl-green:hover  { background: var(--pine-600); }
+    .dl-outline { background: transparent; color: var(--pine-600); border: 1.5px solid var(--pine-300); }
+    .dl-outline:hover { background: var(--pine-50); }
+    .dl-sky  { background: var(--sky-500); color: white; }
+    .dl-sky:hover  { background: #0284c7; }
+
+    /* ── TABLE ── */
+    .tw { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: var(--slate-50); padding: 9px 16px; font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--slate-500); text-align: left; white-space: nowrap; }
+    tbody tr { border-top: 1px solid var(--slate-100); transition: background .1s; }
+    tbody tr:hover { background: var(--slate-50); }
+    tbody td { padding: 10px 16px; font-size: .8rem; color: var(--slate-700); }
+    .td-b  { font-weight: 600; color: var(--slate-800); }
+    .td-m  { font-family: 'DM Mono',monospace; font-size: .72rem; color: var(--slate-500); }
+    .badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 20px; font-size: .67rem; font-weight: 600; }
+    .b-aktif    { background: var(--pine-100); color: var(--pine-600); }
+    .b-nonaktif { background: var(--rose-100); color: var(--rose-500); }
+    .b-cukup    { background: var(--pine-100); color: var(--pine-600); }
+    .b-perhatian{ background: var(--amber-100); color: #b45309; }
+    .b-kritis   { background: var(--rose-100); color: var(--rose-500); }
+
+    /* ── PROG ── */
+    .prog { height: 5px; background: var(--slate-200); border-radius: 3px; overflow: hidden; margin-top: 3px; }
+    .prog-f { height: 100%; border-radius: 3px; transition: width .6s; }
+
+    /* ── LAPORAN GRID ── */
+    .laporan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 20px; }
+    .lap-item { border: 1.5px solid var(--slate-200); border-radius: var(--r-md); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; transition: box-shadow .15s, border-color .15s; cursor: pointer; }
+    .lap-item:hover { box-shadow: var(--shd-md); border-color: var(--pine-300); }
+    .lap-icon { font-size: 1.4rem; }
+    .lap-name { font-size: .82rem; font-weight: 700; color: var(--slate-700); font-family: 'Bitter', serif; }
+    .lap-desc { font-size: .7rem; color: var(--slate-500); }
+    .lap-foot { display: flex; align-items: center; justify-content: space-between; }
+    .lap-date { font-size: .67rem; color: var(--slate-400); font-family: 'DM Mono',monospace; }
+    .lap-dl { font-size: .72rem; font-weight: 700; color: var(--pine-600); background: var(--pine-50); border: 1px solid var(--pine-200); border-radius: 6px; padding: 3px 9px; cursor: pointer; transition: background .14s; }
+    .lap-dl:hover { background: var(--pine-100); }
+
+    /* ── CHART BAR ── */
+    .chart-area { padding: 16px 20px 18px; }
+    .ch-legend { display: flex; gap: 14px; margin-bottom: 12px; }
+    .ch-leg-item { display: flex; align-items: center; gap: 5px; font-size: .7rem; color: var(--slate-500); }
+    .ch-leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .ch-bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+    .ch-bar-g { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .ch-bar-pair { display: flex; align-items: flex-end; gap: 3px; width: 100%; }
+    .ch-bar { flex: 1; border-radius: 3px 3px 0 0; transition: opacity .15s; }
+    .ch-bar:hover { opacity: .75; }
+    .ch-bar-lbl { font-size: .63rem; color: var(--slate-400); }
+    .ch-x { display: flex; gap: 8px; margin-top: 5px; }
+    .ch-x-item { flex: 1; text-align: center; font-size: .63rem; color: var(--slate-400); }
+
+    /* ── TOKO DETAIL LIST ── */
+    .toko-list { display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; }
+    .toko-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--slate-100); transition: background .1s; cursor: pointer; }
+    .toko-item:hover { background: var(--slate-50); }
+    .toko-item:last-child { border-bottom: none; }
+    .toko-rank { width: 22px; height: 22px; border-radius: 50%; background: var(--slate-100); color: var(--slate-500); font-size: .7rem; font-weight: 700; display: grid; place-items: center; flex-shrink: 0; }
+    .toko-rank.r1 { background: #fbbf24; color: #7c3a00; }
+    .toko-rank.r2 { background: #94a3b8; color: white; }
+    .toko-rank.r3 { background: #cd7f32; color: white; }
+    .toko-meta { flex: 1; min-width: 0; }
+    .toko-meta strong { display: block; font-size: .81rem; font-weight: 600; color: var(--slate-700); }
+    .toko-meta span   { font-size: .69rem; color: var(--slate-400); }
+    .toko-tx { font-size: .78rem; font-weight: 700; font-family: 'DM Mono',monospace; color: var(--pine-600); }
+
+    /* ── KECAMATAN MAP ── */
+    .kec-list { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px; }
+    .kec-item { display: flex; flex-direction: column; gap: 4px; }
+    .kec-row  { display: flex; align-items: center; justify-content: space-between; }
+    .kec-name { font-size: .8rem; font-weight: 600; color: var(--slate-700); }
+    .kec-count{ font-size: .75rem; font-family: 'DM Mono',monospace; color: var(--pine-600); font-weight: 600; }
+    .kec-bar  { height: 7px; background: var(--slate-200); border-radius: 4px; overflow: hidden; }
+    .kec-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--pine-400), var(--pine-500)); transition: width .7s ease; }
+
+    /* ── UNDUHAN PANEL ── */
+    .unduh-panel { display: flex; flex-direction: column; gap: 8px; padding: 14px 20px; }
+    .unduh-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--slate-200); border-radius: var(--r-sm); transition: all .14s; cursor: pointer; }
+    .unduh-row:hover { border-color: var(--pine-300); background: var(--pine-50); }
+    .unduh-ico { width: 32px; height: 32px; border-radius: var(--r-sm); display: grid; place-items: center; font-size: .9rem; flex-shrink: 0; }
+    .unduh-info { flex: 1; }
+    .unduh-info strong { display: block; font-size: .8rem; font-weight: 600; color: var(--slate-700); }
+    .unduh-info span { font-size: .68rem; color: var(--slate-400); }
+    .unduh-btn { font-size: .72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; transition: opacity .14s; }
+    .unduh-btn:hover { opacity: .85; }
+
+    /* ── MOBILE ── */
+    .mob-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 99; }
+    .mob-tog { display: none; position: fixed; bottom: 20px; right: 20px; width: 46px; height: 46px; background: var(--pine-600); border-radius: 50%; border: none; color: white; font-size: 1.2rem; cursor: pointer; z-index: 200; box-shadow: 0 4px 16px rgba(21,128,61,.4); }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb { background: var(--slate-300); border-radius: 10px; }
+
+    @media(max-width:1100px) { .stats-row { grid-template-columns: repeat(2,1fr); } .two-col,.three-col { grid-template-columns: 1fr; } }
+    @media(max-width:768px)  { .sb { transform: translateX(-100%); } .sb.open { transform: translateX(0); } .mob-ov.open { display: block; } .main { margin-left: 0; } .mob-tog { display: grid; place-items: center; } .page { padding: 14px; } }
+  </style>
+</head>
+<body>
+
+<div class="mob-ov" id="ov" onclick="toggleSB()"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sb" id="sb">
+  <div class="sb-brand">
+    <div class="sb-ico">🏛️</div>
+    <div class="sb-brand-t">
+      <strong>Smart Inventory</strong>
+      <span>Dinas Koperasi & UMKM</span>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-sec">Ringkasan</div>
+    <a class="sb-link active" onclick="nav(this,'overview')">
+      <span class="sb-link-ico">📊</span> Overview UMKM
+    </a>
+    <a class="sb-link" onclick="nav(this,'toko')">
+      <span class="sb-link-ico">🏪</span> Daftar Toko
+      <span class="sb-readonly-tag">baca</span>
+    </a>
+    <a class="sb-link" onclick="nav(this,'stok')">
+      <span class="sb-link-ico">📦</span> Kondisi Stok
+      <span class="sb-readonly-tag">baca</span>
+    </a>
+
+    <div class="sb-sec">Laporan & Data</div>
+    <a class="sb-link" onclick="nav(this,'laporan')">
+      <span class="sb-link-ico">📋</span> Laporan Periodik
+    </a>
+    <a class="sb-link" onclick="nav(this,'unduhan')">
+      <span class="sb-link-ico">📥</span> Unduh Data
+    </a>
+    <a class="sb-link" onclick="nav(this,'sebaran')">
+      <span class="sb-link-ico">🗺️</span> Sebaran Kecamatan
+    </a>
+
+    <div class="sb-sec">Akun</div>
+    <a class="sb-link" onclick="doLogout()" style="color:rgba(244,63,94,.7)">
+      <span class="sb-link-ico">🚪</span> Keluar
+    </a>
+  </nav>
+
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-uavatar">🏛️</div>
+      <div class="sb-umeta">
+        <strong>Kepala Bidang UMKM</strong>
+        <span>Dinas Koperasi Pangkep</span>
+      </div>
+      <span class="sb-role">Read Only</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <header class="topbar">
+    <div class="tb-ttl">
+      <h1 id="pg-title">Overview UMKM Kabupaten Pangkep</h1>
+      <p id="pg-sub">Data persediaan real-time · Diperbarui otomatis dari sistem Smart Inventory</p>
+    </div>
+    <div class="tb-r">
+      <span class="readonly-banner">🔒 Hanya Baca</span>
+      <span class="tb-chip" id="today-lbl"></span>
+      <button class="tb-btn">📥</button>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-top"><div class="s-ico ico-g">🏪</div><span class="chip ch-g">↑ 4 bulan ini</span></div>
+        <div><div class="stat-val">24</div><div class="stat-lbl">UMKM Terdaftar di Sistem</div></div>
+        <div class="stat-sub">18 aktif · 6 nonaktif</div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="s-ico ico-t">📦</div><span class="chip ch-t">Dimonitor</span></div>
+        <div><div class="stat-val">847</div><div class="stat-lbl">Total Jenis Barang</div></div>
+        <div class="stat-sub">Rata-rata 47 jenis / toko</div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="s-ico ico-s">🔄</div><span class="chip ch-s">30 hari</span></div>
+        <div><div class="stat-val">3.241</div><div class="stat-lbl">Total Transaksi Bulan Ini</div></div>
+        <div class="stat-sub">↑ 12% dari bulan lalu</div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="s-ico ico-a">⚠️</div><span class="chip ch-a">Perlu Perhatian</span></div>
+        <div><div class="stat-val" style="color:var(--amber-500)">47</div><div class="stat-lbl">Item Stok Kritis Seluruh UMKM</div></div>
+        <div class="stat-sub">Di bawah ROP masing-masing</div>
+      </div>
+    </div>
+
+    <!-- ROW 2: TABEL TOKO + SEBARAN KECAMATAN -->
+    <div class="two-col">
+
+      <!-- TABEL TOKO -->
+      <div class="card">
+        <div class="card-h">
+          <h3>🏪 Daftar UMKM & Aktivitas Stok</h3>
+          <button class="dl-btn dl-green" onclick="dlSimulasi('CSV')">⬇ Unduh CSV</button>
+        </div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Toko</th>
+                <th>Kecamatan</th>
+                <th>Jenis Barang</th>
+                <th>Tx Bulan Ini</th>
+                <th>Item Kritis</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-toko"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SEBARAN KECAMATAN -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <div class="card">
+          <div class="card-h"><h3>🗺️ Sebaran per Kecamatan</h3></div>
+          <div class="kec-list" id="kec-list"></div>
+        </div>
+
+        <!-- TOP TOKO AKTIF -->
+        <div class="card">
+          <div class="card-h"><h3>🏆 Top Toko Paling Aktif</h3><p>Berdasarkan transaksi</p></div>
+          <div class="toko-list" id="top-toko"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ROW 3: CHART BULANAN + KONDISI STOK -->
+    <div class="two-col">
+
+      <!-- CHART TRANSAKSI BULANAN -->
+      <div class="card">
+        <div class="card-h">
+          <h3>📈 Tren Transaksi Bulanan UMKM</h3>
+          <p>6 bulan terakhir</p>
+        </div>
+        <div class="chart-area">
+          <div class="ch-legend">
+            <div class="ch-leg-item"><div class="ch-leg-dot" style="background:var(--pine-400)"></div>Barang Masuk</div>
+            <div class="ch-leg-item"><div class="ch-leg-dot" style="background:var(--sky-500)"></div>Barang Keluar</div>
+          </div>
+          <div class="ch-bars" id="chart-bars"></div>
+          <div class="ch-x" id="chart-x"></div>
+        </div>
+      </div>
+
+      <!-- KONDISI STOK UMKM -->
+      <div class="card">
+        <div class="card-h"><h3>📦 Ringkasan Kondisi Stok</h3><p>Seluruh toko</p></div>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Kategori Barang</th><th>Total Item</th><th>Kritis</th><th>Kondisi</th></tr></thead>
+            <tbody id="tbl-stok"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 4: LAPORAN & UNDUH -->
+    <div class="two-col">
+
+      <!-- LAPORAN PERIODIK -->
+      <div class="card">
+        <div class="card-h">
+          <h3>📋 Laporan Tersedia</h3>
+          <button class="dl-btn dl-outline">Semua Laporan →</button>
+        </div>
+        <div class="laporan-grid" id="laporan-grid"></div>
+      </div>
+
+      <!-- UNDUH DATA -->
+      <div class="card">
+        <div class="card-h"><h3>📥 Unduh Data</h3></div>
+        <div class="unduh-panel" id="unduh-panel"></div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<button class="mob-tog" onclick="toggleSB()">☰</button>
+
+<script>
+  /* ── DATA ── */
+  const tokoData = [
+    { nama:'Toko Berkah Jaya',    kec:'Bungoro',     barang:47, tx:215, kritis:2,  status:'aktif'    },
+    { nama:'Toko Sumber Rezeki',  kec:'Bungoro',     barang:52, tx:183, kritis:4,  status:'aktif'    },
+    { nama:'Toko Pak Ahmad',      kec:'Bungoro',     barang:61, tx:178, kritis:1,  status:'aktif'    },
+    { nama:'UD Maju Bersama',     kec:'Pangkajene',  barang:38, tx:142, kritis:5,  status:'aktif'    },
+    { nama:'Toko Cahaya',         kec:'Pangkajene',  barang:44, tx:130, kritis:3,  status:'aktif'    },
+    { nama:'Warung Bu Siti',      kec:'Minasatene',  barang:29, tx:97,  kritis:8,  status:'aktif'    },
+    { nama:'UD Harapan Jaya',     kec:'Minasatene',  barang:35, tx:88,  kritis:2,  status:'aktif'    },
+    { nama:'Toko Rezeki Nomplok', kec:'Labakkang',   barang:41, tx:76,  kritis:6,  status:'aktif'    },
+    { nama:'UD Lancar Jaya',      kec:'Labakkang',   barang:28, tx:0,   kritis:0,  status:'nonaktif' },
+    { nama:'Warung Pak Jumadi',   kec:'Mandalle',    barang:18, tx:54,  kritis:3,  status:'aktif'    },
+  ];
+
+  const kecData = [
+    { kec:'Bungoro',    n:7 }, { kec:'Pangkajene', n:5 },
+    { kec:'Minasatene', n:4 }, { kec:'Labakkang',  n:3 }, { kec:'Mandalle',   n:3 },
+    { kec:'Balocci',    n:2 },
+  ];
+
+  const chartData = [
+    { bln:'Jan', masuk:280, keluar:240 }, { bln:'Feb', masuk:320, keluar:290 },
+    { bln:'Mar', masuk:295, keluar:270 }, { bln:'Apr', masuk:380, keluar:330 },
+    { bln:'Mei', masuk:410, keluar:360 }, { bln:'Jun', masuk:190, keluar:160 },
+  ];
+
+  const stokData = [
+    { kat:'Sembako',          total:312, kritis:18 },
+    { kat:'Minuman & Snack',  total:198, kritis:12 },
+    { kat:'Kebersihan & Sabun', total:143, kritis:9 },
+    { kat:'Bumbu & Rempah',   total:104, kritis:5  },
+    { kat:'Alat Tulis',       total:90,  kritis:3  },
+  ];
+
+  const laporanData = [
+    { ico:'📊', nama:'Laporan Bulanan Juni 2026',    desc:'Ringkasan transaksi & stok seluruh UMKM', tgl:'03/06/2026' },
+    { ico:'📈', nama:'Analisis Tren Stok Q2 2026',   desc:'Perbandingan stok 3 bulan terakhir',      tgl:'01/06/2026' },
+    { ico:'🗺️', nama:'Sebaran UMKM per Kecamatan',   desc:'Peta distribusi & keaktifan toko',        tgl:'01/06/2026' },
+    { ico:'⚠️', nama:'Laporan Stok Kritis',          desc:'Daftar barang di bawah batas ROP',        tgl:'03/06/2026' },
+    { ico:'📋', nama:'Laporan Bulanan Mei 2026',     desc:'Arsip data bulan Mei',                    tgl:'01/05/2026' },
+    { ico:'📥', nama:'Rekap EOQ/ROP Semua Toko',     desc:'Parameter dan hasil kalkulasi terbaru',   tgl:'02/06/2026' },
+  ];
+
+  const unduhData = [
+    { ico:'📊', bg:'var(--pine-100)', col:' var(--pine-600)', nama:'Data Semua Toko',        desc:'Profil & info kontak UMKM',      fmt:'CSV',  btnCls:'dl-green'  },
+    { ico:'📦', bg:'var(--sky-100)',  col:'var(--sky-500)',   nama:'Rekap Stok Semua Toko',  desc:'Snapshot stok terkini',          fmt:'XLSX', btnCls:'dl-sky'    },
+    { ico:'🔄', bg:'var(--teal-100)', col:'var(--teal-500)',  nama:'Histori Transaksi',       desc:'30 hari terakhir semua toko',    fmt:'CSV',  btnCls:'dl-green'  },
+    { ico:'📐', bg:'var(--amber-100)','col':'#b45309',        nama:'Hasil EOQ & ROP',         desc:'Kalkulasi terbaru per barang',   fmt:'PDF',  btnCls:'dl-outline' },
+    { ico:'📋', bg:'var(--pine-100)', col:'var(--pine-600)',  nama:'Laporan Lengkap Bulanan', desc:'Format PDF siap cetak',          fmt:'PDF',  btnCls:'dl-outline' },
+  ];
+
+  /* ── TANGGAL ── */
+  const hArr = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const bArr = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const now  = new Date();
+  document.getElementById('today-lbl').textContent =
+    `${hArr[now.getDay()]}, ${now.getDate()} ${bArr[now.getMonth()]} ${now.getFullYear()}`;
+
+  /* ── RENDER TOKO ── */
+  function renderToko() {
+    document.getElementById('tbl-toko').innerHTML = tokoData.map((t, i) => {
+      const persen = Math.min(100, Math.round(t.tx / 220 * 100));
+      const kritisColor = t.kritis >= 6 ? 'var(--rose-500)' : t.kritis >= 3 ? '#b45309' : 'var(--pine-600)';
+      return `<tr>
+        <td class="td-m">${i+1}</td>
+        <td class="td-b">${t.nama}</td>
+        <td>${t.kec}</td>
+        <td><span class="td-m">${t.barang}</span></td>
+        <td>
+          <span style="font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700">${t.tx}</span>
+          <div class="prog"><div class="prog-f" style="width:${persen}%;background:var(--pine-400)"></div></div>
+        </td>
+        <td><span style="font-weight:700;color:${kritisColor};font-family:'DM Mono',monospace">${t.kritis}</span></td>
+        <td><span class="badge ${t.status === 'aktif' ? 'b-aktif' : 'b-nonaktif'}">${t.status === 'aktif' ? '🟢 Aktif' : '⚫ Nonaktif'}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ── RENDER KECAMATAN ── */
+  function renderKec() {
+    const max = Math.max(...kecData.map(k => k.n));
+    document.getElementById('kec-list').innerHTML = kecData.map(k => `
+      <div class="kec-item">
+        <div class="kec-row">
+          <span class="kec-name">${k.kec}</span>
+          <span class="kec-count">${k.n} toko</span>
+        </div>
+        <div class="kec-bar"><div class="kec-fill" style="width:${Math.round(k.n/max*100)}%"></div></div>
+      </div>`).join('');
+  }
+
+  /* ── RENDER TOP TOKO ── */
+  function renderTopToko() {
+    const sorted = [...tokoData].sort((a,b) => b.tx - a.tx).slice(0,5);
+    document.getElementById('top-toko').innerHTML = sorted.map((t,i) => `
+      <div class="toko-item">
+        <div class="toko-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</div>
+        <div class="toko-meta">
+          <strong>${t.nama}</strong>
+          <span>${t.kec}</span>
+        </div>
+        <span class="toko-tx">${t.tx} tx</span>
+      </div>`).join('');
+  }
+
+  /* ── RENDER CHART ── */
+  function renderChart() {
+    const maxV = Math.max(...chartData.map(c => Math.max(c.masuk, c.keluar)));
+    document.getElementById('chart-bars').innerHTML = chartData.map(c => {
+      const hM = Math.round(c.masuk  / maxV * 108);
+      const hK = Math.round(c.keluar / maxV * 108);
+      return `<div class="ch-bar-g">
+        <div class="ch-bar-pair">
+          <div class="ch-bar" style="height:${hM}px;background:linear-gradient(180deg,var(--pine-300),var(--pine-500))"></div>
+          <div class="ch-bar" style="height:${hK}px;background:linear-gradient(180deg,#7dd3fc,var(--sky-500))"></div>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('chart-x').innerHTML = chartData.map(c =>
+      `<div class="ch-x-item">${c.bln}</div>`).join('');
+  }
+
+  /* ── RENDER STOK ── */
+  function renderStok() {
+    document.getElementById('tbl-stok').innerHTML = stokData.map(s => {
+      const pct = Math.round(s.kritis / s.total * 100);
+      let badge, kelas;
+      if (pct >= 10)      { badge = '🔴 Kritis';    kelas = 'b-kritis'; }
+      else if (pct >= 5)  { badge = '🟡 Perhatian'; kelas = 'b-perhatian'; }
+      else                { badge = '🟢 Cukup';     kelas = 'b-cukup'; }
+      return `<tr>
+        <td class="td-b">${s.kat}</td>
+        <td><span class="td-m">${s.total}</span></td>
+        <td><span style="color:${pct>=10?'var(--rose-500)':pct>=5?'#b45309':'var(--pine-600)'};font-weight:700;font-family:'DM Mono',monospace">${s.kritis}</span></td>
+        <td><span class="badge ${kelas}">${badge}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ── RENDER LAPORAN ── */
+  function renderLaporan() {
+    document.getElementById('laporan-grid').innerHTML = laporanData.map(l => `
+      <div class="lap-item">
+        <div class="lap-icon">${l.ico}</div>
+        <div class="lap-name">${l.nama}</div>
+        <div class="lap-desc">${l.desc}</div>
+        <div class="lap-foot">
+          <span class="lap-date">${l.tgl}</span>
+          <span class="lap-dl" onclick="dlSimulasi('${l.nama}')">⬇ Unduh</span>
+        </div>
+      </div>`).join('');
+  }
+
+  /* ── RENDER UNDUHAN ── */
+  function renderUnduh() {
+    document.getElementById('unduh-panel').innerHTML = unduhData.map(u => `
+      <div class="unduh-row" onclick="dlSimulasi('${u.nama}')">
+        <div class="unduh-ico" style="background:${u.bg};color:${u.col}">${u.ico}</div>
+        <div class="unduh-info">
+          <strong>${u.nama}</strong>
+          <span>${u.desc}</span>
+        </div>
+        <button class="unduh-btn dl-btn ${u.btnCls}" style="pointer-events:none">⬇ ${u.fmt}</button>
+      </div>`).join('');
+  }
+
+  /* ── SIMULASI UNDUH ── */
+  function dlSimulasi(nama) {
+    const btn = event.currentTarget;
+    const orig = btn.innerHTML;
+    btn.style.opacity = '.6';
+    setTimeout(() => {
+      btn.style.opacity = '';
+      alert(`📥 Mengunduh: ${nama}\n\n(Demo — sambungkan ke Google Apps Script untuk unduhan nyata)`);
+    }, 600);
+  }
+
+  /* ── NAV ── */
+  function nav(el, page) {
+    const t = {
+      overview:'Overview UMKM Kabupaten Pangkep', toko:'Daftar UMKM Terdaftar',
+      stok:'Kondisi Stok Semua Toko', laporan:'Laporan Periodik',
+      unduhan:'Unduh Data', sebaran:'Sebaran Kecamatan',
+    };
+    document.getElementById('pg-title').textContent = t[page] || page;
+    document.querySelectorAll('.sb-link').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    if (window.innerWidth <= 768) toggleSB(false);
+  }
+  function toggleSB(force) {
+    const sb = document.getElementById('sb'), ov = document.getElementById('ov');
+    const open = force !== undefined ? force : !sb.classList.contains('open');
+    sb.classList.toggle('open', open); ov.classList.toggle('open', open);
+  }
+  function doLogout() { if(confirm('Keluar dari akun Dinas Koperasi?')) window.location.href = 'index.html'; }
+
+  /* ── INIT ── */
+  renderToko(); renderKec(); renderTopToko();
+  renderChart(); renderStok(); renderLaporan(); renderUnduh();
+</script>
+</body>
+</html>

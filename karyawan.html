@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karyawan — Smart Inventory UMKM Pangkep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --or-900: #431407;
+      --or-800: #7c2d12;
+      --or-700: #9a3412;
+      --or-600: #c2410c;
+      --or-500: #ea580c;
+      --or-400: #fb923c;
+      --or-300: #fdba74;
+      --or-200: #fed7aa;
+      --or-100: #ffedd5;
+      --or-50:  #fff7ed;
+
+      --amber-500: #f59e0b;
+      --amber-100: #fef3c7;
+
+      --teal-500:  #0d9488;
+      --teal-100:  #ccfbf1;
+      --teal-50:   #f0fdfa;
+
+      --green-500: #22c55e;
+      --green-100: #dcfce7;
+
+      --rose-500:  #f43f5e;
+      --rose-100:  #ffe4e6;
+
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50:  #f8fafc;
+      --white:     #ffffff;
+
+      --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px;
+      --shd-sm: 0 1px 4px rgba(0,0,0,.07);
+      --shd-md: 0 4px 14px rgba(0,0,0,.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+    body { font-family: 'Nunito', sans-serif; background: #fff7ed; color: var(--slate-800); min-height: 100vh; }
+
+    /* ── TOP NAVBAR (mobile-first style, simple) ── */
+    .navbar {
+      background: linear-gradient(135deg, var(--or-700), var(--or-500));
+      padding: 0 20px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(234,88,12,.3);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 9px; flex: 1; }
+    .nav-logo-ico { font-size: 1.4rem; }
+    .nav-logo-txt strong { display: block; font-size: .9rem; font-weight: 800; color: white; line-height: 1.2; }
+    .nav-logo-txt span   { font-size: .65rem; color: var(--or-200); font-weight: 500; }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-store { font-size: .72rem; font-weight: 700; padding: 4px 11px; border-radius: 20px; background: rgba(255,255,255,.18); color: white; border: 1px solid rgba(255,255,255,.3); }
+    .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.25); border: 2px solid rgba(255,255,255,.5); display: grid; place-items: center; font-size: 1rem; cursor: pointer; }
+
+    /* ── BOTTOM NAV (mobile-style) ── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: var(--white);
+      border-top: 1px solid var(--slate-200);
+      display: flex;
+      z-index: 100;
+      box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    }
+    .bn-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; cursor: pointer; transition: color .15s; color: var(--slate-400);
+      font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+      position: relative;
+    }
+    .bn-item:hover { color: var(--or-500); }
+    .bn-item.active { color: var(--or-600); }
+    .bn-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 32px; height: 3px; background: var(--or-500); border-radius: 0 0 3px 3px; }
+    .bn-ico { font-size: 1.3rem; }
+    .bn-badge { position: absolute; top: 6px; right: calc(50% - 18px); background: var(--rose-500); color: white; font-size: .55rem; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid white; }
+
+    /* ── PAGE WRAPPER ── */
+    .page-wrap { padding: 20px 16px 88px; max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+    /* ── GREETING CARD ── */
+    .greeting {
+      background: linear-gradient(135deg, var(--or-600), var(--or-800));
+      border-radius: var(--r-xl);
+      padding: 20px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .greeting::before {
+      content: '📦';
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 5rem; opacity: .12;
+    }
+    .greeting h2 { font-size: 1.1rem; font-weight: 800; }
+    .greeting p  { font-size: .8rem; color: var(--or-200); margin-top: 3px; }
+    .greeting-stats { display: flex; gap: 16px; margin-top: 14px; }
+    .g-stat { display: flex; flex-direction: column; }
+    .g-stat strong { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+    .g-stat span   { font-size: .65rem; color: var(--or-200); font-weight: 600; margin-top: 1px; }
+    .g-divider { width: 1px; background: rgba(255,255,255,.2); }
+
+    /* ── ALERT ── */
+    .alert-kritis {
+      background: linear-gradient(135deg, #fff7ed, #ffedd5);
+      border: 1.5px solid var(--or-300);
+      border-left: 4px solid var(--or-500);
+      border-radius: var(--r-md);
+      padding: 12px 14px;
+      display: flex; align-items: flex-start; gap: 10px;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .ak-ico  { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .ak-body strong { display: block; font-size: .82rem; font-weight: 800; color: var(--or-700); }
+    .ak-body span   { font-size: .74rem; color: var(--or-600); }
+
+    /* ── SECTION HEADER ── */
+    .sec-head { display: flex; align-items: center; justify-content: space-between; }
+    .sec-head h3 { font-size: .9rem; font-weight: 800; color: var(--slate-700); }
+    .sec-head a  { font-size: .75rem; font-weight: 700; color: var(--or-500); cursor: pointer; text-decoration: none; }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: var(--white);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shd-sm);
+      border: 1px solid var(--slate-200);
+      overflow: hidden;
+    }
+    .form-card-head {
+      padding: 14px 18px;
+      background: linear-gradient(135deg, var(--or-50), #fff);
+      border-bottom: 1px solid var(--or-100);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .form-card-head span { font-size: 1.1rem; }
+    .form-card-head h3  { font-size: .88rem; font-weight: 800; color: var(--slate-700); }
+    .form-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 13px; }
+
+    /* ── TYPE TOGGLE ── */
+    .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tt-btn {
+      padding: 11px 8px; border-radius: var(--r-md); border: 2px solid var(--slate-200);
+      background: transparent; font-family: inherit; font-size: .83rem; font-weight: 700;
+      cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 7px;
+      color: var(--slate-500);
+    }
+    .tt-btn.a-masuk  { border-color: var(--teal-500); background: var(--teal-50);  color: var(--teal-500); }
+    .tt-btn.a-keluar { border-color: var(--or-500);   background: var(--or-50);   color: var(--or-600);  }
+
+    /* ── FORM GROUP ── */
+    .fg { display: flex; flex-direction: column; gap: 5px; }
+    .fl { font-size: .72rem; font-weight: 800; color: var(--slate-600); text-transform: uppercase; letter-spacing: .5px; }
+    .fc {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid var(--slate-200); border-radius: var(--r-md);
+      font-family: inherit; font-size: .9rem; color: var(--slate-800);
+      background: var(--white); outline: none; transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+    }
+    .fc:focus { border-color: var(--or-400); box-shadow: 0 0 0 3px rgba(251,146,60,.15); }
+    .fc::placeholder { color: var(--slate-300); }
+    .fc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ── STOK INFO BOX ── */
+    .stok-info {
+      display: none;
+      background: var(--slate-50); border: 1px solid var(--slate-200);
+      border-radius: var(--r-md); padding: 10px 14px;
+      gap: 10px; align-items: center;
+    }
+    .stok-info.show { display: flex; }
+    .si-label { font-size: .72rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase; }
+    .si-val   { font-size: 1.1rem; font-weight: 900; font-family: 'DM Mono',monospace; }
+    .si-unit  { font-size: .72rem; color: var(--slate-400); }
+    .si-divider { width: 1px; background: var(--slate-200); align-self: stretch; }
+
+    /* ── SUBMIT BTN ── */
+    .btn-submit {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--or-500), var(--or-700));
+      color: white; border: none; border-radius: var(--r-md);
+      font-family: inherit; font-size: .92rem; font-weight: 800;
+      cursor: pointer; transition: opacity .15s, transform .12s;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      box-shadow: 0 4px 14px rgba(234,88,12,.3);
+    }
+    .btn-submit:hover  { opacity: .92; }
+    .btn-submit:active { transform: scale(.97); }
+    .btn-submit.success { background: var(--green-500); box-shadow: 0 4px 14px rgba(34,197,94,.3); }
+
+    /* ── STOK LIST ── */
+    .stok-grid { display: flex; flex-direction: column; gap: 8px; }
+    .stok-card {
+      background: var(--white); border-radius: var(--r-lg);
+      border: 1px solid var(--slate-200); padding: 13px 15px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: var(--shd-sm); transition: transform .15s, box-shadow .15s;
+      cursor: pointer;
+    }
+    .stok-card:hover { transform: translateY(-1px); box-shadow: var(--shd-md); }
+    .stok-card-ico {
+      width: 40px; height: 40px; border-radius: var(--r-md);
+      display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .stok-card-body { flex: 1; min-width: 0; }
+    .stok-card-name { font-size: .85rem; font-weight: 700; color: var(--slate-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stok-card-sku  { font-size: .67rem; color: var(--slate-400); font-family: 'DM Mono',monospace; margin-top: 1px; }
+    .stok-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .stok-num { font-size: 1rem; font-weight: 900; font-family: 'DM Mono',monospace; }
+    .stok-bar { width: 60px; height: 5px; background: var(--slate-200); border-radius: 3px; overflow: hidden; }
+    .stok-bar-fill { height: 100%; border-radius: 3px; }
+
+    /* STATUS */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .s-aman   { background: var(--green-500); }
+    .s-segera { background: var(--amber-500); }
+    .s-kritis { background: var(--rose-500); }
+
+    /* ── RIWAYAT ── */
+    .riwayat-list { display: flex; flex-direction: column; gap: 8px; }
+    .rwt-item {
+      background: var(--white); border-radius: var(--r-lg);
+      border: 1px solid var(--slate-200); padding: 12px 15px;
+      display: flex; align-items: center; gap: 11px;
+      box-shadow: var(--shd-sm);
+    }
+    .rwt-badge {
+      width: 36px; height: 36px; border-radius: var(--r-md);
+      display: grid; place-items: center; font-size: .95rem; flex-shrink: 0;
+    }
+    .rb-masuk  { background: var(--teal-100); }
+    .rb-keluar { background: var(--or-100); }
+    .rwt-body { flex: 1; min-width: 0; }
+    .rwt-name { font-size: .83rem; font-weight: 700; color: var(--slate-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rwt-meta { font-size: .68rem; color: var(--slate-400); margin-top: 1px; }
+    .rwt-qty {
+      font-size: .85rem; font-weight: 800; font-family: 'DM Mono',monospace;
+      white-space: nowrap;
+    }
+    .rq-masuk  { color: var(--teal-500); }
+    .rq-keluar { color: var(--or-500); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 32px 16px; color: var(--slate-400); }
+    .empty-state .e-ico { font-size: 2.5rem; margin-bottom: 8px; }
+    .empty-state p { font-size: .82rem; }
+
+    /* ── STOK KRITIS CHIPS ── */
+    .kritis-chips { display: flex; flex-direction: column; gap: 8px; }
+    .kritis-chip {
+      background: var(--white); border: 1.5px solid var(--or-200);
+      border-left: 4px solid var(--or-500);
+      border-radius: var(--r-md); padding: 10px 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .kc-ico { font-size: 1.1rem; }
+    .kc-body { flex: 1; }
+    .kc-body strong { display: block; font-size: .82rem; font-weight: 700; color: var(--slate-700); }
+    .kc-body span   { font-size: .7rem; color: var(--slate-500); }
+    .kc-stok { font-size: .75rem; font-weight: 800; color: var(--rose-500); font-family: 'DM Mono',monospace; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--slate-300); border-radius: 10px; }
+
+    @media(min-width:600px) {
+      .page-wrap { padding: 24px 24px 88px; }
+      .form-body { padding: 18px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<header class="navbar">
+  <div class="nav-logo">
+    <span class="nav-logo-ico">📦</span>
+    <div class="nav-logo-txt">
+      <strong>Smart Inventory</strong>
+      <span>Panel Karyawan</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-store">🏪 Berkah Jaya</span>
+    <div class="nav-avatar" title="Andi · Karyawan">😊</div>
+  </div>
+</header>
+
+<!-- ═══ CONTENT ═══ -->
+<div class="page-wrap" id="page-wrap">
+
+  <!-- GREETING -->
+  <div class="greeting">
+    <h2>Halo, Andi! 👋</h2>
+    <p id="greeting-date">Rabu, 03 Jun 2026 · Toko Berkah Jaya</p>
+    <div class="greeting-stats">
+      <div class="g-stat">
+        <strong id="tx-today">0</strong>
+        <span>Transaksi Hari Ini</span>
+      </div>
+      <div class="g-divider"></div>
+      <div class="g-stat">
+        <strong>47</strong>
+        <span>Jenis Barang</span>
+      </div>
+      <div class="g-divider"></div>
+      <div class="g-stat">
+        <strong id="kritis-count" style="color:var(--or-300)">3</strong>
+        <span>Stok Kritis</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERT STOK KRITIS -->
+  <div class="alert-kritis">
+    <span class="ak-ico">⚠️</span>
+    <div class="ak-body">
+      <strong>3 barang perlu segera dipesan</strong>
+      <span>Minyak Goreng, Gula Pasir, Tepung Terigu stoknya di bawah batas minimum</span>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: FORM TRANSAKSI ── -->
+  <div>
+    <div class="sec-head" style="margin-bottom:10px">
+      <h3>🔄 Catat Transaksi</h3>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-head">
+        <span>📝</span>
+        <h3>Input Barang Masuk / Keluar</h3>
+      </div>
+      <div class="form-body">
+
+        <!-- TYPE -->
+        <div class="fg">
+          <span class="fl">Jenis Transaksi</span>
+          <div class="type-toggle">
+            <button class="tt-btn a-masuk" id="btn-masuk" onclick="setType('masuk')">📥 Barang Masuk</button>
+            <button class="tt-btn"         id="btn-keluar" onclick="setType('keluar')">📤 Barang Keluar</button>
+          </div>
+        </div>
+
+        <!-- BARANG -->
+        <div class="fg">
+          <label class="fl">Pilih Barang</label>
+          <select class="fc" id="sel-barang" onchange="updateStokInfo()">
+            <option value="">— pilih barang —</option>
+            <option value="MGB-001" data-stok="8"   data-rop="20" data-sat="botol">Minyak Goreng Bimoli 1L</option>
+            <option value="GP-002"  data-stok="5"   data-rop="15" data-sat="kg">Gula Pasir 1Kg</option>
+            <option value="TT-003"  data-stok="12"  data-rop="25" data-sat="kg">Tepung Terigu 1Kg</option>
+            <option value="BP-004"  data-stok="60"  data-rop="30" data-sat="sak">Beras Premium 5Kg</option>
+            <option value="SL-005"  data-stok="35"  data-rop="20" data-sat="biji">Sabun Lifebuoy</option>
+            <option value="IG-006"  data-stok="120" data-rop="50" data-sat="biji">Indomie Goreng</option>
+          </select>
+        </div>
+
+        <!-- STOK INFO -->
+        <div class="stok-info" id="stok-info">
+          <div style="flex:1">
+            <div class="si-label">Stok Sekarang</div>
+            <div><span class="si-val" id="si-stok">—</span> <span class="si-unit" id="si-sat">—</span></div>
+          </div>
+          <div class="si-divider"></div>
+          <div style="flex:1">
+            <div class="si-label">Batas ROP</div>
+            <div><span class="si-val" id="si-rop" style="color:var(--amber-500)">—</span> <span class="si-unit" id="si-sat2">—</span></div>
+          </div>
+          <div class="si-divider"></div>
+          <div id="si-status-wrap">
+            <div class="si-label">Status</div>
+            <div id="si-status">—</div>
+          </div>
+        </div>
+
+        <!-- JUMLAH + TANGGAL -->
+        <div class="fc-row">
+          <div class="fg">
+            <label class="fl">Jumlah</label>
+            <input class="fc" type="number" id="inp-jumlah" placeholder="cth: 12" min="1" inputmode="numeric" />
+          </div>
+          <div class="fg">
+            <label class="fl">Tanggal</label>
+            <input class="fc" type="date" id="inp-tgl" />
+          </div>
+        </div>
+
+        <!-- KETERANGAN -->
+        <div class="fg">
+          <label class="fl">Keterangan</label>
+          <input class="fc" type="text" id="inp-ket" placeholder="cth: dari Pak Budi supplier" />
+        </div>
+
+        <button class="btn-submit" id="btn-submit" onclick="simpan()">
+          💾 Simpan Transaksi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: STOK BARANG ── -->
+  <div>
+    <div class="sec-head" style="margin-bottom:10px">
+      <h3>📦 Stok Barang Sekarang</h3>
+      <a onclick="toggleSection('stok')">Sembunyikan ↑</a>
+    </div>
+    <div id="sec-stok" class="stok-grid" id="stok-grid">
+      <!-- diisi JS -->
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: STOK KRITIS ── -->
+  <div>
+    <div class="sec-head" style="margin-bottom:10px">
+      <h3>⚠️ Perlu Perhatian</h3>
+    </div>
+    <div class="kritis-chips" id="kritis-chips">
+      <!-- diisi JS -->
+    </div>
+  </div>
+
+  <!-- ── SECTION 4: RIWAYAT TRANSAKSI ── -->
+  <div>
+    <div class="sec-head" style="margin-bottom:10px">
+      <h3>📋 Riwayat Transaksi Hari Ini</h3>
+      <a onclick="clearRiwayat()">Bersihkan</a>
+    </div>
+    <div class="riwayat-list" id="riwayat-list">
+      <!-- diisi JS -->
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ BOTTOM NAV ═══ -->
+<nav class="bottom-nav">
+  <div class="bn-item active" onclick="setBN(this,'transaksi')">
+    <span class="bn-ico">🔄</span>
+    <span>Transaksi</span>
+    <span class="bn-badge" id="bn-badge">0</span>
+  </div>
+  <div class="bn-item" onclick="setBN(this,'stok')">
+    <span class="bn-ico">📦</span>
+    <span>Stok</span>
+  </div>
+  <div class="bn-item" onclick="setBN(this,'kritis')">
+    <span class="bn-ico">⚠️</span>
+    <span>Kritis</span>
+  </div>
+  <div class="bn-item" onclick="setBN(this,'riwayat')">
+    <span class="bn-ico">📋</span>
+    <span>Riwayat</span>
+  </div>
+</nav>
+
+<!-- ═══ SCRIPT ═══ -->
+<script>
+  /* ── DATA ── */
+  const barangList = [
+    { sku:'MGB-001', nama:'Minyak Goreng Bimoli 1L', stok:8,  rop:20, sat:'botol', ico:'🫙' },
+    { sku:'GP-002',  nama:'Gula Pasir 1Kg',          stok:5,  rop:15, sat:'kg',    ico:'🍬' },
+    { sku:'TT-003',  nama:'Tepung Terigu 1Kg',       stok:12, rop:25, sat:'kg',    ico:'🌾' },
+    { sku:'BP-004',  nama:'Beras Premium 5Kg',        stok:60, rop:30, sat:'sak',   ico:'🍚' },
+    { sku:'SL-005',  nama:'Sabun Lifebuoy',           stok:35, rop:20, sat:'biji',  ico:'🧼' },
+    { sku:'IG-006',  nama:'Indomie Goreng',           stok:120,rop:50, sat:'biji',  ico:'🍜' },
+  ];
+
+  let riwayatHariIni = [
+    { type:'masuk',  nama:'Indomie Goreng',     qty:120, sat:'biji', waktu:'14:22', ket:'dari supplier' },
+    { type:'keluar', nama:'Minyak Goreng',       qty:5,  sat:'botol',waktu:'13:45', ket:'' },
+    { type:'keluar', nama:'Gula Pasir',          qty:3,  sat:'kg',   waktu:'11:20', ket:'pelanggan' },
+  ];
+
+  let txCount = riwayatHariIni.length;
+  let txType  = 'masuk';
+
+  /* ── TANGGAL ── */
+  const hArr = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const bArr = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const now  = new Date();
+  document.getElementById('greeting-date').textContent =
+    `${hArr[now.getDay()]}, ${now.getDate()} ${bArr[now.getMonth()]} ${now.getFullYear()} · Toko Berkah Jaya`;
+  document.getElementById('inp-tgl').value = now.toISOString().split('T')[0];
+  document.getElementById('tx-today').textContent = txCount;
+  document.getElementById('bn-badge').textContent = txCount;
+  document.getElementById('bn-badge').style.display = txCount > 0 ? 'grid' : 'none';
+
+  /* ── TX TYPE ── */
+  function setType(t) {
+    txType = t;
+    const bM = document.getElementById('btn-masuk');
+    const bK = document.getElementById('btn-keluar');
+    bM.className = `tt-btn${t==='masuk' ? ' a-masuk' : ''}`;
+    bK.className = `tt-btn${t==='keluar' ? ' a-keluar' : ''}`;
+  }
+
+  /* ── STOK INFO ── */
+  function updateStokInfo() {
+    const sel = document.getElementById('sel-barang');
+    const opt = sel.options[sel.selectedIndex];
+    const box = document.getElementById('stok-info');
+    if (!sel.value) { box.classList.remove('show'); return; }
+    const s   = parseInt(opt.dataset.stok);
+    const r   = parseInt(opt.dataset.rop);
+    const sat = opt.dataset.sat;
+    document.getElementById('si-stok').textContent = s;
+    document.getElementById('si-rop').textContent  = r;
+    document.getElementById('si-sat').textContent  = sat;
+    document.getElementById('si-sat2').textContent = sat;
+    let stLabel, stColor;
+    if (s <= r * 0.4)   { stLabel = '🔴 Kritis';      stColor = 'var(--rose-500)'; }
+    else if (s <= r)    { stLabel = '🟡 Segera Pesan'; stColor = 'var(--amber-500)'; }
+    else                { stLabel = '🟢 Aman';         stColor = 'var(--green-500)'; }
+    document.getElementById('si-status').innerHTML = `<span style="font-size:.78rem;font-weight:800;color:${stColor}">${stLabel}</span>`;
+    box.classList.add('show');
+  }
+
+  /* ── SIMPAN ── */
+  function simpan() {
+    const barang = document.getElementById('sel-barang');
+    const jumlah = document.getElementById('inp-jumlah').value;
+    const ket    = document.getElementById('inp-ket').value;
+    if (!barang.value || !jumlah || parseInt(jumlah) < 1) {
+      alert('Lengkapi pilihan barang dan jumlah dulu ya! 😊');
+      return;
+    }
+    const namaBarang = barang.options[barang.selectedIndex].text;
+    const satBarang  = barang.options[barang.selectedIndex].dataset.sat;
+    const jam = new Date().toTimeString().slice(0,5);
+
+    riwayatHariIni.unshift({ type: txType, nama: namaBarang, qty: parseInt(jumlah), sat: satBarang, waktu: jam, ket });
+    txCount++;
+    document.getElementById('tx-today').textContent = txCount;
+    document.getElementById('bn-badge').textContent = txCount;
+    document.getElementById('bn-badge').style.display = 'grid';
+
+    // Update stok di data
+    const idx = barangList.findIndex(b => b.sku === barang.value);
+    if (idx >= 0) {
+      if (txType === 'masuk') barangList[idx].stok += parseInt(jumlah);
+      else                     barangList[idx].stok  = Math.max(0, barangList[idx].stok - parseInt(jumlah));
+    }
+
+    // Feedback
+    const btn = document.getElementById('btn-submit');
+    btn.innerHTML = '✅ Tersimpan!';
+    btn.classList.add('success');
+    setTimeout(() => {
+      btn.innerHTML  = '💾 Simpan Transaksi';
+      btn.classList.remove('success');
+    }, 2000);
+
+    // Reset form
+    barang.value = '';
+    document.getElementById('inp-jumlah').value = '';
+    document.getElementById('inp-ket').value    = '';
+    document.getElementById('stok-info').classList.remove('show');
+
+    // Re-render
+    renderStok(); renderRiwayat(); renderKritis();
+  }
+
+  /* ── RENDER STOK ── */
+  function renderStok() {
+    const el = document.getElementById('sec-stok');
+    el.innerHTML = barangList.map(b => {
+      const persen = Math.min(100, Math.round(b.stok / (b.rop * 2) * 100));
+      let numColor, barColor, dotClass;
+      if (b.stok <= b.rop * 0.4)   { numColor = 'var(--rose-500)'; barColor = 'var(--rose-500)'; dotClass = 's-kritis'; }
+      else if (b.stok <= b.rop)    { numColor = 'var(--amber-500)'; barColor = 'var(--amber-500)'; dotClass = 's-segera'; }
+      else                          { numColor = 'var(--green-500)'; barColor = 'var(--green-500)'; dotClass = 's-aman'; }
+      return `<div class="stok-card" onclick="prefillForm('${b.sku}')">
+        <div class="stok-card-ico" style="background:var(--or-100)">${b.ico}</div>
+        <div class="stok-card-body">
+          <div class="stok-card-name">${b.nama}</div>
+          <div class="stok-card-sku">${b.sku} · ROP: ${b.rop} ${b.sat}</div>
+        </div>
+        <div class="stok-card-right">
+          <span class="stok-num" style="color:${numColor}">${b.stok} <span style="font-size:.65rem;font-weight:600;color:var(--slate-400)">${b.sat}</span></span>
+          <div class="stok-bar"><div class="stok-bar-fill" style="width:${persen}%;background:${barColor}"></div></div>
+        </div>
+        <div class="status-dot ${dotClass}"></div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── PREFILL FORM ── */
+  function prefillForm(sku) {
+    const sel = document.getElementById('sel-barang');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === sku) { sel.selectedIndex = i; break; }
+    }
+    updateStokInfo();
+    document.getElementById('inp-jumlah').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── RENDER KRITIS ── */
+  function renderKritis() {
+    const kritis = barangList.filter(b => b.stok <= b.rop);
+    document.getElementById('kritis-count').textContent = kritis.length;
+    const el = document.getElementById('kritis-chips');
+    if (kritis.length === 0) {
+      el.innerHTML = `<div class="empty-state"><div class="e-ico">🎉</div><p>Semua stok dalam kondisi aman!</p></div>`;
+      return;
+    }
+    el.innerHTML = kritis.map(b => {
+      const isSangat = b.stok <= b.rop * 0.4;
+      return `<div class="kritis-chip" style="border-left-color:${isSangat ? 'var(--rose-500)' : 'var(--amber-500)'}">
+        <span class="kc-ico">${b.ico}</span>
+        <div class="kc-body">
+          <strong>${b.nama}</strong>
+          <span>Stok tersisa ${b.stok} ${b.sat} — ROP = ${b.rop} ${b.sat}</span>
+        </div>
+        <span class="kc-stok">${b.stok}</span>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── RENDER RIWAYAT ── */
+  function renderRiwayat() {
+    const el = document.getElementById('riwayat-list');
+    if (riwayatHariIni.length === 0) {
+      el.innerHTML = `<div class="empty-state"><div class="e-ico">📋</div><p>Belum ada transaksi hari ini</p></div>`;
+      return;
+    }
+    el.innerHTML = riwayatHariIni.map(r => `
+      <div class="rwt-item">
+        <div class="rwt-badge ${r.type === 'masuk' ? 'rb-masuk' : 'rb-keluar'}">${r.type === 'masuk' ? '📥' : '📤'}</div>
+        <div class="rwt-body">
+          <div class="rwt-name">${r.nama}</div>
+          <div class="rwt-meta">${r.waktu} ${r.ket ? '· ' + r.ket : ''}</div>
+        </div>
+        <span class="rwt-qty ${r.type === 'masuk' ? 'rq-masuk' : 'rq-keluar'}">${r.type === 'masuk' ? '+' : '−'}${r.qty} ${r.sat}</span>
+      </div>`).join('');
+  }
+
+  /* ── CLEAR RIWAYAT ── */
+  function clearRiwayat() {
+    if (confirm('Bersihkan riwayat transaksi hari ini dari tampilan?')) {
+      riwayatHariIni = [];
+      renderRiwayat();
+    }
+  }
+
+  /* ── BOTTOM NAV ── */
+  function setBN(el, section) {
+    document.querySelectorAll('.bn-item').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    const targets = {
+      transaksi: document.querySelector('.form-card'),
+      stok:      document.getElementById('sec-stok'),
+      kritis:    document.getElementById('kritis-chips'),
+      riwayat:   document.getElementById('riwayat-list'),
+    };
+    if (targets[section]) {
+      targets[section].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function toggleSection(id) {
+    const el = document.getElementById('sec-' + id);
+    if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+  }
+
+  /* ── INIT ── */
+  renderStok();
+  renderKritis();
+  renderRiwayat();
+</script>
+</body>
+</html>

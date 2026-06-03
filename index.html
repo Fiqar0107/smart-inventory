@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Inventory — UMKM Pangkep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --teal-900: #0a2e2e;
+      --teal-800: #0d3b3b;
+      --teal-700: #0f4a4a;
+      --teal-600: #136b6b;
+      --teal-500: #178a8a;
+      --teal-400: #1aabab;
+      --teal-300: #3ec9c9;
+      --teal-200: #8ee8e8;
+      --teal-100: #d0f5f5;
+      --teal-50:  #edfafa;
+      --amber-500: #f59e0b;
+      --amber-400: #fbbf24;
+      --amber-100: #fef3c7;
+      --rose-500:  #ef4444;
+      --rose-100:  #fee2e2;
+      --green-500: #22c55e;
+      --green-100: #dcfce7;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50:  #f8fafc;
+      --white:     #ffffff;
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-2xl: 24px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--slate-900);
+      color: var(--slate-800);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* ═══ LEFT PANEL ═══ */
+    .left-panel {
+      width: 52%;
+      background: linear-gradient(160deg, var(--teal-900) 0%, #0a1628 50%, var(--teal-800) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 48px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* background decoration */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,171,171,.12) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      pointer-events: none;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,171,171,.08) 0%, transparent 70%);
+      bottom: -80px; left: -80px;
+      pointer-events: none;
+    }
+    .lp-grid-dots {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    /* brand */
+    .lp-brand {
+      display: flex; align-items: center; gap: 12px;
+      position: relative; z-index: 1;
+    }
+    .lp-brand-ico {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--teal-400), var(--teal-700));
+      border-radius: var(--r-md);
+      display: grid; place-items: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 16px rgba(26,171,171,.3);
+    }
+    .lp-brand-txt strong { display: block; color: var(--white); font-size: 1rem; font-weight: 800; }
+    .lp-brand-txt span   { font-size: .72rem; color: var(--teal-300); font-weight: 500; }
+
+    /* main text */
+    .lp-main {
+      position: relative; z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    .lp-tagline {
+      font-size: .72rem; font-weight: 700; letter-spacing: 1.4px;
+      text-transform: uppercase; color: var(--teal-400);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .lp-tagline::before { content: ''; width: 24px; height: 2px; background: var(--teal-400); border-radius: 2px; }
+    .lp-title {
+      font-size: 2.6rem; font-weight: 900; line-height: 1.15;
+      color: var(--white); margin-bottom: 16px;
+    }
+    .lp-title .accent { color: var(--teal-300); }
+    .lp-desc {
+      font-size: .88rem; color: rgba(255,255,255,.55);
+      line-height: 1.7; max-width: 380px; margin-bottom: 32px;
+    }
+
+    /* feature pills */
+    .lp-features { display: flex; flex-direction: column; gap: 10px; }
+    .lp-feat {
+      display: flex; align-items: center; gap: 11px;
+      padding: 11px 14px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: var(--r-md);
+      transition: background .2s, border-color .2s;
+    }
+    .lp-feat:hover { background: rgba(255,255,255,.07); border-color: rgba(26,171,171,.3); }
+    .lp-feat-ico {
+      width: 34px; height: 34px; border-radius: var(--r-sm);
+      background: linear-gradient(135deg, rgba(26,171,171,.25), rgba(26,171,171,.1));
+      display: grid; place-items: center; font-size: .95rem; flex-shrink: 0;
+    }
+    .lp-feat-txt strong { display: block; font-size: .82rem; color: var(--white); font-weight: 700; }
+    .lp-feat-txt span   { font-size: .7rem; color: rgba(255,255,255,.45); }
+
+    /* footer credits */
+    .lp-footer {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .lp-footer-logo {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+    }
+    .lp-footer-logo span { font-size: .68rem; color: rgba(255,255,255,.45); font-weight: 600; }
+    .lp-footer-logo strong { font-size: .68rem; color: rgba(255,255,255,.7); font-weight: 700; }
+    .lp-footer-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.2); }
+
+    /* ═══ RIGHT PANEL ═══ */
+    .right-panel {
+      flex: 1;
+      background: var(--slate-50);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      overflow-y: auto;
+    }
+
+    .form-box {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* tab switcher */
+    .tab-row {
+      display: flex;
+      gap: 0;
+      background: var(--slate-200);
+      border-radius: var(--r-lg);
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+    .tab-btn {
+      flex: 1; padding: 9px; border: none; background: transparent;
+      border-radius: var(--r-md);
+      font-family: inherit; font-size: .83rem; font-weight: 700;
+      cursor: pointer; color: var(--slate-500);
+      transition: all .2s;
+    }
+    .tab-btn.active {
+      background: var(--white);
+      color: var(--teal-700);
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    /* form title */
+    .form-title { font-size: 1.4rem; font-weight: 800; color: var(--slate-900); margin-bottom: 4px; }
+    .form-sub   { font-size: .8rem; color: var(--slate-500); margin-bottom: 24px; }
+
+    /* form groups */
+    .fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .fl { font-size: .72rem; font-weight: 700; color: var(--slate-600); text-transform: uppercase; letter-spacing: .5px; }
+    .fc-wrap { position: relative; }
+    .fc {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--slate-200);
+      border-radius: var(--r-md);
+      font-family: inherit; font-size: .88rem; color: var(--slate-800);
+      background: var(--white); outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+    }
+    .fc:focus { border-color: var(--teal-400); box-shadow: 0 0 0 3px rgba(26,171,171,.1); }
+    .fc::placeholder { color: var(--slate-300); }
+    .fc-ico {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; cursor: pointer; color: var(--slate-400);
+      transition: color .14s; user-select: none;
+    }
+    .fc-ico:hover { color: var(--slate-600); }
+    .fc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* role selector */
+    .role-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 14px;
+    }
+    .role-btn {
+      padding: 10px 8px; border-radius: var(--r-md);
+      border: 1.5px solid var(--slate-200); background: var(--white);
+      font-family: inherit; font-size: .78rem; font-weight: 600;
+      cursor: pointer; color: var(--slate-600);
+      display: flex; align-items: center; gap: 7px;
+      transition: all .15s;
+    }
+    .role-btn:hover { border-color: var(--teal-300); color: var(--teal-700); background: var(--teal-50); }
+    .role-btn.selected { border-color: var(--teal-400); background: var(--teal-50); color: var(--teal-700); }
+    .role-btn .rb-ico { font-size: 1rem; }
+
+    /* error / success msg */
+    .msg-box {
+      display: none; padding: 10px 14px; border-radius: var(--r-md);
+      font-size: .8rem; font-weight: 600; margin-bottom: 14px;
+      align-items: center; gap: 8px;
+    }
+    .msg-box.show { display: flex; }
+    .msg-error   { background: var(--rose-100);  color: var(--rose-500);  border-left: 3px solid var(--rose-500); }
+    .msg-success { background: var(--green-100); color: #15803d; border-left: 3px solid var(--green-500); }
+
+    /* submit */
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--teal-500), var(--teal-800));
+      color: white; border: none; border-radius: var(--r-md);
+      font-family: inherit; font-size: .92rem; font-weight: 800;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      box-shadow: 0 4px 16px rgba(15,74,74,.25);
+      margin-top: 6px;
+    }
+    .btn-submit:hover  { opacity: .92; }
+    .btn-submit:active { transform: scale(.98); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* divider */
+    .divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+    .divider hr { flex: 1; border: none; border-top: 1px solid var(--slate-200); }
+    .divider span { font-size: .72rem; color: var(--slate-400); white-space: nowrap; }
+
+    /* demo accounts */
+    .demo-section { margin-top: 20px; }
+    .demo-title { font-size: .7rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 8px; }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .demo-card {
+      padding: 8px 10px; border-radius: var(--r-sm);
+      border: 1px solid var(--slate-200); background: var(--white);
+      cursor: pointer; transition: all .14s;
+    }
+    .demo-card:hover { border-color: var(--teal-300); background: var(--teal-50); }
+    .demo-card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .demo-card-ico { font-size: .85rem; }
+    .demo-card-role { font-size: .72rem; font-weight: 700; color: var(--slate-700); }
+    .demo-card-cred { font-size: .65rem; color: var(--slate-400); font-family: 'DM Mono',monospace; }
+
+    /* forgot / link */
+    .form-link { font-size: .76rem; color: var(--teal-600); font-weight: 600; cursor: pointer; text-decoration: none; }
+    .form-link:hover { color: var(--teal-800); text-decoration: underline; }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+    /* password strength */
+    .pw-strength { margin-top: 5px; }
+    .pw-bars { display: flex; gap: 3px; margin-bottom: 3px; }
+    .pw-bar { height: 3px; flex: 1; border-radius: 2px; background: var(--slate-200); transition: background .3s; }
+    .pw-label { font-size: .67rem; color: var(--slate-400); }
+
+    /* terms */
+    .terms-row { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 14px; }
+    .terms-check { width: 16px; height: 16px; border: 1.5px solid var(--slate-300); border-radius: 4px; cursor: pointer; display: grid; place-items: center; flex-shrink: 0; margin-top: 1px; transition: all .14s; font-size: .65rem; color: transparent; }
+    .terms-check.checked { background: var(--teal-500); border-color: var(--teal-500); color: white; }
+    .terms-txt { font-size: .75rem; color: var(--slate-500); line-height: 1.5; }
+
+    /* ═══ PANEL ANIMATIONS ═══ */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .form-panel { animation: fadeInUp .35s ease both; }
+    .form-panel.hidden { display: none; }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media(max-width: 860px) {
+      .left-panel { display: none; }
+      .right-panel { background: var(--white); }
+    }
+    @media(max-width: 480px) {
+      .right-panel { padding: 24px 18px; justify-content: flex-start; padding-top: 40px; }
+      .demo-grid { grid-template-columns: 1fr 1fr; }
+      .lp-title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LEFT PANEL ═══ -->
+<div class="left-panel">
+  <div class="lp-grid-dots"></div>
+
+  <!-- Brand -->
+  <div class="lp-brand">
+    <div class="lp-brand-ico">📦</div>
+    <div class="lp-brand-txt">
+      <strong>Smart Inventory</strong>
+      <span>UMKM Pangkep</span>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="lp-main">
+    <div class="lp-tagline">Program Pengabdian Masyarakat</div>
+    <h1 class="lp-title">
+      Kelola Stok<br>
+      UMKM dengan<br>
+      <span class="accent">Lebih Cerdas</span>
+    </h1>
+    <p class="lp-desc">
+      Sistem manajemen persediaan berbasis website untuk UMKM di Kabupaten Pangkep.
+      Hitung EOQ & ROP otomatis — tanpa perlu input teknis apapun.
+    </p>
+    <div class="lp-features">
+      <div class="lp-feat">
+        <div class="lp-feat-ico">📐</div>
+        <div class="lp-feat-txt">
+          <strong>EOQ & ROP Otomatis</strong>
+          <span>Dihitung dari riwayat transaksi 30 hari, tiap tengah malam</span>
+        </div>
+      </div>
+      <div class="lp-feat">
+        <div class="lp-feat-ico">💬</div>
+        <div class="lp-feat-txt">
+          <strong>Notifikasi WhatsApp</strong>
+          <span>Peringatan otomatis saat stok mendekati batas minimum</span>
+        </div>
+      </div>
+      <div class="lp-feat">
+        <div class="lp-feat-ico">🆓</div>
+        <div class="lp-feat-txt">
+          <strong>100% Gratis & Terbuka</strong>
+          <span>GitHub Pages · Google Sheets · Apps Script</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="lp-footer">
+    <div class="lp-footer-logo">
+      <span>🎓</span>
+      <strong>Politeknik Pertanian Negeri Pangkajene Kepulauan</strong>
+    </div>
+    <div class="lp-footer-dot"></div>
+    <span style="font-size:.65rem;color:rgba(255,255,255,.3)">Pengabdian Masyarakat 2026</span>
+  </div>
+</div>
+
+<!-- ═══ RIGHT PANEL ═══ -->
+<div class="right-panel">
+  <div class="form-box">
+
+    <!-- TAB SWITCHER -->
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">🔑 Masuk</button>
+      <button class="tab-btn"        id="tab-daftar" onclick="switchTab('daftar')">📝 Daftar Toko</button>
+    </div>
+
+    <!-- ── PANEL LOGIN ── -->
+    <div id="panel-login" class="form-panel">
+      <div class="form-title">Selamat Datang 👋</div>
+      <p class="form-sub">Masuk ke akun Smart Inventory Anda</p>
+
+      <!-- error msg -->
+      <div class="msg-box msg-error" id="login-error">
+        <span>⚠️</span><span id="login-error-txt">Email atau password salah</span>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Email</label>
+        <div class="fc-wrap">
+          <input class="fc" type="email" id="login-email" placeholder="contoh@email.com" autocomplete="email" />
+          <span class="fc-ico">✉️</span>
+        </div>
+      </div>
+
+      <div class="fg">
+        <div class="flex-between">
+          <span class="fl">Password</span>
+          <a class="form-link" onclick="showLupaPassword()">Lupa password?</a>
+        </div>
+        <div class="fc-wrap">
+          <input class="fc" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" style="padding-right:42px" />
+          <span class="fc-ico" onclick="togglePass('login-pass', this)">👁</span>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btn-login" onclick="doLogin()">
+        <span id="btn-login-txt">Masuk ke Dashboard</span>
+      </button>
+
+      <div class="divider"><hr/><span>Akun Demo — klik untuk isi otomatis</span><hr/></div>
+
+      <div class="demo-grid">
+        <div class="demo-card" onclick="fillDemo('pemilik')">
+          <div class="demo-card-top"><span class="demo-card-ico">🏪</span><span class="demo-card-role">Pemilik Toko</span></div>
+          <div class="demo-card-cred">pemilik@demo.com</div>
+        </div>
+        <div class="demo-card" onclick="fillDemo('karyawan')">
+          <div class="demo-card-top"><span class="demo-card-ico">👷</span><span class="demo-card-role">Karyawan</span></div>
+          <div class="demo-card-cred">karyawan@demo.com</div>
+        </div>
+        <div class="demo-card" onclick="fillDemo('admin')">
+          <div class="demo-card-top"><span class="demo-card-ico">⚙️</span><span class="demo-card-role">Admin Pengabdian</span></div>
+          <div class="demo-card-cred">admin@demo.com</div>
+        </div>
+        <div class="demo-card" onclick="fillDemo('dinas')">
+          <div class="demo-card-top"><span class="demo-card-ico">🏛️</span><span class="demo-card-role">Dinas Koperasi</span></div>
+          <div class="demo-card-cred">dinas@demo.com</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL DAFTAR ── -->
+    <div id="panel-daftar" class="form-panel hidden">
+      <div class="form-title">Daftarkan Toko 🏪</div>
+      <p class="form-sub">Isi data toko Anda. Akun akan aktif setelah disetujui Admin.</p>
+
+      <!-- success msg -->
+      <div class="msg-box msg-success" id="daftar-success">
+        <span>✅</span><span>Pendaftaran berhasil! Admin akan menghubungi Anda via WhatsApp.</span>
+      </div>
+      <div class="msg-box msg-error" id="daftar-error">
+        <span>⚠️</span><span id="daftar-error-txt">Mohon lengkapi semua data</span>
+      </div>
+
+      <!-- Nama Toko -->
+      <div class="fg">
+        <label class="fl">Nama Toko</label>
+        <div class="fc-wrap">
+          <input class="fc" type="text" id="d-nama-toko" placeholder="cth: Toko Berkah Jaya" />
+          <span class="fc-ico">🏪</span>
+        </div>
+      </div>
+
+      <!-- Nama Pemilik + No HP -->
+      <div class="fc-row">
+        <div class="fg">
+          <label class="fl">Nama Pemilik</label>
+          <input class="fc" type="text" id="d-nama-pemilik" placeholder="Nama lengkap" />
+        </div>
+        <div class="fg">
+          <label class="fl">No. WhatsApp</label>
+          <input class="fc" type="tel" id="d-hp" placeholder="0812xxxxxxxx" inputmode="tel" />
+        </div>
+      </div>
+
+      <!-- Kecamatan -->
+      <div class="fg">
+        <label class="fl">Kecamatan</label>
+        <select class="fc" id="d-kec">
+          <option value="">— pilih kecamatan —</option>
+          <option>Bungoro</option>
+          <option>Pangkajene</option>
+          <option>Minasatene</option>
+          <option>Labakkang</option>
+          <option>Mandalle</option>
+          <option>Balocci</option>
+          <option>Tondong Tallasa</option>
+          <option>Ma'rang</option>
+          <option>Segeri</option>
+          <option>Liukang Tupabbiring</option>
+          <option>Liukang Tupabbiring Utara</option>
+          <option>Liukang Kalmas</option>
+          <option>Liukang Tangayya</option>
+        </select>
+      </div>
+
+      <!-- Jenis Usaha -->
+      <div class="fg">
+        <label class="fl">Jenis Usaha</label>
+        <div class="role-grid">
+          <button class="role-btn" onclick="selectJenis(this,'sembako')"><span class="rb-ico">🛒</span>Sembako</button>
+          <button class="role-btn" onclick="selectJenis(this,'kelontong')"><span class="rb-ico">🏪</span>Kelontong</button>
+          <button class="role-btn" onclick="selectJenis(this,'warung')"><span class="rb-ico">🍜</span>Warung Makan</button>
+          <button class="role-btn" onclick="selectJenis(this,'lainnya')"><span class="rb-ico">📦</span>Lainnya</button>
+        </div>
+        <input type="hidden" id="d-jenis" />
+      </div>
+
+      <!-- Email + Password -->
+      <div class="fg">
+        <label class="fl">Email Login</label>
+        <div class="fc-wrap">
+          <input class="fc" type="email" id="d-email" placeholder="email@toko.com" autocomplete="email" />
+          <span class="fc-ico">✉️</span>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Buat Password</label>
+        <div class="fc-wrap">
+          <input class="fc" type="password" id="d-pass" placeholder="min. 6 karakter" oninput="checkStrength(this.value)" style="padding-right:42px" />
+          <span class="fc-ico" onclick="togglePass('d-pass', this)">👁</span>
+        </div>
+        <div class="pw-strength">
+          <div class="pw-bars">
+            <div class="pw-bar" id="pw1"></div>
+            <div class="pw-bar" id="pw2"></div>
+            <div class="pw-bar" id="pw3"></div>
+            <div class="pw-bar" id="pw4"></div>
+          </div>
+          <span class="pw-label" id="pw-label">Masukkan password</span>
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <div class="terms-row">
+        <div class="terms-check" id="terms-check" onclick="toggleTerms()"></div>
+        <span class="terms-txt">Saya menyetujui data toko akan digunakan untuk program Smart Inventory UMKM Pangkep dan bersedia mengikuti pelatihan yang diselenggarakan.</span>
+      </div>
+
+      <button class="btn-submit" id="btn-daftar" onclick="doDaftar()">
+        <span id="btn-daftar-txt">Kirim Pendaftaran</span>
+      </button>
+
+      <p style="font-size:.74rem;color:var(--slate-400);text-align:center;margin-top:14px">
+        Sudah punya akun? <a class="form-link" onclick="switchTab('login')">Masuk di sini</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SCRIPT ═══ -->
+<script>
+  /* ── AKUN DEMO ── */
+  const demoAccounts = {
+    pemilik:  { email: 'pemilik@demo.com',  pass: 'demo123', role: 'pemilik',  page: 'dashboard.html' },
+    karyawan: { email: 'karyawan@demo.com', pass: 'demo123', role: 'karyawan', page: 'karyawan.html'  },
+    admin:    { email: 'admin@demo.com',    pass: 'demo123', role: 'admin',    page: 'admin.html'     },
+    dinas:    { email: 'dinas@demo.com',    pass: 'demo123', role: 'dinas',    page: 'dinas.html'     },
+  };
+
+  /* ── TAB ── */
+  function switchTab(tab) {
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-daftar').classList.toggle('active', tab === 'daftar');
+    document.getElementById('panel-login').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('panel-daftar').classList.toggle('hidden', tab !== 'daftar');
+    // reset messages
+    hideMsg('login-error'); hideMsg('daftar-error'); hideMsg('daftar-success');
+  }
+
+  /* ── FILL DEMO ── */
+  function fillDemo(role) {
+    const acc = demoAccounts[role];
+    document.getElementById('login-email').value = acc.email;
+    document.getElementById('login-pass').value  = acc.pass;
+    hideMsg('login-error');
+    // brief highlight
+    ['login-email','login-pass'].forEach(id => {
+      const el = document.getElementById(id);
+      el.style.borderColor = 'var(--teal-400)';
+      el.style.background  = 'var(--teal-50)';
+      setTimeout(() => { el.style.borderColor = ''; el.style.background = ''; }, 800);
+    });
+  }
+
+  /* ── LOGIN ── */
+  function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    hideMsg('login-error');
+
+    if (!email || !pass) {
+      showMsg('login-error', 'Isi email dan password dulu ya!');
+      return;
+    }
+
+    setLoading('btn-login', 'btn-login-txt', true);
+
+    setTimeout(() => {
+      // Cek akun demo
+      const found = Object.values(demoAccounts).find(a => a.email === email && a.pass === pass);
+      if (found) {
+        sessionStorage.setItem('si_user', JSON.stringify({ email, role: found.role }));
+        document.getElementById('btn-login-txt').textContent = '✅ Berhasil!';
+        setTimeout(() => { window.location.href = found.page; }, 600);
+      } else {
+        setLoading('btn-login', 'btn-login-txt', false, 'Masuk ke Dashboard');
+        showMsg('login-error', 'Email atau password salah. Coba akun demo di bawah.');
+        document.getElementById('login-email').style.borderColor = 'var(--rose-500)';
+        document.getElementById('login-pass').style.borderColor  = 'var(--rose-500)';
+        setTimeout(() => {
+          document.getElementById('login-email').style.borderColor = '';
+          document.getElementById('login-pass').style.borderColor  = '';
+        }, 1500);
+      }
+    }, 900);
+  }
+
+  /* ── DAFTAR ── */
+  let termsOk = false;
+
+  function toggleTerms() {
+    termsOk = !termsOk;
+    document.getElementById('terms-check').classList.toggle('checked', termsOk);
+    document.getElementById('terms-check').textContent = termsOk ? '✓' : '';
+  }
+
+  function doDaftar() {
+    hideMsg('daftar-error'); hideMsg('daftar-success');
+    const nama   = document.getElementById('d-nama-toko').value.trim();
+    const pemilik= document.getElementById('d-nama-pemilik').value.trim();
+    const hp     = document.getElementById('d-hp').value.trim();
+    const kec    = document.getElementById('d-kec').value;
+    const jenis  = document.getElementById('d-jenis').value;
+    const email  = document.getElementById('d-email').value.trim();
+    const pass   = document.getElementById('d-pass').value;
+
+    if (!nama || !pemilik || !hp || !kec || !jenis || !email || !pass) {
+      showMsg('daftar-error', 'Mohon lengkapi semua data yang wajib diisi.');
+      return;
+    }
+    if (pass.length < 6) {
+      showMsg('daftar-error', 'Password minimal 6 karakter.');
+      return;
+    }
+    if (!termsOk) {
+      showMsg('daftar-error', 'Centang persetujuan terlebih dahulu.');
+      return;
+    }
+
+    setLoading('btn-daftar', 'btn-daftar-txt', true);
+
+    setTimeout(() => {
+      setLoading('btn-daftar', 'btn-daftar-txt', false, 'Kirim Pendaftaran');
+      showMsg('daftar-success');
+      // reset form
+      ['d-nama-toko','d-nama-pemilik','d-hp','d-email','d-pass'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('d-kec').value = '';
+      document.getElementById('d-jenis').value = '';
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+      termsOk = false;
+      document.getElementById('terms-check').classList.remove('checked');
+      document.getElementById('terms-check').textContent = '';
+      checkStrength('');
+    }, 1200);
+  }
+
+  /* ── JENIS USAHA ── */
+  function selectJenis(el, val) {
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('d-jenis').value = val;
+  }
+
+  /* ── PASSWORD STRENGTH ── */
+  function checkStrength(val) {
+    const bars  = [document.getElementById('pw1'), document.getElementById('pw2'), document.getElementById('pw3'), document.getElementById('pw4')];
+    const label = document.getElementById('pw-label');
+    bars.forEach(b => b.style.background = 'var(--slate-200)');
+    if (!val) { label.textContent = 'Masukkan password'; label.style.color = 'var(--slate-400)'; return; }
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val) || /[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const colors = ['', '#ef4444', '#f59e0b', '#22c55e', '#0d9488'];
+    const labels = ['', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
+    for (let i = 0; i < score; i++) bars[i].style.background = colors[score];
+    label.textContent = labels[score];
+    label.style.color = colors[score];
+  }
+
+  /* ── TOGGLE PASSWORD ── */
+  function togglePass(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else                         { inp.type = 'password'; btn.textContent = '👁'; }
+  }
+
+  /* ── LUPA PASSWORD ── */
+  function showLupaPassword() {
+    alert('Hubungi Admin Pengabdian melalui WhatsApp untuk reset password.\n\nAdmin: Politeknik Pertanian Negeri Pangkajene Kepulauan');
+  }
+
+  /* ── HELPERS ── */
+  function showMsg(id, txt) {
+    const el = document.getElementById(id);
+    el.classList.add('show');
+    if (txt) { const t = el.querySelector('span:last-child'); if (t) t.textContent = txt; }
+  }
+  function hideMsg(id) {
+    document.getElementById(id)?.classList.remove('show');
+  }
+  function setLoading(btnId, txtId, loading, defaultTxt) {
+    const btn = document.getElementById(btnId);
+    const txt = document.getElementById(txtId);
+    if (loading) {
+      btn.disabled = true;
+      btn.innerHTML = '<div class="btn-spinner"></div><span>Memproses...</span>';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = `<span id="${txtId}">${defaultTxt}</span>`;
+    }
+  }
+
+  /* ── ENTER KEY ── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (!document.getElementById('panel-login').classList.contains('hidden')) doLogin();
+      else doDaftar();
+    }
+  });
+
+  /* ── AUTO-FOCUS ── */
+  document.getElementById('login-email').focus();
+</script>
+</body>
+</html>
