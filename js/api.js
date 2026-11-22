@@ -344,7 +344,7 @@ function _demoHandler(action, payload) {
     case "approveToko":
     case "rejectToko":
       return delay(300).then(() => {
-        _state.pendaftaran = _state.pendaftaran.filter((p) => p.id !== payload.id);
+        _state.pendaftaran = _state.pendaftaran.filter((p) => String(p.id) !== String(payload.id));
         return { success: true, msg: action === "approveToko" ? "Disetujui." : "Ditolak." };
       });
     case "saveEoqParams": // nama action lama dipertahankan agar cocok dengan Apps Script

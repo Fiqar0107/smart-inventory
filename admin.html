@@ -757,16 +757,16 @@
   function renderPendaftaran() {
     document.getElementById('tbl-pendaftaran').innerHTML = pendaftaranData.map(p => `
       <tr>
-        <td class="td-bold">${p.nama}</td>
-        <td>${p.pemilik}</td>
-        <td>${p.kec}</td>
+        <td class="td-bold">${escH(p.nama)}</td>
+        <td>${escH(p.pemilik)}</td>
+        <td>${escH(p.kec)}</td>
         <td><span class="td-mono">${p.tgl}</span></td>
         <td><span class="badge ${p.status === 'pending' ? 'b-pending' : 'b-review'}">${p.status === 'pending' ? '⏳ Menunggu' : '🔍 Review'}</span></td>
         <td>
           <div class="act-row">
-            <button class="act-btn act-view" onclick="openModal(${p.id})">👁 Detail</button>
-            <button class="act-btn act-approve" onclick="quickApprove(${p.id})">✅</button>
-            <button class="act-btn act-reject"  onclick="quickReject(${p.id})">❌</button>
+            <button class="act-btn act-view" onclick="openModal('${escH(p.id)}')">👁 Detail</button>
+            <button class="act-btn act-approve" onclick="quickApprove('${escH(p.id)}')">✅</button>
+            <button class="act-btn act-reject"  onclick="quickReject('${escH(p.id)}')">❌</button>
           </div>
         </td>
       </tr>`).join('');
@@ -858,7 +858,7 @@
   let activeId = null;
   function openModal(id) {
     activeId = id;
-    const p = pendaftaranData.find(x => x.id === id);
+    const p = pendaftaranData.find(x => String(x.id) === String(id));
     document.getElementById('modal-nama').textContent    = p.nama;
     document.getElementById('modal-pemilik').textContent = 'Pemilik: ' + p.pemilik;
     document.getElementById('md-kec').textContent        = p.kec;
@@ -880,23 +880,25 @@
     const res = await API.approveToko(activeId, catatan);
     if (res.success) {
       alert('✅ Pendaftaran disetujui. Hubungi pemilik untuk memberi tahu akunnya sudah aktif.');
-      pendaftaranData.splice(pendaftaranData.findIndex(x => x.id === activeId), 1);
+      pendaftaranData.splice(pendaftaranData.findIndex(x => String(x.id) === String(activeId)), 1);
       renderPendaftaran();
       document.getElementById('modal-bg').classList.remove('open');
-    }
+      loadAdminData();
+    } else alert('❌ ' + (res.msg || 'Gagal menyetujui.'));
   }
-  function rejectModal() {
+  async function rejectModal() {
     if (!activeId) return;
     const note = document.getElementById('modal-note').value;
-    if (confirm('Yakin menolak pendaftaran ini?')) {
-      alert(`❌ Pendaftaran ditolak.\nCatatan: ${note || '(tidak ada)'}`);
-      pendaftaranData.splice(pendaftaranData.findIndex(x => x.id === activeId), 1);
-      renderPendaftaran();
-      document.getElementById('modal-bg').classList.remove('open');
-    }
+    if (!confirm('Yakin menolak pendaftaran ini?')) return;
+    const res = await API.rejectToko(activeId, note);
+    if (!res.success) { alert('❌ ' + (res.msg || 'Gagal menolak.')); return; }
+    pendaftaranData.splice(pendaftaranData.findIndex(x => String(x.id) === String(activeId)), 1);
+    renderPendaftaran();
+    document.getElementById('modal-bg').classList.remove('open');
+    loadAdminData();
   }
   function quickApprove(id) { activeId = id; approveModal(); }
-  function quickReject(id)  { activeId = id; if (confirm('Tolak pendaftaran ini?')) { pendaftaranData.splice(pendaftaranData.findIndex(x=>x.id===id),1); renderPendaftaran(); } }
+  function quickReject(id)  { activeId = id; rejectModal(); }
 
   /* ── SIMPAN PARAMETER ROP ── */
   async function simpanRop() {

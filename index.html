@@ -467,9 +467,9 @@
         <span id="btn-login-txt">Masuk ke Dashboard</span>
       </button>
 
-      <div class="divider"><hr/><span>Akun Demo — klik untuk isi otomatis</span><hr/></div>
+      <div class="divider demo-only"><hr/><span>Akun Demo — klik untuk isi otomatis</span><hr/></div>
 
-      <div class="demo-grid">
+      <div class="demo-grid demo-only">
         <div class="demo-card" onclick="fillDemo('pemilik')">
           <div class="demo-card-top"><span class="demo-card-ico" data-only="umkm">🏪</span><span class="demo-card-ico" data-only="poktan">🌾</span><span class="demo-card-role">Pemilik Toko</span></div>
           <div class="demo-card-cred">pemilik@demo.com</div>
@@ -617,6 +617,9 @@
   };
 
   /* ── MODE ── */
+  // Kartu akun demo hanya untuk mode peragaan. Saat mode Kelompok Tani sudah
+  // tersambung ke Google Sheets sendiri, akun demo tidak berlaku di sana.
+  if (SI.mode === 'poktan' && !API_CONFIG.demoMode) document.querySelectorAll('.demo-only').forEach(el => el.style.display = 'none');
   document.getElementById('mode-' + SI.mode).classList.add('selected');
   if (SI.mode === 'poktan') document.getElementById('d-nama-toko').placeholder = 'cth: Kelompok Tani Sipakainga';
 

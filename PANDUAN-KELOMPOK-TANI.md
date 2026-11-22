@@ -1,101 +1,125 @@
 # Panduan: Menyambungkan Mode Kelompok Tani ke Google Sheets
 
-Website memakai **dua Google Sheets terpisah**:
+Mode **Kelompok Tani** memakai Google Sheets **baru** dan kode Apps Script
+**baru** (`apps-script/Code.gs`). Spreadsheet UMKM yang lama **tidak disentuh
+sama sekali** dan tetap dipakai oleh mode UMKM.
 
-| Mode | Spreadsheet | Isi |
-|---|---|---|
-| UMKM | spreadsheet lama | data toko lama — **tidak diubah** |
-| Kelompok Tani | spreadsheet baru | data kelompok tani |
-
-Selama spreadsheet kelompok tani belum disambungkan, mode Kelompok Tani
-menampilkan **data contoh** (pupuk, benih, pestisida) dengan banner
-"MODE PERAGAAN KELOMPOK TANI". Data UMKM lama tidak pernah tampil di mode ini.
-
-Langkah di bawah membuat spreadsheet baru **tanpa menyentuh spreadsheet lama**.
+Waktu yang dibutuhkan: sekitar 15 menit. Tidak perlu menulis kode.
 
 ---
 
-## Langkah 1 — Buat salinan spreadsheet
+## Langkah 1 — Buat spreadsheet baru
 
-1. Buka spreadsheet Smart Inventory yang lama di Google Drive.
-2. Klik **File → Buat salinan** (File → Make a copy).
-3. Beri nama, misalnya `Smart Inventory - Kelompok Tani`.
-4. Klik **Buat salinan**.
+1. Buka https://sheets.new (atau Google Drive → Baru → Google Spreadsheet).
+2. Beri nama, misalnya `Smart Inventory - Kelompok Tani`.
 
-Spreadsheet lama tetap utuh. Semua langkah berikutnya dikerjakan di **salinan**.
+## Langkah 2 — Tempel kode
 
-## Langkah 2 — Kosongkan data toko lama di salinan
+1. Di spreadsheet baru, klik **Ekstensi → Apps Script**.
+2. Hapus semua isi yang ada di editor (biasanya `function myFunction() {}`).
+3. Buka file [`apps-script/Code.gs`](apps-script/Code.gs) di GitHub → klik
+   tombol **Copy raw file** (ikon salin) → tempel ke editor Apps Script.
+4. Klik ikon **Simpan** (💾). Beri nama proyek, misalnya `Smart Inventory Poktan`.
+5. Kembali ke tab spreadsheet, lalu **muat ulang halaman** (F5).
+   Setelah beberapa detik, muncul menu baru **Smart Inventory** di sebelah menu Bantuan.
 
-Di spreadsheet **salinan** (bukan yang lama):
+## Langkah 3 — Siapkan spreadsheet lewat formulir
 
-1. Sheet **Barang**: hapus semua baris data, **sisakan baris judul kolom**.
-2. Sheet **Transaksi**: hapus semua baris data, sisakan baris judul.
-3. Sheet **Notifikasi** dan **Log** (jika ada): hapus baris data, sisakan judul.
-4. Sheet **Toko**: ubah baris `TOKO-001` menjadi data kelompok, misalnya
-   nama `Kelompok Tani Bulo Pao Dua`, kecamatan `Ma'rang`, jenis `Padi`.
-   Hapus baris toko lainnya.
-5. Sheet **Pengguna**: biarkan akun demo, atau ganti nama/email sesuai
-   pengurus kelompok. Pastikan `tokoId`-nya `TOKO-001`.
+1. Klik **Smart Inventory → 1. Siapkan Spreadsheet**.
+2. Saat pertama kali, Google meminta izin:
+   **Lanjutkan → pilih akun Google Bapak → Lanjutan (Advanced) →
+   Buka Smart Inventory Poktan (tidak aman) → Izinkan**.
+   Peringatan "tidak aman" muncul karena kode ini milik Bapak sendiri dan belum
+   diverifikasi Google; ini normal untuk Apps Script pribadi.
+3. Klik lagi **Smart Inventory → 1. Siapkan Spreadsheet**, lalu isi formulir:
+   - Data kelompok (sudah terisi: Kelompok Tani Bulo Pao Dua, Padanglampe, Ma'rang).
+   - **Email dan password Ketua Kelompok** — dipakai ketua untuk masuk website.
+   - **Email dan password Admin Pengabdian** — dipakai Bapak/tim.
+   - Petugas pencatat (boleh dikosongkan, bisa ditambah nanti).
+4. Klik **Siapkan Spreadsheet**. Tunggu sampai muncul ✅, lalu **Tutup**.
 
-Kalau nama sheet di spreadsheet Bapak berbeda, ikuti nama yang ada.
-Yang penting: **baris judul kolom jangan dihapus atau diubah**.
+Sheet Pengguna, Toko, Barang, Transaksi, Pendaftaran, Log, dan Pengaturan
+dibuat otomatis. Password disimpan dalam bentuk acak (hash) — **catat password
+di tempat aman**, karena tidak bisa dibaca kembali dari spreadsheet.
 
-## Langkah 3 — Deploy Apps Script untuk salinan
+## Langkah 4 — Terbitkan sebagai Web App
 
-**Jika di salinan ada menu Ekstensi → Apps Script yang berisi kode Smart Inventory**
-(Apps Script menempel di spreadsheet, ikut tersalin otomatis):
+1. Di editor Apps Script, klik **Terapkan (Deploy) → Deployment baru (New deployment)**.
+2. Klik ikon roda gigi di samping "Pilih jenis" → **Aplikasi web (Web app)**.
+3. Isi:
+   - *Deskripsi*: `Smart Inventory Kelompok Tani`
+   - *Jalankan sebagai (Execute as)*: **Saya (Me)**
+   - *Yang memiliki akses (Who has access)*: **Siapa saja (Anyone)**
+4. Klik **Terapkan (Deploy)** → izinkan akses jika diminta.
+5. **Salin URL Aplikasi web** (berakhiran `/exec`).
 
-1. Di spreadsheet salinan, klik **Ekstensi → Apps Script**.
-2. Klik **Terapkan (Deploy) → Deployment baru (New deployment)**.
-3. Jenis: **Aplikasi web (Web app)**.
-4. *Execute as*: **Saya (Me)**. *Who has access*: **Siapa saja (Anyone)**.
-5. Klik **Deploy**, izinkan akses, lalu **salin URL Web App** (berakhiran `/exec`).
+Cek cepat: tempel URL itu di browser dan tambahkan `?action=getToko` di
+belakangnya. Jika muncul teks berisi `"success":true` dan nama kelompok,
+Web App sudah berjalan.
 
-**Jika Apps Script-nya file terpisah di Drive** (tidak ikut tersalin):
+## Langkah 5 — Pasang URL di website
 
-1. Buka file Apps Script lama di Drive → **File → Buat salinan**.
-2. Di salinan Apps Script, cari ID spreadsheet lama (teks panjang di dalam
-   `SpreadsheetApp.openById("...")`), ganti dengan ID spreadsheet salinan.
-   ID ada di alamat spreadsheet: `docs.google.com/spreadsheets/d/`**`ID_INI`**`/edit`.
-3. Lanjutkan dari nomor 2 di bagian atas (Deploy → Deployment baru).
-
-## Langkah 4 — Pasang URL di website
-
-1. Di GitHub, buka file `js/api.js` → klik ikon pensil (Edit).
+1. Di GitHub, buka file `js/api.js` → klik ikon pensil (**Edit**).
 2. Cari baris:
    ```js
    urlPoktan: "ISI_URL_APPS_SCRIPT_KELOMPOK_TANI",
    ```
-3. Ganti isinya dengan URL Web App dari Langkah 3, misalnya:
+3. Ganti isinya dengan URL dari Langkah 4:
    ```js
    urlPoktan: "https://script.google.com/macros/s/AKfy..../exec",
    ```
-4. Klik **Commit changes**. Tunggu 1–10 menit, lalu buka website dengan Ctrl+Shift+R.
+4. Klik **Commit changes** → **Commit changes**.
+5. Tunggu 1–10 menit, buka website, tekan **Ctrl+Shift+R**.
 
 **Jangan ubah baris `urlUmkm`** — itu sambungan ke data UMKM lama.
 
-## Langkah 5 — Isi data barang kelompok
+## Langkah 6 — Isi barang kelompok
 
-1. Buka website → pilih **Kelompok Tani** → masuk sebagai ketua kelompok.
-2. Banner merah/peragaan seharusnya sudah **tidak muncul**.
+1. Buka website → pilih **Kelompok Tani** → masuk dengan email/password Ketua.
+2. Banner "MODE PERAGAAN" seharusnya **tidak muncul** lagi, dan kartu akun demo
+   di halaman masuk hilang.
 3. Buka **Setup Stok Awal** → pilih barang (pupuk, benih, pestisida) →
-   isi stok, **d** (rata-rata keluar per hari), dan **L** (waktu tunggu hari).
-4. Klik **Simpan ke Sistem**.
-
-Jika muncul **"Gagal Menyimpan"**, berarti Apps Script belum punya action
-`saveDraftStok`. Isi barang langsung di sheet **Barang** spreadsheet salinan
-(kolom ROP = d × L), atau kirim kode Apps Script untuk ditambahkan action-nya.
+   isi stok sekarang, **d** (rata-rata keluar per hari), dan **L** (waktu tunggu, hari).
+4. Klik **Simpan ke Sistem** → harus muncul *"Stok Awal Berhasil Disimpan!"*.
+5. Mulai catat barang masuk dan keluar dari dashboard atau dari akun petugas pencatat.
 
 ## Pemeriksaan akhir
 
 - Mode **UMKM**: data toko lama masih tampil seperti sebelumnya.
 - Mode **Kelompok Tani**: hanya data kelompok yang tampil.
-- Menu **Laporan** di mode Kelompok Tani: tulisan **Sumber: Google Sheets**.
-  Angka di sana baru boleh dipakai untuk laporan setelah tulisan ini muncul.
+- Menu **Laporan** (mode Kelompok Tani): tertulis **Sumber: Google Sheets**.
+  Angka di menu ini baru boleh dipakai untuk laporan setelah tulisan ini muncul.
 
-## Catatan
+---
 
-- Akun di mode UMKM dan mode Kelompok Tani **terpisah**. Pindah mode akan
-  mengeluarkan pengguna dari akunnya.
-- Pendaftaran kelompok baru (tab "Daftar Kelompok") masuk ke spreadsheet
-  kelompok tani. Admin menyetujuinya dengan masuk di mode Kelompok Tani.
+## Menu "Smart Inventory" di spreadsheet
+
+| Menu | Kegunaan |
+|---|---|
+| 1. Siapkan Spreadsheet | Membuat sheet dan akun pertama. Aman dijalankan lagi untuk menambah kelompok lain — data lama tidak dihapus. |
+| Tambah Pengguna | Menambah petugas pencatat, ketua, admin, atau pemantau. |
+| Ganti Password Pengguna | Mengganti password jika pengguna lupa. |
+| Cek Kesiapan | Menampilkan jumlah kelompok, pengguna, barang, transaksi, dan URL Web App. |
+
+## Jika mengubah kode Apps Script nanti
+
+Setelah mengubah `Code.gs`, klik **Terapkan → Kelola deployment → ✏️ Edit →
+Versi: Versi baru → Terapkan**. Dengan cara ini URL tetap sama dan website
+tidak perlu diubah. Jangan membuat "Deployment baru" lagi, karena URL-nya akan berbeda.
+
+## Masalah yang mungkin muncul
+
+| Gejala | Penyebab & solusi |
+|---|---|
+| Menu Smart Inventory tidak muncul | Muat ulang spreadsheet (F5) dan tunggu ±10 detik. |
+| Banner "MODE PERAGAAN KELOMPOK TANI" masih muncul | `urlPoktan` belum diganti, atau website masih versi lama → Ctrl+Shift+R. |
+| Banner "Google Sheets tidak dapat dihubungi" | Akses Web App bukan "Siapa saja", atau URL salah salin (harus berakhiran `/exec`). |
+| "Spreadsheet belum disiapkan" | Jalankan Smart Inventory → 1. Siapkan Spreadsheet. |
+| Ketua lupa password | Smart Inventory → Ganti Password Pengguna. |
+
+## Catatan keamanan
+
+Web App ini terbuka untuk siapa saja yang mengetahui URL-nya (desain yang sama
+dengan sistem UMKM lama). Password tersimpan sebagai hash, tetapi pemeriksaan
+hak akses dilakukan di website, bukan di server. Untuk skala pengabdian ini
+masih wajar; jangan sebarkan URL `/exec` di luar tim dan mitra.
