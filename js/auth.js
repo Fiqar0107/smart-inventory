@@ -1,6 +1,6 @@
 /**
  * ════════════════════════════════════════════════════════
- *  Smart Inventory UMKM Pangkep — Authentication Logic
+ *  Smart Inventory Desa — Authentication Logic
  *  js/auth.js
  *
  *  Tanggung jawab:
@@ -27,12 +27,20 @@ const ROLE_PAGE = {
   dinas:    "dinas.html",
 };
 
+// Label peran yang tampil di layar (nilai role internal tidak berubah)
+const ROLE_LABEL = {
+  pemilik:  (window.SI && SI.L.pengelola) || "Pemilik Toko",
+  karyawan: (window.SI && SI.L.pencatat)  || "Karyawan",
+  admin:    "Admin Pengabdian",
+  dinas:    "Pemantau",
+};
+
 // Akun demo (hanya aktif jika API_URL belum diisi)
 const DEMO_ACCOUNTS = [
-  { email: "pemilik@demo.com",  password: "demo123", role: "pemilik",  nama: "Pak Ahmad",         tokoId: "TOKO-001" },
-  { email: "karyawan@demo.com", password: "demo123", role: "karyawan", nama: "Andi Karyawan",      tokoId: "TOKO-001" },
-  { email: "admin@demo.com",    password: "demo123", role: "admin",    nama: "Dr. Budi Santoso",   tokoId: null       },
-  { email: "dinas@demo.com",    password: "demo123", role: "dinas",    nama: "Kepala Bidang UMKM", tokoId: null       },
+  { email: "pemilik@demo.com",  password: "demo123", role: "pemilik",  nama: ROLE_LABEL.pemilik,  tokoId: "TOKO-001" },
+  { email: "karyawan@demo.com", password: "demo123", role: "karyawan", nama: ROLE_LABEL.karyawan, tokoId: "TOKO-001" },
+  { email: "admin@demo.com",    password: "demo123", role: "admin",    nama: "Admin Pengabdian",  tokoId: null       },
+  { email: "dinas@demo.com",    password: "demo123", role: "dinas",    nama: "Pemantau Program",  tokoId: null       },
 ];
 
 /* ── SESSION HELPERS ─────────────────────────────────── */
@@ -176,7 +184,7 @@ function logout(confirm = true) {
   window.location.replace("index.html");
 }
 
-/* ── REGISTER (PENDAFTARAN TOKO BARU) ────────────────── */
+/* ── REGISTER (PENDAFTARAN TOKO / KELOMPOK BARU) ─────── */
 
 /**
  * Kirim data pendaftaran toko baru ke Apps Script.

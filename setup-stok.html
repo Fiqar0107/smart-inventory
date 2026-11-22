@@ -206,6 +206,9 @@
       .tgrid{grid-template-columns:1fr 1fr;}
     }
   </style>
+  <script src="js/terms.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
 </head>
 <body>
 
@@ -230,7 +233,7 @@
   <div class="panel active" id="p1">
     <div class="intro">
       <h2>📦 Selamat Datang di Setup Stok Awal</h2>
-      <p>Sebelum sistem bisa menghitung EOQ &amp; ROP otomatis, masukkan <strong>stok barang yang ada di toko sekarang</strong>. Pilih cara termudah untuk Anda.</p>
+      <p>Masukkan <strong>stok barang yang ada di toko sekarang</strong>, lalu isi rata-rata barang keluar per hari (<strong>d</strong>) dan waktu tunggu pengiriman (<strong>L</strong>). Sistem menghitung titik pesan ulang <strong>ROP = d × L</strong>. Pilih cara termudah untuk Anda.</p>
       <div class="intro-chips">
         <span class="ichip">⏱ Estimasi 10–30 menit</span>
         <span class="ichip">📱 Bisa dari HP</span>
@@ -250,7 +253,7 @@
       <div class="mc" onclick="pilihMetode('template',this)">
         <div class="mc-ico">📋</div>
         <div class="mc-ttl">Pilih dari Template</div>
-        <div class="mc-desc">Pilih nama barang dari daftar yang sudah tersedia (sembako, kelontong, dll), lalu isi jumlah stok saja.</div>
+        <div class="mc-desc">Pilih nama barang dari daftar yang sudah tersedia (<span data-only="umkm">sembako, minuman, sabun, dll</span><span data-only="poktan">pupuk, benih, pestisida, dll</span>), lalu isi jumlah stok saja.</div>
         <span class="mc-badge mb-mid">⚡ Lebih Cepat</span>
       </div>
       <div class="mc" onclick="pilihMetode('csv',this)">
@@ -261,7 +264,7 @@
       </div>
     </div>
 
-    <div class="ib it1"><span class="ib-ico">💡</span><div><strong>Tips untuk pemula:</strong> Gunakan <strong>Pilih dari Template</strong> — sudah ada 30+ nama barang umum yang tinggal dipilih dan diisi stoknya saja.</div></div>
+    <div class="ib it1"><span class="ib-ico">💡</span><div><strong>Tips untuk pemula:</strong> Gunakan <strong>Pilih dari Template</strong> — nama barang umum tinggal dipilih dan diisi stoknya. Kolom d dan L boleh diisi belakangan bersama pendamping.</div></div>
 
     <div class="nr">
       <div></div>
@@ -277,7 +280,7 @@
       <div class="card">
         <div class="ch"><h3>✍️ Input Stok Barang Manual</h3><p id="cnt-manual">0 barang</p></div>
         <div class="cb">
-          <div class="ib it3"><span class="ib-ico">ℹ️</span><div>Kolom <strong>Nama Barang</strong> dan <strong>Stok Sekarang</strong> wajib diisi. Kolom lain boleh dikosongkan.</div></div>
+          <div class="ib it3"><span class="ib-ico">ℹ️</span><div>Kolom <strong>Nama Barang</strong> dan <strong>Stok Sekarang</strong> wajib diisi. <strong>d</strong> = rata-rata keluar per hari, <strong>L</strong> = berapa hari barang datang setelah dipesan. ROP dihitung otomatis.</div></div>
           <div class="tw">
             <table class="it">
               <thead><tr>
@@ -287,6 +290,9 @@
                 <th>Satuan</th>
                 <th>Harga Beli (Rp)</th>
                 <th>Kategori</th>
+                <th title="rata-rata keluar per hari">d /hari</th>
+                <th title="waktu tunggu (hari)">L hari</th>
+                <th>ROP</th>
                 <th style="width:36px"></th>
               </tr></thead>
               <tbody id="tbody-manual"></tbody>
@@ -319,6 +325,9 @@
                 <th class="req">Stok Sekarang</th>
                 <th>Satuan</th>
                 <th>Harga Beli (Rp)</th>
+                <th title="rata-rata keluar per hari">d /hari</th>
+                <th title="waktu tunggu (hari)">L hari</th>
+                <th>ROP</th>
                 <th style="width:36px"></th>
               </tr></thead>
               <tbody id="tbody-tpl"></tbody>
@@ -350,7 +359,7 @@
             <div class="ch"><h3>👀 Preview Data</h3><p id="csv-cnt"></p></div>
             <div style="overflow-x:auto">
               <table class="ptbl">
-                <thead><tr><th>#</th><th>Nama Barang</th><th>Stok</th><th>Satuan</th><th>Harga Beli</th><th>Kategori</th><th>Status</th></tr></thead>
+                <thead><tr><th>#</th><th>Nama Barang</th><th>Stok</th><th>Satuan</th><th>Harga Beli</th><th>Kategori</th><th>ROP</th><th>Status</th></tr></thead>
                 <tbody id="tbody-csv"></tbody>
               </table>
             </div>
@@ -375,7 +384,7 @@
       <div class="ch"><h3>📋 Ringkasan Data Stok Awal</h3><p>Periksa sebelum disimpan</p></div>
       <div style="overflow-x:auto">
         <table class="ptbl">
-          <thead><tr><th>#</th><th>Nama Barang</th><th>Stok</th><th>Satuan</th><th>Harga Beli</th><th>Kategori</th></tr></thead>
+          <thead><tr><th>#</th><th>Nama Barang</th><th>Stok</th><th>Satuan</th><th>Kategori</th><th>d × L</th><th>ROP</th></tr></thead>
           <tbody id="tbody-review"></tbody>
         </table>
       </div>
@@ -393,8 +402,8 @@
 
     <!-- Success -->
     <div class="suc card" id="suc-panel">
-      <div class="suc-ico">🎉</div>
-      <h2>Stok Awal Berhasil Disimpan!</h2>
+      <div class="suc-ico" id="suc-ico">🎉</div>
+      <h2 id="suc-judul">Stok Awal Berhasil Disimpan!</h2>
       <p id="suc-desc">Data stok sudah tersimpan dan siap digunakan.</p>
       <div class="suc-next">
         <a href="dashboard.html" class="btn bp blg">🏠 Buka Dashboard</a>
@@ -417,9 +426,11 @@ let rowId=0, katAktif='semua';
 
 const STEPS=[{n:1,l:'Pilih Cara Input'},{n:2,l:'Input Data Stok'},{n:3,l:'Review & Simpan'}];
 
-const KATS={semua:'Semua',sembako:'🛒 Sembako',minuman:'🥤 Minuman',snack:'🍪 Snack',sabun:'🧴 Sabun',bumbu:'🧂 Bumbu',rokok:'🚬 Rokok',atk:'✏️ ATK'};
+const KATS_UMKM={semua:'Semua',sembako:'🛒 Sembako',minuman:'🥤 Minuman',snack:'🍪 Snack',sabun:'🧴 Sabun',bumbu:'🧂 Bumbu',rokok:'🚬 Rokok',atk:'✏️ ATK'};
+const KATS_POKTAN={semua:'Semua',pupuk:'🧪 Pupuk',benih:'🌱 Benih',pestisida:'🧴 Pestisida',perlengkapan:'🧺 Perlengkapan'};
+const KATS=SI.mode==='poktan'?KATS_POKTAN:KATS_UMKM;
 
-const BARANG=[
+const BARANG_UMKM=[
   {ico:'🛢',nama:'Minyak Goreng Bimoli 1L',sat:'botol',kat:'sembako'},
   {ico:'🍚',nama:'Beras Premium 5Kg',sat:'sak',kat:'sembako'},
   {ico:'🍬',nama:'Gula Pasir 1Kg',sat:'kg',kat:'sembako'},
@@ -453,6 +464,31 @@ const BARANG=[
   {ico:'✏️',nama:'Buku Tulis 38 Lembar',sat:'biji',kat:'atk'},
   {ico:'🖊',nama:'Pulpen Standard',sat:'biji',kat:'atk'},
 ];
+const BARANG_POKTAN=[
+  {ico:'🧪',nama:'Pupuk Urea (sak 50 kg)',sat:'sak',kat:'pupuk'},
+  {ico:'🧪',nama:'Pupuk NPK (sak 50 kg)',sat:'sak',kat:'pupuk'},
+  {ico:'🧪',nama:'Pupuk ZA (sak 50 kg)',sat:'sak',kat:'pupuk'},
+  {ico:'🧪',nama:'Pupuk SP-36 (sak 50 kg)',sat:'sak',kat:'pupuk'},
+  {ico:'🧪',nama:'Pupuk KCl (sak 50 kg)',sat:'sak',kat:'pupuk'},
+  {ico:'🧪',nama:'Pupuk Organik (sak 40 kg)',sat:'sak',kat:'pupuk'},
+  {ico:'🧪',nama:'Pupuk Daun Cair 1 L',sat:'botol',kat:'pupuk'},
+  {ico:'🌱',nama:'Benih Padi Inpari 32 (5 kg)',sat:'kantong',kat:'benih'},
+  {ico:'🌱',nama:'Benih Padi Inpari 42 (5 kg)',sat:'kantong',kat:'benih'},
+  {ico:'🌱',nama:'Benih Padi Ciherang (5 kg)',sat:'kantong',kat:'benih'},
+  {ico:'🌽',nama:'Benih Jagung Hibrida (5 kg)',sat:'kantong',kat:'benih'},
+  {ico:'🌶️',nama:'Benih Cabai (10 g)',sat:'bungkus',kat:'benih'},
+  {ico:'🧴',nama:'Insektisida cair 500 ml',sat:'botol',kat:'pestisida'},
+  {ico:'🧴',nama:'Herbisida 1 L',sat:'botol',kat:'pestisida'},
+  {ico:'🧴',nama:'Fungisida 250 g',sat:'bungkus',kat:'pestisida'},
+  {ico:'🧴',nama:'Rodentisida (racun tikus)',sat:'bungkus',kat:'pestisida'},
+  {ico:'🧴',nama:'Moluskisida (keong mas)',sat:'bungkus',kat:'pestisida'},
+  {ico:'🧺',nama:'Karung Panen',sat:'lembar',kat:'perlengkapan'},
+  {ico:'🧺',nama:'Terpal Jemur',sat:'lembar',kat:'perlengkapan'},
+  {ico:'🧺',nama:'Tali Rafia',sat:'gulung',kat:'perlengkapan'},
+  {ico:'⛽',nama:'Solar untuk Traktor',sat:'liter',kat:'perlengkapan'},
+];
+const BARANG=SI.mode==='poktan'?BARANG_POKTAN:BARANG_UMKM;
+const ropDari=(d,l)=>API.hitungRop(parseFloat(d),parseFloat(l));
 
 /* ── RENDER STEPS ── */
 function renderSteps(){
@@ -510,9 +546,17 @@ function addRow(d={}){
       <option value="">—</option>
       ${cats.map(([k,v])=>`<option value="${k}"${d.kategori===k?' selected':''}>${v}</option>`).join('')}
     </select></td>
+    <td><input class="tc" type="number" min="0" step="0.1" placeholder="0" value="${d.d||''}" style="width:70px" oninput="updRopRow(this)"/></td>
+    <td><input class="tc" type="number" min="0" step="1" placeholder="0" value="${d.lt||''}" style="width:64px" oninput="updRopRow(this)"/></td>
+    <td><span class="rop-out" style="font-family:'Geist Mono',monospace;font-weight:700;color:#b45309">${ropDari(d.d,d.lt)||'—'}</span></td>
     <td><button class="rd" onclick="delRow('${id}')">🗑</button></td>`;
   tbody.appendChild(tr);
   updCntManual();
+}
+function updRopRow(inp){
+  const tr=inp.closest('tr'); const ins=tr.querySelectorAll('input');
+  const n=ins.length; const r=ropDari(ins[n-2].value,ins[n-1].value);
+  tr.querySelector('.rop-out').textContent=r||'—';
 }
 function delRow(id){document.getElementById(id)?.remove();renum();updCntManual();}
 function renum(){document.querySelectorAll('#tbody-manual tr').forEach((tr,i)=>{const el=tr.querySelector('.tc-no');if(el)el.value=i+1;});}
@@ -548,7 +592,7 @@ function renderTpl(kat){
 function toggleTpl(nama,el){
   const b=BARANG.find(x=>x.nama===nama);
   if(tplPilihan[nama]){delete tplPilihan[nama];el.classList.remove('on');}
-  else{tplPilihan[nama]={nama,satuan:b.sat,kategori:b.kat,stok:'',harga:''};el.classList.add('on');}
+  else{tplPilihan[nama]={nama,satuan:b.sat,kategori:b.kat,stok:'',harga:'',d:'',lt:''};el.classList.add('on');}
   updTplTable();
   document.getElementById('cnt-tpl').textContent=`${Object.keys(tplPilihan).length} dipilih`;
 }
@@ -563,10 +607,13 @@ function updTplTable(){
       <td><input class="tc" type="number" min="0" placeholder="0" style="width:90px" data-n="${b.nama}" data-f="stok" value="${b.stok||''}" oninput="updTplF(this)"/></td>
       <td><input class="tc" value="${b.satuan}" style="width:80px" data-n="${b.nama}" data-f="satuan" oninput="updTplF(this)"/></td>
       <td><input class="tc" type="number" min="0" placeholder="0" style="width:110px" data-n="${b.nama}" data-f="harga" value="${b.harga||''}" oninput="updTplF(this)"/></td>
+      <td><input class="tc" type="number" min="0" step="0.1" placeholder="0" style="width:70px" data-n="${b.nama}" data-f="d" value="${b.d||''}" oninput="updTplF(this)"/></td>
+      <td><input class="tc" type="number" min="0" step="1" placeholder="0" style="width:64px" data-n="${b.nama}" data-f="lt" value="${b.lt||''}" oninput="updTplF(this)"/></td>
+      <td><span class="rop-out" style="font-family:'Geist Mono',monospace;font-weight:700;color:#b45309">${ropDari(b.d,b.lt)||'—'}</span></td>
       <td><button class="rd" onclick="rmTpl('${b.nama}')">🗑</button></td>
     </tr>`).join('');
 }
-function updTplF(inp){const n=inp.dataset.n,f=inp.dataset.f;if(tplPilihan[n])tplPilihan[n][f]=inp.value;}
+function updTplF(inp){const n=inp.dataset.n,f=inp.dataset.f;if(tplPilihan[n]){tplPilihan[n][f]=inp.value;if(f==='d'||f==='lt'){inp.closest('tr').querySelector('.rop-out').textContent=ropDari(tplPilihan[n].d,tplPilihan[n].lt)||'—';}}}
 function rmTpl(nama){delete tplPilihan[nama];renderTpl(katAktif);updTplTable();document.getElementById('cnt-tpl').textContent=`${Object.keys(tplPilihan).length} dipilih`;}
 
 /* ─── CSV ─── */
@@ -579,7 +626,7 @@ function parseCSV(file){
     const lines=e.target.result.split('\n').filter(l=>l.trim());
     csvRows=lines.slice(1).map(l=>{
       const c=l.split(',').map(x=>x.replace(/"/g,'').trim());
-      return{nama:c[0]||'',stok:c[1]||'',satuan:c[2]||'pcs',harga:c[3]||'',kategori:c[4]||''};
+      return{nama:c[0]||'',stok:c[1]||'',satuan:c[2]||'pcs',harga:c[3]||'',kategori:c[4]||'',d:c[5]||'',lt:c[6]||''};
     }).filter(r=>r.nama);
     document.getElementById('tbody-csv').innerHTML=csvRows.map((row,i)=>{
       const ok=row.nama&&!isNaN(parseFloat(row.stok));
@@ -588,6 +635,7 @@ function parseCSV(file){
         <td>${row.satuan}</td>
         <td>${row.harga?'Rp '+parseInt(row.harga).toLocaleString('id'):'—'}</td>
         <td>${row.kategori||'—'}</td>
+        <td>${ropDari(row.d,row.lt)||'—'}</td>
         <td>${ok?'<span class="badge b-g">✓ OK</span>':'<span class="badge b-r">⚠ Cek</span>'}</td>
       </tr>`;
     }).join('');
@@ -598,10 +646,10 @@ function parseCSV(file){
   r.readAsText(file);
 }
 function downloadTemplate(){
-  const csv='Nama Barang,Stok Sekarang,Satuan,Harga Beli,Kategori\n'+
-    'Minyak Goreng Bimoli 1L,24,botol,15000,sembako\n'+
-    'Gula Pasir 1Kg,12,kg,14000,sembako\n'+
-    'Indomie Goreng,60,biji,3000,sembako\n';
+  const head='Nama Barang,Stok Sekarang,Satuan,Harga Beli,Kategori,Rata-rata Keluar per Hari (d),Waktu Tunggu Hari (L)\n';
+  const csv=head+(SI.mode==='poktan'
+    ? 'Pupuk Urea (sak 50 kg),10,sak,112500,pupuk,2,4\nPupuk NPK (sak 50 kg),8,sak,115000,pupuk,1.5,4\nBenih Padi Inpari 32 (5 kg),6,kantong,65000,benih,1,7\n'
+    : 'Minyak Goreng 1 L,24,botol,15000,sembako,5,4\nGula Pasir 1 kg,12,kg,14000,sembako,3,4\nMi Instan Goreng,60,biji,3000,sembako,12,4\n');
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
   a.download='template-stok-barang.csv'; a.click();
@@ -614,22 +662,26 @@ function collectData(){
     document.querySelectorAll('#tbody-manual tr').forEach(tr=>{
       const inputs=tr.querySelectorAll('input,select');
       const nama=inputs[1]?.value.trim();
+      const d=parseFloat(inputs[6]?.value)||0, lt=parseFloat(inputs[7]?.value)||0;
       if(nama)allData.push({
         nama,stok:parseFloat(inputs[2]?.value)||0,
         satuan:inputs[3]?.value.trim()||'pcs',
         harga:parseFloat(inputs[4]?.value)||0,
-        kategori:inputs[5]?.value||''
+        kategori:inputs[5]?.value||'',
+        d,lt,rop:ropDari(d,lt)
       });
     });
   }else if(metode==='template'){
     allData=Object.values(tplPilihan).map(b=>({
       nama:b.nama,stok:parseFloat(b.stok)||0,
-      satuan:b.satuan||'pcs',harga:parseFloat(b.harga)||0,kategori:b.kategori
+      satuan:b.satuan||'pcs',harga:parseFloat(b.harga)||0,kategori:b.kategori,
+      d:parseFloat(b.d)||0,lt:parseFloat(b.lt)||0,rop:ropDari(b.d,b.lt)
     }));
   }else{
     allData=csvRows.filter(r=>r.nama).map(r=>({
       nama:r.nama,stok:parseFloat(r.stok)||0,
-      satuan:r.satuan||'pcs',harga:parseFloat(r.harga)||0,kategori:r.kategori
+      satuan:r.satuan||'pcs',harga:parseFloat(r.harga)||0,kategori:r.kategori,
+      d:parseFloat(r.d)||0,lt:parseFloat(r.lt)||0,rop:ropDari(r.d,r.lt)
     }));
   }
 }
@@ -638,12 +690,12 @@ function collectData(){
 function renderReview(){
   const total=allData.length,
         totalStok=allData.reduce((s,b)=>s+b.stok,0),
-        dengHarga=allData.filter(b=>b.harga>0).length,
+        dengRop=allData.filter(b=>b.rop>0).length,
         kats=[...new Set(allData.map(b=>b.kategori).filter(Boolean))].length;
   document.getElementById('rstats').innerHTML=`
     <div class="rsc"><div class="rsc-v">${total}</div><div class="rsc-l">Jenis Barang</div></div>
     <div class="rsc"><div class="rsc-v">${totalStok.toLocaleString('id')}</div><div class="rsc-l">Total Unit Stok</div></div>
-    <div class="rsc"><div class="rsc-v">${dengHarga}</div><div class="rsc-l">Ada Data Harga</div></div>
+    <div class="rsc"><div class="rsc-v">${dengRop}</div><div class="rsc-l">Sudah Ada ROP</div></div>
     <div class="rsc"><div class="rsc-v">${kats}</div><div class="rsc-l">Kategori</div></div>`;
   document.getElementById('tbody-review').innerHTML=allData.map((b,i)=>`
     <tr>
@@ -651,8 +703,9 @@ function renderReview(){
       <td style="font-weight:600">${b.nama}</td>
       <td><span style="font-family:'Geist Mono',monospace;font-weight:700">${b.stok}</span></td>
       <td>${b.satuan}</td>
-      <td>${b.harga?'Rp '+b.harga.toLocaleString('id'):'<span style="color:var(--slate-400)">—</span>'}</td>
       <td>${b.kategori?`<span class="badge b-g">${b.kategori}</span>`:'—'}</td>
+      <td style="color:var(--slate-500)">${b.rop?`${b.d} × ${b.lt}`:'—'}</td>
+      <td><span style="font-family:'Geist Mono',monospace;font-weight:700;color:#b45309">${b.rop||'<span style="color:var(--slate-400);font-weight:400">belum</span>'}</span></td>
     </tr>`).join('');
 }
 
@@ -663,7 +716,7 @@ function simpanDraf(){
   alert('✅ Draf tersimpan! Anda bisa lanjutkan nanti di perangkat yang sama.');
 }
 
-/* ─── SIMPAN PERMANEN ─── */
+/* ─── SIMPAN PERMANEN (dikirim ke Google Sheets lewat Apps Script) ─── */
 async function simpanPermanen(){
   const up=document.getElementById('up-panel'),
         nav=document.getElementById('review-nav'),
@@ -671,14 +724,28 @@ async function simpanPermanen(){
         pct=document.getElementById('up-pct'),
         sub=document.getElementById('up-sub');
   up.classList.add('show'); nav.style.display='none';
-  const steps=[[10,'Memvalidasi data...'],[30,'Menghubungi Google Sheets...'],[55,`Menyimpan ${allData.length} barang...`],[80,'Menghitung EOQ & ROP awal...'],[100,'Selesai! ✅']];
-  for(const[p,m]of steps){await delay(700);bar.style.width=p+'%';pct.textContent=p+'%';sub.textContent=m;}
-  await delay(500);
+  bar.style.width='30%'; pct.textContent='…'; sub.textContent=`Mengirim ${allData.length} barang…`;
+  let tokoId='TOKO-001';
+  try{const u=JSON.parse(sessionStorage.getItem('si_user')||'{}');if(u.tokoId)tokoId=u.tokoId;}catch{}
+  const items=allData.map(b=>({nama:b.nama,stok:b.stok,satuan:b.satuan,harga:b.harga,kategori:b.kategori,d:b.d,lt:b.lt,rop:b.rop}));
+  const res=await API.saveDraftStok(tokoId,items);
+  bar.style.width='100%'; pct.textContent='100%';
+  await delay(300);
   up.classList.remove('show');
+  const live=API.statusKoneksi()==='live';
+  const ok=res&&res.success;
   document.getElementById('suc-panel').classList.add('show');
-  document.getElementById('suc-desc').textContent=`${allData.length} jenis barang dengan total ${allData.reduce((s,b)=>s+b.stok,0).toLocaleString('id')} unit berhasil disimpan sebagai stok awal.`;
-  localStorage.removeItem('si_draft');
+  document.getElementById('suc-ico').textContent=ok?(live?'🎉':'🧪'):'⚠️';
+  document.getElementById('suc-judul').textContent=!ok?'Gagal Menyimpan':(live?'Stok Awal Berhasil Disimpan!':'Tersimpan sebagai Data Contoh');
+  document.getElementById('suc-desc').textContent=!ok
+    ? `Server menjawab: ${res&&res.msg?res.msg:'tidak ada jawaban'}. Data belum masuk ke Google Sheets. Draf masih tersimpan di perangkat ini.`
+    : live
+      ? `${allData.length} jenis barang dengan total ${allData.reduce((s,b)=>s+b.stok,0).toLocaleString('id')} unit tersimpan di Google Sheets.`
+      : `Google Sheets tidak terhubung, jadi ${allData.length} barang hanya tersimpan sementara di layar ini dan akan hilang saat halaman ditutup.`;
+  if(ok&&live)localStorage.removeItem('si_draft');
+  else simpanDrafDiam();
 }
+function simpanDrafDiam(){try{localStorage.setItem('si_draft',JSON.stringify({metode,allData,tplPilihan,ts:new Date().toISOString()}));}catch{}}
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 
 function tambahLagi(){
@@ -691,7 +758,7 @@ function tambahLagi(){
 function init(){
   renderSteps();
   // nama toko
-  try{const s=JSON.parse(sessionStorage.getItem('si_user')||'{}');if(s.nama)document.getElementById('lbl-toko').textContent='🏪 '+s.nama;}catch{}
+  try{const s=JSON.parse(sessionStorage.getItem('si_user')||'{}');if(s.tokoId)API.getToko(s.tokoId).then(r=>{if(r.success&&r.data[0])document.getElementById('lbl-toko').textContent=SI.L.ikonUnit+' '+r.data[0].nama;});}catch{}
   // load draf
   const raw=localStorage.getItem('si_draft');
   if(raw){try{

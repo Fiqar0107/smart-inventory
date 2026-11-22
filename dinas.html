@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dinas Koperasi — Smart Inventory UMKM Pangkep</title>
+  <title>Pemantau — Smart Inventory UMKM Pangkep</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
@@ -228,6 +228,7 @@
     @media(max-width:1100px) { .stats-row { grid-template-columns: repeat(2,1fr); } .two-col,.three-col { grid-template-columns: 1fr; } }
     @media(max-width:768px)  { .sb { transform: translateX(-100%); } .sb.open { transform: translateX(0); } .mob-ov.open { display: block; } .main { margin-left: 0; } .mob-tog { display: grid; place-items: center; } .page { padding: 14px; } }
   </style>
+  <script src="js/terms.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
 </head>
@@ -238,10 +239,10 @@
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sb" id="sb">
   <div class="sb-brand">
-    <div class="sb-ico">🏛️</div>
+    <div class="sb-ico">👁️</div>
     <div class="sb-brand-t">
       <strong>Smart Inventory</strong>
-      <span>Dinas Koperasi & UMKM</span>
+      <span>Panel Pemantau</span>
     </div>
   </div>
 
@@ -278,10 +279,10 @@
 
   <div class="sb-foot">
     <div class="sb-user">
-      <div class="sb-uavatar">🏛️</div>
+      <div class="sb-uavatar">👁️</div>
       <div class="sb-umeta">
-        <strong>Kepala Bidang UMKM</strong>
-        <span>Dinas Koperasi Pangkep</span>
+        <strong id="sb-unama">Pemantau</strong>
+        <span>Pemantau Program</span>
       </div>
       <span class="sb-role">Read Only</span>
     </div>
@@ -294,12 +295,12 @@
   <header class="topbar">
     <div class="tb-ttl">
       <h1 id="pg-title">Overview UMKM Kabupaten Pangkep</h1>
-      <p id="pg-sub">Data persediaan real-time · Diperbarui otomatis dari sistem Smart Inventory</p>
+      <p id="pg-sub">Ringkasan dari data yang tercatat di sistem Smart Inventory</p>
     </div>
     <div class="tb-r">
       <span class="readonly-banner">🔒 Hanya Baca</span>
       <span class="tb-chip" id="today-lbl"></span>
-      <button class="tb-btn">📥</button>
+      <button class="tb-btn" title="Unduh data" onclick="unduh('stok')">📥</button>
     </div>
   </header>
 
@@ -308,23 +309,23 @@
     <!-- STATS -->
     <div class="stats-row">
       <div class="stat">
-        <div class="stat-top"><div class="s-ico ico-g">🏪</div><span class="chip ch-g">↑ 4 bulan ini</span></div>
-        <div><div class="stat-val">24</div><div class="stat-lbl">UMKM Terdaftar di Sistem</div></div>
-        <div class="stat-sub">18 aktif · 6 nonaktif</div>
+        <div class="stat-top"><div class="s-ico ico-g">🏪</div><span class="chip ch-g">Terdaftar</span></div>
+        <div><div class="stat-val" id="st-toko">—</div><div class="stat-lbl">UMKM Terdaftar di Sistem</div></div>
+        <div class="stat-sub" id="st-toko-sub">—</div>
       </div>
       <div class="stat">
         <div class="stat-top"><div class="s-ico ico-t">📦</div><span class="chip ch-t">Dimonitor</span></div>
-        <div><div class="stat-val">847</div><div class="stat-lbl">Total Jenis Barang</div></div>
-        <div class="stat-sub">Rata-rata 47 jenis / toko</div>
+        <div><div class="stat-val" id="st-barang">—</div><div class="stat-lbl">Total Jenis Barang</div></div>
+        <div class="stat-sub" id="st-barang-sub">—</div>
       </div>
       <div class="stat">
         <div class="stat-top"><div class="s-ico ico-s">🔄</div><span class="chip ch-s">30 hari</span></div>
-        <div><div class="stat-val">3.241</div><div class="stat-lbl">Total Transaksi Bulan Ini</div></div>
-        <div class="stat-sub">↑ 12% dari bulan lalu</div>
+        <div><div class="stat-val" id="st-tx">—</div><div class="stat-lbl">Transaksi 30 Hari Terakhir</div></div>
+        <div class="stat-sub" id="st-tx-sub">—</div>
       </div>
       <div class="stat">
         <div class="stat-top"><div class="s-ico ico-a">⚠️</div><span class="chip ch-a">Perlu Perhatian</span></div>
-        <div><div class="stat-val" style="color:var(--amber-500)">47</div><div class="stat-lbl">Item Stok Kritis Seluruh UMKM</div></div>
+        <div><div class="stat-val" id="st-kritis" style="color:var(--amber-500)">—</div><div class="stat-lbl">Barang di Bawah ROP</div></div>
         <div class="stat-sub">Di bawah ROP masing-masing</div>
       </div>
     </div>
@@ -336,7 +337,7 @@
       <div class="card">
         <div class="card-h">
           <h3>🏪 Daftar UMKM & Aktivitas Stok</h3>
-          <button class="dl-btn dl-green" onclick="dlSimulasi('CSV')">⬇ Unduh CSV</button>
+          <button class="dl-btn dl-green" onclick="unduh('toko')">⬇ Unduh CSV</button>
         </div>
         <div class="tw">
           <table>
@@ -346,8 +347,8 @@
                 <th>Nama Toko</th>
                 <th>Kecamatan</th>
                 <th>Jenis Barang</th>
-                <th>Tx Bulan Ini</th>
-                <th>Item Kritis</th>
+                <th>Tx 30 Hari</th>
+                <th>Di Bawah ROP</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -379,7 +380,7 @@
       <!-- CHART TRANSAKSI BULANAN -->
       <div class="card">
         <div class="card-h">
-          <h3>📈 Tren Transaksi Bulanan UMKM</h3>
+          <h3>📈 Tren Transaksi Bulanan</h3>
           <p>6 bulan terakhir</p>
         </div>
         <div class="chart-area">
@@ -411,8 +412,8 @@
       <!-- LAPORAN PERIODIK -->
       <div class="card">
         <div class="card-h">
-          <h3>📋 Laporan Tersedia</h3>
-          <button class="dl-btn dl-outline">Semua Laporan →</button>
+          <h3>📋 Rekap per Toko</h3>
+          <p>30 hari terakhir</p>
         </div>
         <div class="laporan-grid" id="laporan-grid"></div>
       </div>
@@ -431,191 +432,189 @@
 <button class="mob-tog" onclick="toggleSB()">☰</button>
 
 <script>
-  /* ── DATA ── */
-  const tokoData = [
-    { nama:'Toko Berkah Jaya',    kec:'Bungoro',     barang:47, tx:215, kritis:2,  status:'aktif'    },
-    { nama:'Toko Sumber Rezeki',  kec:'Bungoro',     barang:52, tx:183, kritis:4,  status:'aktif'    },
-    { nama:'Toko Pak Ahmad',      kec:'Bungoro',     barang:61, tx:178, kritis:1,  status:'aktif'    },
-    { nama:'UD Maju Bersama',     kec:'Pangkajene',  barang:38, tx:142, kritis:5,  status:'aktif'    },
-    { nama:'Toko Cahaya',         kec:'Pangkajene',  barang:44, tx:130, kritis:3,  status:'aktif'    },
-    { nama:'Warung Bu Siti',      kec:'Minasatene',  barang:29, tx:97,  kritis:8,  status:'aktif'    },
-    { nama:'UD Harapan Jaya',     kec:'Minasatene',  barang:35, tx:88,  kritis:2,  status:'aktif'    },
-    { nama:'Toko Rezeki Nomplok', kec:'Labakkang',   barang:41, tx:76,  kritis:6,  status:'aktif'    },
-    { nama:'UD Lancar Jaya',      kec:'Labakkang',   barang:28, tx:0,   kritis:0,  status:'nonaktif' },
-    { nama:'Warung Pak Jumadi',   kec:'Mandalle',    barang:18, tx:54,  kritis:3,  status:'aktif'    },
-  ];
-
-  const kecData = [
-    { kec:'Bungoro',    n:7 }, { kec:'Pangkajene', n:5 },
-    { kec:'Minasatene', n:4 }, { kec:'Labakkang',  n:3 }, { kec:'Mandalle',   n:3 },
-    { kec:'Balocci',    n:2 },
-  ];
-
-  const chartData = [
-    { bln:'Jan', masuk:280, keluar:240 }, { bln:'Feb', masuk:320, keluar:290 },
-    { bln:'Mar', masuk:295, keluar:270 }, { bln:'Apr', masuk:380, keluar:330 },
-    { bln:'Mei', masuk:410, keluar:360 }, { bln:'Jun', masuk:190, keluar:160 },
-  ];
-
-  const stokData = [
-    { kat:'Sembako',          total:312, kritis:18 },
-    { kat:'Minuman & Snack',  total:198, kritis:12 },
-    { kat:'Kebersihan & Sabun', total:143, kritis:9 },
-    { kat:'Bumbu & Rempah',   total:104, kritis:5  },
-    { kat:'Alat Tulis',       total:90,  kritis:3  },
-  ];
-
-  const laporanData = [
-    { ico:'📊', nama:'Laporan Bulanan Juni 2026',    desc:'Ringkasan transaksi & stok seluruh UMKM', tgl:'03/06/2026' },
-    { ico:'📈', nama:'Analisis Tren Stok Q2 2026',   desc:'Perbandingan stok 3 bulan terakhir',      tgl:'01/06/2026' },
-    { ico:'🗺️', nama:'Sebaran UMKM per Kecamatan',   desc:'Peta distribusi & keaktifan toko',        tgl:'01/06/2026' },
-    { ico:'⚠️', nama:'Laporan Stok Kritis',          desc:'Daftar barang di bawah batas ROP',        tgl:'03/06/2026' },
-    { ico:'📋', nama:'Laporan Bulanan Mei 2026',     desc:'Arsip data bulan Mei',                    tgl:'01/05/2026' },
-    { ico:'📥', nama:'Rekap EOQ/ROP Semua Toko',     desc:'Parameter dan hasil kalkulasi terbaru',   tgl:'02/06/2026' },
-  ];
-
-  const unduhData = [
-    { ico:'📊', bg:'var(--pine-100)', col:' var(--pine-600)', nama:'Data Semua Toko',        desc:'Profil & info kontak UMKM',      fmt:'CSV',  btnCls:'dl-green'  },
-    { ico:'📦', bg:'var(--sky-100)',  col:'var(--sky-500)',   nama:'Rekap Stok Semua Toko',  desc:'Snapshot stok terkini',          fmt:'XLSX', btnCls:'dl-sky'    },
-    { ico:'🔄', bg:'var(--teal-100)', col:'var(--teal-500)',  nama:'Histori Transaksi',       desc:'30 hari terakhir semua toko',    fmt:'CSV',  btnCls:'dl-green'  },
-    { ico:'📐', bg:'var(--amber-100)','col':'#b45309',        nama:'Hasil EOQ & ROP',         desc:'Kalkulasi terbaru per barang',   fmt:'PDF',  btnCls:'dl-outline' },
-    { ico:'📋', bg:'var(--pine-100)', col:'var(--pine-600)',  nama:'Laporan Lengkap Bulanan', desc:'Format PDF siap cetak',          fmt:'PDF',  btnCls:'dl-outline' },
-  ];
+  /* ── STATE (semua dihitung dari data sistem) ── */
+  const user = (() => { try { return JSON.parse(sessionStorage.getItem('si_user') || '{}'); } catch { return {}; } })();
+  let tokoList = [], barangAll = [], txAll = [];
+  const escH = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt = n => Number(n || 0).toLocaleString('id-ID', { maximumFractionDigits: 1 });
+  const ymd = d => API.tglISO(d.toISOString());
+  const batas30 = (() => { const d = new Date(); d.setDate(d.getDate() - 29); return ymd(d); })();
+  const diBawahRop = b => Number(b.rop) > 0 && Number(b.stok) <= Number(b.rop);
 
   /* ── TANGGAL ── */
   const hArr = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
   const bArr = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
   const now  = new Date();
-  document.getElementById('today-lbl').textContent =
-    `${hArr[now.getDay()]}, ${now.getDate()} ${bArr[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('today-lbl').textContent = `${hArr[now.getDay()]}, ${now.getDate()} ${bArr[now.getMonth()]} ${now.getFullYear()}`;
+  if (user.nama) document.getElementById('sb-unama').textContent = user.nama;
 
-  /* ── RENDER TOKO ── */
+  /* ── STATISTIK ── */
+  function renderStats() {
+    const aktif = tokoList.filter(t => t.status === 'aktif').length;
+    const tx30 = txAll.filter(t => t.tanggal >= batas30);
+    document.getElementById('st-toko').textContent = tokoList.length;
+    document.getElementById('st-toko-sub').textContent = `${aktif} aktif · ${tokoList.length - aktif} nonaktif`;
+    document.getElementById('st-barang').textContent = barangAll.length;
+    document.getElementById('st-barang-sub').textContent = tokoList.length ? `Rata-rata ${fmt(barangAll.length / tokoList.length)} jenis / toko` : '—';
+    document.getElementById('st-tx').textContent = fmt(tx30.length);
+    document.getElementById('st-tx-sub').textContent = `masuk ${tx30.filter(t => t.jenis === 'masuk').length} · keluar ${tx30.filter(t => t.jenis === 'keluar').length}`;
+    document.getElementById('st-kritis').textContent = barangAll.filter(diBawahRop).length;
+    const src = API.statusKoneksi() === 'live' ? 'Sumber: Google Sheets' : 'Sumber: DATA CONTOH — bukan data asli';
+    document.getElementById('pg-sub').textContent = `Ringkasan dari data yang tercatat di sistem · ${src}`;
+  }
+
+  function perToko(t) {
+    const b = barangAll.filter(x => x.tokoId === t.id);
+    const tx = txAll.filter(x => x.tokoId === t.id && x.tanggal >= batas30);
+    return { ...t, jumlahBarang: b.length, tx: tx.length, kritis: b.filter(diBawahRop).length };
+  }
+
+  /* ── TABEL TOKO ── */
   function renderToko() {
-    document.getElementById('tbl-toko').innerHTML = tokoData.map((t, i) => {
-      const persen = Math.min(100, Math.round(t.tx / 220 * 100));
-      const kritisColor = t.kritis >= 6 ? 'var(--rose-500)' : t.kritis >= 3 ? '#b45309' : 'var(--pine-600)';
+    const rows = tokoList.map(perToko);
+    const maxTx = Math.max(1, ...rows.map(r => r.tx));
+    document.getElementById('tbl-toko').innerHTML = rows.map((t, i) => {
+      const kritisColor = t.kritis >= 3 ? 'var(--rose-500)' : t.kritis >= 1 ? '#b45309' : 'var(--pine-600)';
       return `<tr>
-        <td class="td-m">${i+1}</td>
-        <td class="td-b">${t.nama}</td>
-        <td>${t.kec}</td>
-        <td><span class="td-m">${t.barang}</span></td>
+        <td class="td-m">${i + 1}</td>
+        <td class="td-b">${escH(t.nama)}</td>
+        <td>${escH(t.kecamatan || '—')}</td>
+        <td><span class="td-m">${t.jumlahBarang}</span></td>
         <td>
           <span style="font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700">${t.tx}</span>
-          <div class="prog"><div class="prog-f" style="width:${persen}%;background:var(--pine-400)"></div></div>
+          <div class="prog"><div class="prog-f" style="width:${Math.round(t.tx / maxTx * 100)}%;background:var(--pine-400)"></div></div>
         </td>
         <td><span style="font-weight:700;color:${kritisColor};font-family:'DM Mono',monospace">${t.kritis}</span></td>
         <td><span class="badge ${t.status === 'aktif' ? 'b-aktif' : 'b-nonaktif'}">${t.status === 'aktif' ? '🟢 Aktif' : '⚫ Nonaktif'}</span></td>
       </tr>`;
-    }).join('');
+    }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--slate-400);padding:24px">Belum ada toko terdaftar.</td></tr>`;
   }
 
-  /* ── RENDER KECAMATAN ── */
+  /* ── SEBARAN KECAMATAN ── */
   function renderKec() {
-    const max = Math.max(...kecData.map(k => k.n));
-    document.getElementById('kec-list').innerHTML = kecData.map(k => `
+    const c = {};
+    tokoList.forEach(t => { const k = t.kecamatan || '—'; c[k] = (c[k] || 0) + 1; });
+    const list = Object.entries(c).sort((a, b) => b[1] - a[1]);
+    const max = Math.max(1, ...list.map(x => x[1]));
+    document.getElementById('kec-list').innerHTML = list.map(([kec, n]) => `
       <div class="kec-item">
-        <div class="kec-row">
-          <span class="kec-name">${k.kec}</span>
-          <span class="kec-count">${k.n} toko</span>
-        </div>
-        <div class="kec-bar"><div class="kec-fill" style="width:${Math.round(k.n/max*100)}%"></div></div>
-      </div>`).join('');
+        <div class="kec-row"><span class="kec-name">${escH(kec)}</span><span class="kec-count">${n} toko</span></div>
+        <div class="kec-bar"><div class="kec-fill" style="width:${Math.round(n / max * 100)}%"></div></div>
+      </div>`).join('') || '<p style="padding:16px;color:var(--slate-400);font-size:.8rem">Belum ada data.</p>';
   }
 
-  /* ── RENDER TOP TOKO ── */
+  /* ── PALING AKTIF ── */
   function renderTopToko() {
-    const sorted = [...tokoData].sort((a,b) => b.tx - a.tx).slice(0,5);
-    document.getElementById('top-toko').innerHTML = sorted.map((t,i) => `
+    const sorted = tokoList.map(perToko).sort((a, b) => b.tx - a.tx).slice(0, 5);
+    document.getElementById('top-toko').innerHTML = sorted.map((t, i) => `
       <div class="toko-item">
-        <div class="toko-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</div>
-        <div class="toko-meta">
-          <strong>${t.nama}</strong>
-          <span>${t.kec}</span>
-        </div>
+        <div class="toko-rank ${i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : ''}">${i + 1}</div>
+        <div class="toko-meta"><strong>${escH(t.nama)}</strong><span>${escH(t.kecamatan || '')}</span></div>
         <span class="toko-tx">${t.tx} tx</span>
-      </div>`).join('');
+      </div>`).join('') || '<p style="padding:16px;color:var(--slate-400);font-size:.8rem">Belum ada data.</p>';
   }
 
-  /* ── RENDER CHART ── */
+  /* ── GRAFIK BULANAN (6 bulan, dari transaksi) ── */
   function renderChart() {
-    const maxV = Math.max(...chartData.map(c => Math.max(c.masuk, c.keluar)));
-    document.getElementById('chart-bars').innerHTML = chartData.map(c => {
-      const hM = Math.round(c.masuk  / maxV * 108);
-      const hK = Math.round(c.keluar / maxV * 108);
-      return `<div class="ch-bar-g">
+    const bulan = [];
+    for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); bulan.push({ key: ymd(d).slice(0, 7), bln: bArr[d.getMonth()] }); }
+    const data = bulan.map(b => ({
+      bln: b.bln,
+      masuk: txAll.filter(t => t.tanggal.slice(0, 7) === b.key && t.jenis === 'masuk').length,
+      keluar: txAll.filter(t => t.tanggal.slice(0, 7) === b.key && t.jenis === 'keluar').length,
+    }));
+    const maxV = Math.max(1, ...data.map(c => Math.max(c.masuk, c.keluar)));
+    document.getElementById('chart-bars').innerHTML = data.map(c => `<div class="ch-bar-g">
         <div class="ch-bar-pair">
-          <div class="ch-bar" style="height:${hM}px;background:linear-gradient(180deg,var(--pine-300),var(--pine-500))"></div>
-          <div class="ch-bar" style="height:${hK}px;background:linear-gradient(180deg,#7dd3fc,var(--sky-500))"></div>
+          <div class="ch-bar" title="${c.masuk} masuk" style="height:${Math.round(c.masuk / maxV * 108)}px;background:linear-gradient(180deg,var(--pine-300),var(--pine-500))"></div>
+          <div class="ch-bar" title="${c.keluar} keluar" style="height:${Math.round(c.keluar / maxV * 108)}px;background:linear-gradient(180deg,#7dd3fc,var(--sky-500))"></div>
         </div>
-      </div>`;
-    }).join('');
-    document.getElementById('chart-x').innerHTML = chartData.map(c =>
-      `<div class="ch-x-item">${c.bln}</div>`).join('');
+      </div>`).join('');
+    document.getElementById('chart-x').innerHTML = data.map(c => `<div class="ch-x-item">${c.bln}</div>`).join('');
   }
 
-  /* ── RENDER STOK ── */
+  /* ── KONDISI STOK PER KATEGORI ── */
   function renderStok() {
-    document.getElementById('tbl-stok').innerHTML = stokData.map(s => {
-      const pct = Math.round(s.kritis / s.total * 100);
+    const k = {};
+    barangAll.forEach(b => { const kat = b.kategori || 'lainnya'; k[kat] = k[kat] || { total: 0, kritis: 0 }; k[kat].total++; if (diBawahRop(b)) k[kat].kritis++; });
+    document.getElementById('tbl-stok').innerHTML = Object.entries(k).map(([kat, s]) => {
+      const pct = s.total ? Math.round(s.kritis / s.total * 100) : 0;
       let badge, kelas;
-      if (pct >= 10)      { badge = '🔴 Kritis';    kelas = 'b-kritis'; }
-      else if (pct >= 5)  { badge = '🟡 Perhatian'; kelas = 'b-perhatian'; }
-      else                { badge = '🟢 Cukup';     kelas = 'b-cukup'; }
+      if (pct >= 30)      { badge = '🔴 Kritis'; kelas = 'b-kritis'; }
+      else if (pct > 0)   { badge = '🟡 Perhatian';  kelas = 'b-perhatian'; }
+      else                { badge = '🟢 Cukup';      kelas = 'b-cukup'; }
       return `<tr>
-        <td class="td-b">${s.kat}</td>
+        <td class="td-b" style="text-transform:capitalize">${escH(kat)}</td>
         <td><span class="td-m">${s.total}</span></td>
-        <td><span style="color:${pct>=10?'var(--rose-500)':pct>=5?'#b45309':'var(--pine-600)'};font-weight:700;font-family:'DM Mono',monospace">${s.kritis}</span></td>
+        <td><span style="color:${pct >= 30 ? 'var(--rose-500)' : pct > 0 ? '#b45309' : 'var(--pine-600)'};font-weight:700;font-family:'DM Mono',monospace">${s.kritis}</span></td>
         <td><span class="badge ${kelas}">${badge}</span></td>
       </tr>`;
-    }).join('');
+    }).join('') || `<tr><td colspan="4" style="text-align:center;color:var(--slate-400);padding:24px">Belum ada data barang.</td></tr>`;
   }
 
-  /* ── RENDER LAPORAN ── */
+  /* ── REKAP PER TOKO ── */
   function renderLaporan() {
-    document.getElementById('laporan-grid').innerHTML = laporanData.map(l => `
-      <div class="lap-item">
-        <div class="lap-icon">${l.ico}</div>
-        <div class="lap-name">${l.nama}</div>
-        <div class="lap-desc">${l.desc}</div>
+    document.getElementById('laporan-grid').innerHTML = tokoList.map(t => {
+      const r = API.rekapPenggunaan(barangAll.filter(b => b.tokoId === t.id), txAll.filter(x => x.tokoId === t.id), batas30, ymd(now));
+      return `<div class="lap-item">
+        <div class="lap-icon">${SI.L.ikonUnit}</div>
+        <div class="lap-name">${escH(t.nama)}</div>
+        <div class="lap-desc">${r.txTotal} transaksi · ${r.hariTercatat} hari mencatat · ${r.peringatanRop} peringatan ROP</div>
         <div class="lap-foot">
-          <span class="lap-date">${l.tgl}</span>
-          <span class="lap-dl" onclick="dlSimulasi('${l.nama}')">⬇ Unduh</span>
+          <span class="lap-date">${escH(t.kecamatan || '')}</span>
+          <span class="lap-dl" onclick="unduhRekap('${escH(t.id)}')">⬇ Unduh</span>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('') || '<p style="padding:16px;color:var(--slate-400);font-size:.8rem">Belum ada data.</p>';
   }
 
-  /* ── RENDER UNDUHAN ── */
+  /* ── UNDUH DATA (CSV nyata dari data sistem) ── */
+  const UNDUH = [
+    { id: 'toko',  ico: '📊', bg: 'var(--pine-100)',  col: 'var(--pine-600)', nama: 'Data Semua Toko',       desc: 'Profil dan ringkasan 30 hari' },
+    { id: 'stok',  ico: '📦', bg: 'var(--sky-100)',   col: 'var(--sky-500)',  nama: 'Stok Semua Toko',       desc: 'Sisa stok dan batas ROP terkini' },
+    { id: 'tx',    ico: '🔄', bg: 'var(--teal-100)',  col: 'var(--teal-500)', nama: 'Histori Transaksi',     desc: '30 hari terakhir semua toko' },
+    { id: 'rop',   ico: '⚠️', bg: 'var(--amber-100)', col: '#b45309',         nama: 'Barang di Bawah ROP',   desc: 'Perlu dipesan ulang' },
+  ];
   function renderUnduh() {
-    document.getElementById('unduh-panel').innerHTML = unduhData.map(u => `
-      <div class="unduh-row" onclick="dlSimulasi('${u.nama}')">
+    document.getElementById('unduh-panel').innerHTML = UNDUH.map(u => `
+      <div class="unduh-row" onclick="unduh('${u.id}')">
         <div class="unduh-ico" style="background:${u.bg};color:${u.col}">${u.ico}</div>
-        <div class="unduh-info">
-          <strong>${u.nama}</strong>
-          <span>${u.desc}</span>
-        </div>
-        <button class="unduh-btn dl-btn ${u.btnCls}" style="pointer-events:none">⬇ ${u.fmt}</button>
+        <div class="unduh-info"><strong>${u.nama}</strong><span>${u.desc}</span></div>
+        <button class="unduh-btn dl-btn dl-green" style="pointer-events:none">⬇ CSV</button>
       </div>`).join('');
   }
-
-  /* ── SIMULASI UNDUH ── */
-  function dlSimulasi(nama) {
-    const btn = event.currentTarget;
-    const orig = btn.innerHTML;
-    btn.style.opacity = '.6';
-    setTimeout(() => {
-      btn.style.opacity = '';
-      alert(`📥 Mengunduh: ${nama}\n\n(Demo — sambungkan ke Google Apps Script untuk unduhan nyata)`);
-    }, 600);
+  const namaToko = id => (tokoList.find(t => t.id === id) || {}).nama || id;
+  const brg = id => barangAll.find(b => b.id === id) || {};
+  function unduh(jenis) {
+    const tgl = ymd(now);
+    if (jenis === 'toko') API.unduhCSV(`daftar-toko-${tgl}.csv`, tokoList.map(perToko), [
+      { label: 'Nama', key: 'nama' }, { label: 'Kecamatan', key: 'kecamatan' }, { label: 'Jenis', key: 'jenis' },
+      { label: 'Status', key: 'status' }, { label: 'Jenis Barang', key: 'jumlahBarang' },
+      { label: 'Transaksi 30 Hari', key: 'tx' }, { label: 'Di Bawah ROP', key: 'kritis' }]);
+    if (jenis === 'stok' || jenis === 'rop') API.unduhCSV(`${jenis === 'rop' ? 'di-bawah-rop' : 'stok'}-${tgl}.csv`,
+      barangAll.filter(b => jenis === 'stok' || diBawahRop(b)), [
+      { label: 'Toko', get: b => namaToko(b.tokoId) }, { label: 'Barang', key: 'nama' }, { label: 'Kategori', key: 'kategori' },
+      { label: 'Stok', key: 'stok' }, { label: 'Satuan', key: 'satuan' }, { label: 'ROP', key: 'rop' }]);
+    if (jenis === 'tx') API.unduhCSV(`transaksi-30-hari-${tgl}.csv`, txAll.filter(t => t.tanggal >= batas30), [
+      { label: 'Tanggal', key: 'tanggal' }, { label: 'Toko', get: t => namaToko(t.tokoId) }, { label: 'Barang', get: t => brg(t.barangId).nama || t.barangId },
+      { label: 'Jenis', key: 'jenis' }, { label: 'Jumlah', key: 'jumlah' }, { label: 'Keterangan', key: 'keterangan' }, { label: 'Dicatat oleh', key: 'oleh' }]);
+  }
+  function unduhRekap(tokoId) {
+    const r = API.rekapPenggunaan(barangAll.filter(b => b.tokoId === tokoId), txAll.filter(x => x.tokoId === tokoId), batas30, ymd(now));
+    API.unduhCSV(`rekap-${tokoId}-${ymd(now)}.csv`, [
+      ['Nama', namaToko(tokoId)], ['Periode', r.periode], ['Jenis barang', r.jenisBarang],
+      ['Transaksi masuk', r.txMasuk], ['Transaksi keluar', r.txKeluar], ['Hari dengan pencatatan', r.hariTercatat],
+      ['Pengguna yang mencatat', r.pengguna === null ? 'tidak tersedia' : r.pengguna],
+      ['Peringatan ROP muncul', r.peringatanRop], ['Di bawah ROP saat ini', r.saatIniDiBawahRop],
+      ['Sumber data', API.statusKoneksi() === 'live' ? 'Google Sheets' : 'DATA CONTOH'],
+    ].map(([a, b]) => ({ a, b })), [{ label: 'Indikator', key: 'a' }, { label: 'Hasil', key: 'b' }]);
   }
 
   /* ── NAV ── */
   function nav(el, page) {
-    const t = {
-      overview:'Overview UMKM Kabupaten Pangkep', toko:'Daftar UMKM Terdaftar',
-      stok:'Kondisi Stok Semua Toko', laporan:'Laporan Periodik',
-      unduhan:'Unduh Data', sebaran:'Sebaran Kecamatan',
-    };
-    document.getElementById('pg-title').textContent = t[page] || page;
+    const target = { overview: '.stats-row', toko: '#tbl-toko', stok: '#tbl-stok', laporan: '#laporan-grid', unduhan: '#unduh-panel', sebaran: '#kec-list' }[page];
+    const t = document.querySelector(target);
+    if (t) t.closest('.card, .stats-row').scrollIntoView({ behavior: 'smooth', block: 'start' });
     document.querySelectorAll('.sb-link').forEach(x => x.classList.remove('active'));
     el.classList.add('active');
     if (window.innerWidth <= 768) toggleSB(false);
@@ -625,34 +624,18 @@
     const open = force !== undefined ? force : !sb.classList.contains('open');
     sb.classList.toggle('open', open); ov.classList.toggle('open', open);
   }
-  function doLogout() { if(confirm('Keluar dari akun Dinas Koperasi?')) window.location.href = 'index.html'; }
+  function doLogout() { if (confirm('Keluar dari akun Pemantau?')) { sessionStorage.removeItem('si_user'); window.location.href = 'index.html'; } }
 
   /* ── INIT ── */
-  async function loadDinasData() {
-    const res = await API.getGlobalStats();
-    if (res.success) {
-      const d = res.data;
-      // Update stat cards
-      const cards = document.querySelectorAll('.stat-val');
-      if (cards[0]) cards[0].textContent = d.totalToko;
-      if (cards[2]) cards[2].textContent = d.totalTransaksi;
-      if (cards[3]) cards[3].textContent = d.itemKritis;
-      // Isi tokoData dari API
-      tokoData.length = 0;
-      d.tokoList.forEach(t => tokoData.push({
-        nama: t.nama, kec: t.kecamatan, barang: t.jumlahBarang,
-        tx: t.txBulanIni, kritis: t.itemKritis, status: t.status,
-      }));
-      // Hitung kecamatan
-      const kecCount = {};
-      d.tokoList.forEach(t => { kecCount[t.kecamatan] = (kecCount[t.kecamatan]||0)+1; });
-      kecData.length = 0;
-      Object.entries(kecCount).forEach(([kec,n]) => kecData.push({ kec, n }));
-    }
-    renderToko(); renderKec(); renderTopToko();
-    renderChart(); renderStok(); renderLaporan(); renderUnduh();
+  async function loadData() {
+    const [rs, rb, rt] = await Promise.all([API.getGlobalStats(), API.getBarang(), API.getTransaksi(undefined, 10000)]);
+    tokoList  = rs.success ? (rs.data.tokoList || []) : [];
+    barangAll = rb.success ? rb.data : [];
+    txAll     = rt.success ? rt.data.map(t => ({ ...t, tanggal: API.tglISO(t.tanggal) })) : [];
+    if (!tokoList.length) { const ra = await API.getAllToko(); if (ra.success) tokoList = ra.data; }
+    renderStats(); renderToko(); renderKec(); renderTopToko(); renderChart(); renderStok(); renderLaporan(); renderUnduh();
   }
-  loadDinasData();
+  loadData();
 </script>
 </body>
 </html>
