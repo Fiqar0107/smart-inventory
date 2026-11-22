@@ -21,7 +21,8 @@ disimpan di perangkat dan bisa diganti kapan saja dari menu Profil.
 **Data kedua mode disimpan terpisah.** Mode UMKM memakai Google Sheets lama
 (`urlUmkm` di `js/api.js`, data lama tidak diubah). Mode Kelompok Tani memakai
 Google Sheets sendiri (`urlPoktan`). Selama `urlPoktan` belum diisi, mode
-Kelompok Tani menampilkan data contoh. Cara menyambungkannya:
+Kelompok Tani menampilkan data contoh. Kode server untuk spreadsheet kelompok
+tani ada di [`apps-script/Code.gs`](apps-script/Code.gs); cara memasangnya:
 [PANDUAN-KELOMPOK-TANI.md](PANDUAN-KELOMPOK-TANI.md).
 
 Selain sumber data, yang berubah hanya **teks di layar**. Nilai role di Google Sheets (`pemilik`,
@@ -100,6 +101,7 @@ karyawan.html     pencatat (tampilan HP)
 admin.html        admin pengabdian
 dinas.html        pemantau (baca saja)
 setup-stok.html   input stok awal + d, L, ROP
+apps-script/Code.gs   server Google Apps Script untuk mode Kelompok Tani
 css/style.css
 js/terms.js       mode & istilah (dimuat paling awal)
 js/auth.js        sesi & label peran
