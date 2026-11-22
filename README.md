@@ -18,7 +18,13 @@ disimpan di perangkat dan bisa diganti kapan saja dari menu Profil.
 | Unit usaha | Toko | Kelompok |
 | Contoh barang | sembako, minuman, sabun | pupuk, benih, pestisida |
 
-Yang berubah hanya **teks di layar**. Nilai role di Google Sheets (`pemilik`,
+**Data kedua mode disimpan terpisah.** Mode UMKM memakai Google Sheets lama
+(`urlUmkm` di `js/api.js`, data lama tidak diubah). Mode Kelompok Tani memakai
+Google Sheets sendiri (`urlPoktan`). Selama `urlPoktan` belum diisi, mode
+Kelompok Tani menampilkan data contoh. Cara menyambungkannya:
+[PANDUAN-KELOMPOK-TANI.md](PANDUAN-KELOMPOK-TANI.md).
+
+Selain sumber data, yang berubah hanya **teks di layar**. Nilai role di Google Sheets (`pemilik`,
 `karyawan`, `admin`, `dinas`) dan ID (`TOKO-001`, dst.) tetap sama, jadi
 Apps Script tidak perlu di-deploy ulang. Penggantian istilah ada di `js/terms.js`.
 

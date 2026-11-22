@@ -175,7 +175,14 @@
     setMode(m) {
       if (!MODES.includes(m)) return;
       try { localStorage.setItem(KEY, m); } catch (e) {}
-      location.reload();
+      // Tiap mode punya Google Sheets sendiri → akun tidak terbawa antar-mode
+      const diIndex = /(^|\/)(index\.html)?$/.test(location.pathname);
+      if (m !== MODE && !diIndex) {
+        try { sessionStorage.removeItem("si_user"); } catch (e) {}
+        location.href = "index.html";
+      } else {
+        location.reload();
+      }
     },
   };
 })();
