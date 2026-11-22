@@ -685,22 +685,22 @@
     .btn-submit:hover { opacity: .9; }
     .btn-submit:active { transform: scale(.98); }
 
-    /* ─── EOQ/ROP PANEL ─── */
-    .eoq-grid {
+    /* ─── ROP PANEL ─── */
+    .rop-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       padding: 16px 20px;
     }
-    .eoq-item {
+    .rop-item {
       background: var(--slate-50);
       border-radius: var(--radius-md);
       padding: 14px;
       border: 1px solid var(--slate-200);
       transition: box-shadow .15s;
     }
-    .eoq-item:hover { box-shadow: var(--shadow-sm); }
-    .eoq-item-name {
+    .rop-item:hover { box-shadow: var(--shadow-sm); }
+    .rop-item-name {
       font-size: .78rem;
       font-weight: 700;
       color: var(--slate-700);
@@ -709,26 +709,26 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .eoq-row {
+    .rop-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 5px;
     }
-    .eoq-key {
+    .rop-key {
       font-size: .67rem;
       color: var(--slate-500);
       text-transform: uppercase;
       letter-spacing: .5px;
     }
-    .eoq-val {
+    .rop-val {
       font-size: .8rem;
       font-weight: 700;
       font-family: 'DM Mono', monospace;
     }
-    .eoq-val.teal  { color: var(--teal-600); }
-    .eoq-val.amber { color: #b45309; }
-    .eoq-chip {
+    .rop-val.teal  { color: var(--teal-600); }
+    .rop-val.amber { color: #b45309; }
+    .rop-chip {
       display: inline-block;
       margin-top: 6px;
       font-size: .62rem;
@@ -902,7 +902,50 @@
     @media (max-width: 480px) {
       .stats-grid { grid-template-columns: 1fr 1fr; }
     }
+  
+    /* ─── PANEL HALAMAN ─── */
+    .page-panel { display: none; flex-direction: column; gap: 24px; }
+    .page-panel.active { display: flex; }
+    .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; padding: 14px 20px; border-bottom: 1px solid var(--slate-100); }
+    .toolbar .form-group { min-width: 150px; }
+    .toolbar .grow { flex: 1; min-width: 200px; }
+    .btn-sec { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--slate-200); background: var(--white); color: var(--slate-700); font: 600 .8rem 'Plus Jakarta Sans', sans-serif; cursor: pointer; white-space: nowrap; }
+    .btn-sec:hover { border-color: var(--teal-400); color: var(--teal-700); background: var(--teal-50); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; padding: 16px 20px; }
+    .info-note { font-size: .76rem; color: var(--slate-500); padding: 12px 20px 16px; line-height: 1.55; }
+    .empty-row td { text-align: center; color: var(--slate-400); padding: 28px 16px; white-space: normal; }
+    .rumus { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+    .rumus-box { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: var(--radius-md); padding: 18px; }
+    .rumus-eq { font-family: 'DM Mono', monospace; font-size: 1.35rem; font-weight: 500; color: var(--teal-700); margin-bottom: 10px; }
+    .rumus-box ul { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .8rem; color: var(--slate-700); }
+    .rumus-box li b { font-family: 'DM Mono', monospace; color: var(--teal-700); }
+    .kalk { display: flex; flex-direction: column; gap: 12px; }
+    .kalk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kalk-hasil { border-radius: var(--radius-md); background: var(--amber-100); padding: 14px 16px; font-size: .82rem; color: #92400e; }
+    .kalk-hasil strong { display: block; font-family: 'DM Mono', monospace; font-size: 1.6rem; color: #b45309; }
+    .rekap td { white-space: normal; }
+    .rekap td:first-child { color: var(--slate-400); width: 40px; }
+    .rekap td:last-child { font-weight: 600; color: var(--slate-800); }
+    .profil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+    .profil-item { border: 1px solid var(--slate-100); border-radius: var(--radius-sm); padding: 12px 14px; }
+    .profil-item .k { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--slate-400); margin-bottom: 4px; }
+    .profil-item .v { font-size: .88rem; font-weight: 600; color: var(--slate-800); word-break: break-word; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: .68rem; font-weight: 700; }
+    .tag-masuk { background: var(--teal-100); color: var(--teal-700); }
+    .tag-keluar { background: var(--amber-100); color: #b45309; }
+    .count-chip { font-size: .72rem; color: var(--slate-500); font-weight: 600; }
+    @media (max-width: 768px) {
+      .rumus, .profil-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      .sidebar, .topbar, .mobile-toggle, .sidebar-overlay, #demo-mode-bar, .no-print { display: none !important; }
+      .main { margin: 0 !important; }
+      .page-panel { display: none !important; }
+      .page-panel.print-target { display: flex !important; }
+      .card { box-shadow: none; break-inside: avoid; }
+    }
   </style>
+  <script src="js/terms.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
 </head>
@@ -923,35 +966,34 @@
 
   <nav class="sidebar-nav">
     <div class="nav-label">Utama</div>
-    <a class="nav-item active" onclick="setPage('dashboard')">
+    <a class="nav-item active" data-panel="dashboard" onclick="setPage('dashboard')">
       <span class="nav-icon">🏠</span> Dashboard
     </a>
     <a class="nav-item setup-link" href="setup-stok.html" title="Input stok barang pertama kali">
       <span class="nav-icon">📦</span> Setup Stok Awal
-      <span class="nav-badge" style="background:var(--amber-500)">Baru</span>
     </a>
-    <a class="nav-item" onclick="setPage('barang')">
+    <a class="nav-item" data-panel="barang" onclick="setPage('barang')">
       <span class="nav-icon">📋</span> Data Barang
     </a>
-    <a class="nav-item" onclick="setPage('transaksi')">
+    <a class="nav-item" data-panel="transaksi" onclick="setPage('transaksi')">
       <span class="nav-icon">🔄</span> Transaksi
-      <span class="nav-badge">3</span>
+      <span class="nav-badge" id="nb-tx" style="display:none">0</span>
     </a>
 
     <div class="nav-label">Analisis</div>
-    <a class="nav-item" onclick="setPage('eoq')">
-      <span class="nav-icon">📐</span> Kalkulator EOQ/ROP
+    <a class="nav-item" data-panel="rop" onclick="setPage('rop')">
+      <span class="nav-icon">📐</span> Titik Pesan Ulang (ROP)
     </a>
-    <a class="nav-item" onclick="setPage('laporan')">
+    <a class="nav-item" data-panel="laporan" onclick="setPage('laporan')">
       <span class="nav-icon">📊</span> Laporan
     </a>
 
     <div class="nav-label">Pengaturan</div>
-    <a class="nav-item" onclick="setPage('notif')">
-      <span class="nav-icon">🔔</span> Notifikasi
-      <span class="nav-badge">5</span>
+    <a class="nav-item" data-panel="notif" onclick="setPage('notif')">
+      <span class="nav-icon">🔔</span> Peringatan Stok
+      <span class="nav-badge" id="nb-notif" style="display:none">0</span>
     </a>
-    <a class="nav-item" onclick="setPage('profil')">
+    <a class="nav-item" data-panel="profil" onclick="setPage('profil')">
       <span class="nav-icon">⚙️</span> Profil Toko
     </a>
     <a class="nav-item" onclick="logout()" style="color:rgba(239,68,68,.7);">
@@ -960,10 +1002,10 @@
   </nav>
 
   <div class="sidebar-footer">
-    <div class="store-info">
-      <div class="store-avatar">🏪</div>
+    <div class="store-info" onclick="setPage('profil')" style="cursor:pointer">
+      <div class="store-avatar" id="sb-ava">🏪</div>
       <div class="store-meta">
-        <strong>Toko Berkah Jaya</strong>
+        <strong id="sb-nama">—</strong>
         <span>Pemilik Toko</span>
       </div>
       <span class="chevron">›</span>
@@ -978,51 +1020,50 @@
   <header class="topbar">
     <div class="topbar-title">
       <h1 id="page-title">Dashboard Utama</h1>
-      <p id="page-sub">Selamat datang, Pak Ahmad · Toko Berkah Jaya</p>
+      <p id="page-sub">Memuat data…</p>
     </div>
     <div class="topbar-right">
       <span class="topbar-date" id="today-date"></span>
-      <button class="topbar-btn" title="Notifikasi">
+      <button class="topbar-btn" title="Peringatan stok" onclick="setPage('notif')">
         🔔
-        <span class="notif-dot"></span>
+        <span class="notif-dot" id="tb-dot" style="display:none"></span>
       </button>
-      <button class="topbar-btn" title="Unduh Laporan">📥</button>
+      <button class="topbar-btn" title="Laporan" onclick="setPage('laporan')">📥</button>
     </div>
   </header>
 
   <!-- PAGE CONTENT -->
   <main class="page-content">
 
+  <!-- ══════════ PANEL: DASHBOARD ══════════ -->
+  <section class="page-panel active" id="panel-dashboard">
+
     <!-- BANNER SETUP STOK AWAL (tampil jika belum ada data) -->
-    <div class="setup-banner" id="setup-banner">
+    <div class="setup-banner" id="setup-banner" style="display:none">
       <div class="setup-banner-ico">📦</div>
       <div class="setup-banner-body">
         <strong>Selamat datang! Mulai dengan memasukkan stok barang Anda 👋</strong>
-        <span>Sistem belum memiliki data barang. Input stok awal sekarang agar EOQ &amp; ROP bisa dihitung otomatis.</span>
+        <span>Sistem belum memiliki data barang. Masukkan stok awal dan batas ROP agar peringatan stok bisa bekerja.</span>
         <div class="setup-banner-steps">
           <span class="sbs-chip">1️⃣ Input nama &amp; jumlah stok</span>
-          <span class="sbs-chip">2️⃣ Sistem hitung EOQ &amp; ROP</span>
-          <span class="sbs-chip">3️⃣ Notifikasi WA aktif otomatis</span>
+          <span class="sbs-chip">2️⃣ Tentukan ROP = d × L</span>
+          <span class="sbs-chip">3️⃣ Catat barang masuk &amp; keluar</span>
         </div>
       </div>
       <div class="setup-banner-actions">
-        <a href="setup-stok.html" class="setup-btn-main">
-          🚀 Mulai Setup Stok
-        </a>
-        <button class="setup-btn-dismiss" onclick="dismissSetupBanner()">
-          Lewati dulu
-        </button>
+        <a href="setup-stok.html" class="setup-btn-main">🚀 Mulai Setup Stok</a>
+        <button class="setup-btn-dismiss" onclick="dismissSetupBanner()">Lewati dulu</button>
       </div>
     </div>
 
     <!-- ALERT -->
-    <div class="alert-banner" id="alert-stok">
+    <div class="alert-banner" id="alert-stok" style="display:none">
       <span class="alert-icon">⚠️</span>
       <div class="alert-text">
-        <strong>3 barang di bawah batas ROP</strong>
-        <span>Minyak Goreng Bimoli, Gula Pasir, Tepung Terigu membutuhkan pemesanan segera</span>
+        <strong id="alert-judul">—</strong>
+        <span id="alert-ket">—</span>
       </div>
-      <button class="alert-action" onclick="setPage('barang')">Lihat Barang</button>
+      <button class="alert-action" onclick="setPage('rop')">Lihat Barang</button>
       <button class="alert-close" onclick="this.parentElement.style.display='none'">✕</button>
     </div>
 
@@ -1031,25 +1072,25 @@
       <div class="stat-card">
         <div class="stat-top">
           <div class="stat-icon teal">📦</div>
-          <span class="stat-trend up">↑ 2</span>
+          <span class="stat-trend flat">Tercatat</span>
         </div>
         <div>
-          <div class="stat-value" id="stat-total-barang">47</div>
-          <div class="stat-label">Total Jenis Barang</div>
+          <div class="stat-value" id="stat-total-barang">—</div>
+          <div class="stat-label">Jenis Barang</div>
         </div>
-        <div class="stat-sub">Diperbarui hari ini</div>
+        <div class="stat-sub" id="stat-total-sub">—</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-top">
           <div class="stat-icon red">⚠️</div>
-          <span class="stat-trend down">Perlu Tindakan</span>
+          <span class="stat-trend down">Perlu Dipesan</span>
         </div>
         <div>
-          <div class="stat-value" style="color:var(--red-500)" id="stat-stok-kritis">3</div>
-          <div class="stat-label">Barang Stok Kritis</div>
+          <div class="stat-value" style="color:var(--red-500)" id="stat-stok-kritis">—</div>
+          <div class="stat-label">Barang di Bawah ROP</div>
         </div>
-        <div class="stat-sub">Di bawah batas ROP</div>
+        <div class="stat-sub" id="stat-kritis-sub">Stok ≤ batas ROP</div>
       </div>
 
       <div class="stat-card">
@@ -1058,123 +1099,81 @@
           <span class="stat-trend flat">Hari ini</span>
         </div>
         <div>
-          <div class="stat-value" id="stat-tx-masuk">12</div>
+          <div class="stat-value" id="stat-tx-masuk">—</div>
           <div class="stat-label">Transaksi Masuk</div>
         </div>
-        <div class="stat-sub">+320 unit total</div>
+        <div class="stat-sub" id="stat-masuk-sub">—</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-top">
           <div class="stat-icon amber">📤</div>
-          <span class="stat-trend up">↑ 8%</span>
+          <span class="stat-trend flat">Hari ini</span>
         </div>
         <div>
-          <div class="stat-value" id="stat-tx-keluar">28</div>
+          <div class="stat-value" id="stat-tx-keluar">—</div>
           <div class="stat-label">Transaksi Keluar</div>
         </div>
-        <div class="stat-sub">-148 unit total</div>
+        <div class="stat-sub" id="stat-keluar-sub">—</div>
       </div>
     </div>
 
     <!-- ROW 2: TABEL + FORM TRANSAKSI -->
     <div class="two-col">
-
-      <!-- TABEL STOK BARANG -->
       <div class="card">
         <div class="card-header">
           <h3>📋 Stok Barang</h3>
-          <a class="card-link">Lihat Semua →</a>
+          <a class="card-link" onclick="setPage('barang')">Lihat Semua →</a>
         </div>
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>Barang</th>
-                <th>Stok</th>
-                <th>ROP</th>
-                <th>EOQ</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="tabel-stok">
-              <!-- diisi JS -->
-            </tbody>
+            <thead><tr><th>Barang</th><th>Stok</th><th>ROP</th><th>Status</th></tr></thead>
+            <tbody id="tabel-stok"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- QUICK TRANSAKSI -->
       <div class="card quick-tx">
-        <div class="card-header">
-          <h3>🔄 Catat Transaksi</h3>
-        </div>
+        <div class="card-header"><h3>🔄 Catat Transaksi</h3></div>
         <div class="card-body">
-          <!-- Jenis -->
           <div class="form-group">
             <span class="form-label">Jenis</span>
             <div class="tx-type-row">
-              <button class="tx-type-btn active masuk" id="btn-masuk" onclick="setTxType('masuk')">
-                📥 Barang Masuk
-              </button>
-              <button class="tx-type-btn keluar" id="btn-keluar" onclick="setTxType('keluar')">
-                📤 Barang Keluar
-              </button>
+              <button class="tx-type-btn active masuk" id="btn-masuk" onclick="setTxType('masuk')">📥 Barang Masuk</button>
+              <button class="tx-type-btn keluar" id="btn-keluar" onclick="setTxType('keluar')">📤 Barang Keluar</button>
             </div>
           </div>
-
-          <!-- Pilih Barang -->
           <div class="form-group">
             <label class="form-label">Pilih Barang</label>
-            <select class="form-control" id="tx-barang">
+            <select class="form-control" id="tx-barang" onchange="infoBarangTx()">
               <option value="">— pilih barang —</option>
-              <option>Minyak Goreng Bimoli 1L</option>
-              <option>Gula Pasir 1Kg</option>
-              <option>Tepung Terigu Segitiga</option>
-              <option>Beras Premium 5Kg</option>
-              <option>Sabun Mandi Lifebuoy</option>
             </select>
+            <span id="tx-info" style="font-size:.72rem;color:var(--slate-500)"></span>
           </div>
-
-          <!-- Jumlah -->
           <div class="form-group">
-            <label class="form-label">Jumlah (Unit)</label>
-            <input type="number" class="form-control" id="tx-jumlah"
-                   placeholder="cth: 12" min="1" />
+            <label class="form-label">Jumlah</label>
+            <input type="number" class="form-control" id="tx-jumlah" placeholder="cth: 12" min="1" inputmode="numeric" />
           </div>
-
-          <!-- Keterangan -->
           <div class="form-group">
             <label class="form-label">Keterangan (opsional)</label>
-            <input type="text" class="form-control" id="tx-ket"
-                   placeholder="cth: dari supplier Pak Budi" />
+            <input type="text" class="form-control" id="tx-ket" placeholder="cth: dari penyalur" />
           </div>
-
-          <!-- Submit -->
-          <button class="btn-submit" onclick="simpanTransaksi()">
-            💾 Simpan Transaksi
-          </button>
+          <button class="btn-submit" id="btn-simpan" onclick="simpanTransaksi()">💾 Simpan Transaksi</button>
         </div>
       </div>
     </div>
 
-    <!-- ROW 3: GRAFIK + NOTIFIKASI -->
+    <!-- ROW 3: GRAFIK + PERINGATAN -->
     <div class="two-col">
-
-      <!-- GRAFIK TRANSAKSI 7 HARI -->
       <div class="card">
         <div class="card-header">
           <h3>📈 Transaksi 7 Hari Terakhir</h3>
-          <p>Masuk vs Keluar</p>
+          <p>Jumlah pencatatan per hari</p>
         </div>
         <div class="chart-area">
           <div class="chart-legend">
-            <div class="legend-item">
-              <div class="legend-dot" style="background:var(--teal-400)"></div>Masuk
-            </div>
-            <div class="legend-item">
-              <div class="legend-dot" style="background:var(--amber-500)"></div>Keluar
-            </div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--teal-400)"></div>Masuk</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--amber-500)"></div>Keluar</div>
           </div>
           <div class="chart-svg-wrap" id="chart-wrap">
             <div class="chart-grid-line" style="top:0%"></div>
@@ -1188,44 +1187,230 @@
         </div>
       </div>
 
-      <!-- NOTIFIKASI -->
       <div class="card">
         <div class="card-header">
-          <h3>🔔 Notifikasi</h3>
-          <a class="card-link">Tandai dibaca</a>
+          <h3>🔔 Peringatan Stok</h3>
+          <a class="card-link" onclick="setPage('notif')">Semua →</a>
         </div>
-        <div class="notif-list" id="notif-list">
-          <!-- diisi JS -->
-        </div>
+        <div class="notif-list" id="notif-list"></div>
       </div>
     </div>
 
-    <!-- ROW 4: EOQ/ROP RINGKASAN + AKTIVITAS -->
+    <!-- ROW 4: ROP RINGKASAN + AKTIVITAS -->
     <div class="two-col">
-
-      <!-- EOQ/ROP CARDS -->
       <div class="card">
         <div class="card-header">
-          <h3>📐 Hasil EOQ & ROP Otomatis</h3>
-          <p>Dihitung dari 30 hari transaksi</p>
+          <h3>📐 Barang Mendekati ROP</h3>
+          <a class="card-link" onclick="setPage('rop')">Detail →</a>
         </div>
-        <div class="eoq-grid" id="eoq-grid">
-          <!-- diisi JS -->
-        </div>
+        <div class="rop-grid" id="rop-grid"></div>
       </div>
 
-      <!-- AKTIVITAS TERKINI -->
       <div class="card">
         <div class="card-header">
           <h3>⏱️ Aktivitas Terkini</h3>
-          <a class="card-link">Semua →</a>
+          <a class="card-link" onclick="setPage('transaksi')">Semua →</a>
         </div>
-        <div class="activity-feed" id="activity-feed">
-          <!-- diisi JS -->
+        <div class="activity-feed" id="activity-feed"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ PANEL: DATA BARANG ══════════ -->
+  <section class="page-panel" id="panel-barang">
+    <div class="card">
+      <div class="card-header">
+        <h3>📋 Semua Barang</h3>
+        <span class="count-chip" id="cnt-barang"></span>
+      </div>
+      <div class="toolbar">
+        <div class="form-group grow">
+          <label class="form-label">Cari</label>
+          <input class="form-control" id="f-cari" placeholder="Nama barang atau kode…" oninput="renderBarangPanel()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select class="form-control" id="f-kat" onchange="renderBarangPanel()"><option value="">Semua</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="f-status" onchange="renderBarangPanel()">
+            <option value="">Semua</option>
+            <option value="kritis">Di bawah ROP</option>
+            <option value="aman">Aman</option>
+          </select>
+        </div>
+        <button class="btn-sec" onclick="unduhStok()">⬇ Unduh CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Barang</th><th>Kategori</th><th>Stok</th><th>ROP</th><th>Status</th></tr></thead>
+          <tbody id="tbl-barang"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ PANEL: TRANSAKSI ══════════ -->
+  <section class="page-panel" id="panel-transaksi">
+    <div class="card">
+      <div class="card-header">
+        <h3>🔄 Riwayat Barang Masuk &amp; Keluar</h3>
+        <span class="count-chip" id="cnt-tx"></span>
+      </div>
+      <div class="toolbar">
+        <div class="form-group">
+          <label class="form-label">Jenis</label>
+          <select class="form-control" id="t-jenis" onchange="renderTxPanel()">
+            <option value="">Semua</option>
+            <option value="masuk">Masuk</option>
+            <option value="keluar">Keluar</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dari</label>
+          <input type="date" class="form-control" id="t-dari" onchange="renderTxPanel()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sampai</label>
+          <input type="date" class="form-control" id="t-sampai" onchange="renderTxPanel()" />
+        </div>
+        <div class="form-group grow">
+          <label class="form-label">Barang</label>
+          <select class="form-control" id="t-barang" onchange="renderTxPanel()"><option value="">Semua barang</option></select>
+        </div>
+        <button class="btn-sec" onclick="unduhTransaksi()">⬇ Unduh CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tanggal</th><th>Barang</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th><th>Dicatat oleh</th></tr></thead>
+          <tbody id="tbl-tx"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ PANEL: ROP ══════════ -->
+  <section class="page-panel" id="panel-rop">
+    <div class="card">
+      <div class="card-header"><h3>📐 Kapan Harus Pesan Ulang?</h3></div>
+      <div class="rumus">
+        <div class="rumus-box">
+          <div class="rumus-eq">ROP = d × L</div>
+          <ul>
+            <li><b>ROP</b> — titik pesan ulang: kalau sisa stok sudah sama atau di bawah angka ini, saatnya memesan lagi.</li>
+            <li><b>d</b> — rata-rata barang keluar per hari.</li>
+            <li><b>L</b> — berapa hari barang baru datang setelah dipesan (waktu tunggu).</li>
+          </ul>
+          <p style="font-size:.76rem;color:var(--slate-500);margin-top:10px">Contoh: rata-rata keluar 2 sak per hari, barang datang 4 hari setelah dipesan → ROP = 2 × 4 = 8 sak. Pesan ulang saat stok tinggal 8 sak.</p>
+        </div>
+        <div class="kalk">
+          <div class="kalk-row">
+            <div class="form-group">
+              <label class="form-label">d — rata-rata keluar / hari</label>
+              <input type="number" class="form-control" id="k-d" min="0" step="0.1" placeholder="cth: 2" oninput="hitungKalk()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">L — waktu tunggu (hari)</label>
+              <input type="number" class="form-control" id="k-l" min="0" step="1" placeholder="cth: 4" oninput="hitungKalk()" />
+            </div>
+          </div>
+          <div class="kalk-hasil">Titik pesan ulang<strong id="k-hasil">—</strong><span id="k-ket">Isi d dan L untuk menghitung.</span></div>
         </div>
       </div>
-
     </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>📋 ROP per Barang</h3>
+        <p>d dihitung dari barang keluar 30 hari terakhir yang tercatat</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Barang</th><th>Stok</th><th>d (keluar/hari)</th><th>L (hari)</th><th>ROP</th><th>Status</th></tr></thead>
+          <tbody id="tbl-rop"></tbody>
+        </table>
+      </div>
+      <p class="info-note">Nilai ROP yang dipakai sistem adalah nilai yang tersimpan di Google Sheets (kolom ROP). Kolom d dihitung dari transaksi keluar yang tercatat. Bila d hasil pencatatan jauh berbeda dari d yang dipakai saat menentukan ROP, sebaiknya ROP ditinjau ulang bersama pengurus.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ PANEL: LAPORAN ══════════ -->
+  <section class="page-panel" id="panel-laporan">
+    <div class="card">
+      <div class="card-header">
+        <h3>📊 Rekap Penggunaan Sistem</h3>
+        <span class="count-chip" id="rekap-sumber"></span>
+      </div>
+      <div class="toolbar no-print">
+        <div class="form-group">
+          <label class="form-label">Dari</label>
+          <input type="date" class="form-control" id="r-dari" onchange="renderLaporan()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sampai</label>
+          <input type="date" class="form-control" id="r-sampai" onchange="renderLaporan()" />
+        </div>
+        <button class="btn-sec" onclick="unduhRekap()">⬇ Unduh Rekap CSV</button>
+        <button class="btn-sec" onclick="cetakLaporan()">🖨 Cetak / PDF</button>
+      </div>
+      <div class="table-wrap">
+        <table class="rekap">
+          <thead><tr><th>No</th><th>Indikator</th><th>Hasil</th></tr></thead>
+          <tbody id="tbl-rekap"></tbody>
+        </table>
+      </div>
+      <p class="info-note" id="rekap-catatan">Semua angka dihitung dari data yang tercatat di sistem. Ringkasan ini dapat diunduh untuk keperluan pelaporan program.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>⚠️ Barang di Bawah ROP Saat Ini</h3></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Barang</th><th>Stok</th><th>ROP</th><th>Kekurangan dari ROP</th></tr></thead>
+          <tbody id="tbl-kritis"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card no-print">
+      <div class="card-header"><h3>⬇ Unduh Data Lengkap</h3></div>
+      <div class="btn-row">
+        <button class="btn-sec" onclick="unduhStok()">📦 Stok barang (CSV)</button>
+        <button class="btn-sec" onclick="unduhTransaksi(true)">🔄 Semua transaksi (CSV)</button>
+      </div>
+      <p class="info-note">File CSV bisa dibuka di Excel atau Google Sheets.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ PANEL: PERINGATAN ══════════ -->
+  <section class="page-panel" id="panel-notif">
+    <div class="card">
+      <div class="card-header">
+        <h3>🔔 Peringatan Stok</h3>
+        <span class="count-chip" id="cnt-notif"></span>
+      </div>
+      <div class="notif-list" id="notif-all"></div>
+      <p class="info-note">Peringatan muncul otomatis ketika sisa stok sama atau di bawah ROP (merah), atau tinggal sedikit di atas ROP (kuning).</p>
+    </div>
+  </section>
+
+  <!-- ══════════ PANEL: PROFIL ══════════ -->
+  <section class="page-panel" id="panel-profil">
+    <div class="card">
+      <div class="card-header"><h3>⚙️ Profil Toko</h3></div>
+      <div class="profil-grid" id="profil-grid"></div>
+      <p class="info-note">Untuk mengubah data profil, hubungi Admin Pengabdian.</p>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>👤 Akun &amp; Tampilan</h3></div>
+      <div class="profil-grid" id="akun-grid"></div>
+      <div class="btn-row" data-noterm>
+        <button class="btn-sec" onclick="SI.setMode('umkm')">🏪 Tampilan UMKM</button>
+        <button class="btn-sec" onclick="SI.setMode('poktan')">🌾 Tampilan Kelompok Tani</button>
+      </div>
+    </div>
+  </section>
 
   </main>
 </div>
@@ -1235,310 +1420,413 @@
 
 <!-- ═══ SCRIPT ═══ -->
 <script>
-  /* ── DATA (dari API / DEMO_DATA) ── */
-  let barangData   = [];
-  let notifData    = [];
-  let eoqData      = [];
-  let activityData = [];
+  /* ── STATE ── */
+  const user   = (() => { try { return JSON.parse(sessionStorage.getItem('si_user') || '{}'); } catch { return {}; } })();
+  const tokoId = user.tokoId || 'TOKO-001';
+  let barangData = [], txData = [], notifData = [], tokoInfo = null;
 
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt = n => Number(n || 0).toLocaleString('id-ID', { maximumFractionDigits: 1 });
+  const today = () => API.tglISO(new Date().toISOString());
+  const namaBarang = id => (barangData.find(b => b.id === id) || {}).nama || id;
+  const satuan = id => (barangData.find(b => b.id === id) || {}).satuan || '';
+
+  function statusStok(b) {
+    const s = Number(b.stok), r = Number(b.rop);
+    if (!(r > 0))          return { label: '⚪ ROP belum diisi', kelas: 'segera', kritis: false };
+    if (s <= r * 0.4)      return { label: '🔴 Hampir Habis', kelas: 'habis', kritis: true };
+    if (s <= r)            return { label: '🟡 Segera Pesan', kelas: 'segera', kritis: true };
+    return { label: '🟢 Aman', kelas: 'aman', kritis: false };
+  }
+
+  /* ── LOAD ── */
   async function loadDashboardData() {
-    const user    = JSON.parse(sessionStorage.getItem('si_user') || '{}');
-    const tokoId  = user.tokoId || 'TOKO-001';
-
-    // Paralel: ambil semua data sekaligus
-    const [resBarang, resDash, resNotif, resTx] = await Promise.all([
+    const [resBarang, resNotif, resTx, resToko] = await Promise.all([
       API.getBarang(tokoId),
-      API.getDashboard(tokoId),
       API.getNotifikasi(tokoId),
-      API.getTransaksi(tokoId, 10),
+      API.getTransaksi(tokoId, 2000),
+      API.getToko(tokoId),
     ]);
+    barangData = resBarang.success ? resBarang.data : [];
+    txData     = resTx.success ? resTx.data.map(t => ({ ...t, tanggal: API.tglISO(t.tanggal) })) : [];
+    notifData  = resNotif.success ? resNotif.data : [];
+    tokoInfo   = resToko.success && resToko.data[0] ? resToko.data[0] : null;
 
-    if (resBarang.success) {
-      barangData = resBarang.data;
-      eoqData = barangData
-        .filter(b => b.stok <= b.rop * 1.5)
-        .slice(0, 4)
-        .map(b => ({ nama: b.nama.split(' ').slice(0,2).join(' '), eoq: b.eoq, rop: b.rop, stok: b.stok, kritis: b.stok <= b.rop }));
-    }
+    const namaUnit = tokoInfo ? tokoInfo.nama : '—';
+    document.getElementById('sb-nama').textContent = namaUnit;
+    document.getElementById('sb-ava').textContent = SI.L.ikonUnit;
+    document.getElementById('tx-ket').placeholder = SI.L.contohMasuk;
+    if (document.querySelector('.nav-item.active')?.dataset.panel === 'dashboard') setSub('dashboard');
 
-    if (resNotif.success) {
-      notifData = resNotif.data.map(n => {
-        const tipeMap = {
-          kritis:    { icon:'⚠️', bg:'var(--red-100)',   color:'var(--red-500)'   },
-          perhatian: { icon:'🟡', bg:'var(--amber-100)', color:'#b45309'          },
-          sistem:    { icon:'🔄', bg:'var(--slate-100)', color:'var(--slate-500)' },
-        };
-        const t = tipeMap[n.tipe] || tipeMap.sistem;
-        return { icon:t.icon, bg:t.bg, color:t.color, judul:n.pesan.slice(0,50), ket:n.pesan, waktu:n.waktu.split(' ')[1]||'—', unread:n.tipe==='kritis'||n.tipe==='perhatian' };
-      });
-    }
-
-    if (resTx.success) {
-      activityData = resTx.data.slice(0, 5).map(t => {
-        const brg = barangData.find(b => b.id === t.barangId);
-        return {
-          type: t.jenis,
-          text: `${t.jumlah} ${brg ? brg.satuan : ''} ${brg ? brg.nama : t.barangId} ${t.jenis}`,
-          sub: `${t.keterangan || ''} · ${t.tanggal}`,
-          qty: (t.jenis==='masuk' ? '+' : '-') + t.jumlah,
-        };
-      });
-    }
-
-    if (resDash.success) {
-      const d = resDash.data;
-      document.getElementById('stat-total-barang').textContent  = d.totalBarang || barangData.length;
-      document.getElementById('stat-stok-kritis').textContent   = d.stokKritis  || eoqData.filter(e=>e.kritis).length;
-      document.getElementById('stat-tx-masuk').textContent      = d.txMasuk     || 0;
-      document.getElementById('stat-tx-keluar').textContent     = d.txKeluar    || 0;
-    }
-
-    // Update nama toko di topbar
-    const resToko = await API.getToko(tokoId);
-    if (resToko.success && resToko.data[0]) {
-      const toko = resToko.data[0];
-      document.querySelectorAll('.store-meta strong').forEach(el => el.textContent = toko.nama);
-      document.getElementById('page-sub').textContent = `Selamat datang, ${user.nama || 'Pemilik'} · ${toko.nama}`;
-    }
-
-    renderTabel(); renderNotif(); renderEoq(); renderActivity();
-    checkSetupBanner();
-    populateTxBarang();
+    renderDashboard(); renderBarangPanel(); renderTxPanel(); renderRop(); renderLaporan(); renderNotifAll(); renderProfil();
+    isiFilter();
   }
 
-  // Isi dropdown pilih barang di form transaksi dari data API
-  function populateTxBarang() {
-    const sel = document.getElementById('tx-barang');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">— pilih barang —</option>' +
-      barangData.map(b => `<option value="${b.id}" data-stok="${b.stok}" data-sat="${b.satuan}">${b.nama}</option>`).join('');
+  /* ── DASHBOARD ── */
+  function renderDashboard() {
+    const kritis = barangData.filter(b => statusStok(b).kritis);
+    const txHari = txData.filter(t => t.tanggal === today());
+    const masuk = txHari.filter(t => t.jenis === 'masuk'), keluar = txHari.filter(t => t.jenis === 'keluar');
+
+    document.getElementById('stat-total-barang').textContent = barangData.length;
+    document.getElementById('stat-total-sub').textContent = `${barangData.filter(b => !(Number(b.rop) > 0)).length} barang belum punya ROP`;
+    document.getElementById('stat-stok-kritis').textContent = kritis.length;
+    document.getElementById('stat-tx-masuk').textContent = masuk.length;
+    document.getElementById('stat-masuk-sub').textContent = `+${fmt(masuk.reduce((s, t) => s + Number(t.jumlah), 0))} unit`;
+    document.getElementById('stat-tx-keluar').textContent = keluar.length;
+    document.getElementById('stat-keluar-sub').textContent = `−${fmt(keluar.reduce((s, t) => s + Number(t.jumlah), 0))} unit`;
+
+    // alert
+    const al = document.getElementById('alert-stok');
+    if (kritis.length) {
+      document.getElementById('alert-judul').textContent = `${kritis.length} barang di bawah batas ROP`;
+      const n = kritis.slice(0, 3).map(b => b.nama).join(', ');
+      document.getElementById('alert-ket').textContent = `${n}${kritis.length > 3 ? ', dan lainnya' : ''} perlu segera dipesan ulang`;
+      al.style.display = '';
+    } else al.style.display = 'none';
+
+    // badge
+    const nbT = document.getElementById('nb-tx'); nbT.textContent = txHari.length; nbT.style.display = txHari.length ? '' : 'none';
+    const nbN = document.getElementById('nb-notif'); nbN.textContent = kritis.length; nbN.style.display = kritis.length ? '' : 'none';
+    document.getElementById('tb-dot').style.display = kritis.length ? '' : 'none';
+
+    // tabel ringkas: utamakan yang kritis
+    const urut = [...barangData].sort((a, b) => (Number(a.stok) / (Number(a.rop) || 1e9)) - (Number(b.stok) / (Number(b.rop) || 1e9)));
+    document.getElementById('tabel-stok').innerHTML = urut.slice(0, 8).map(rowStok).join('') ||
+      `<tr class="empty-row"><td colspan="4">Belum ada data barang. <a href="setup-stok.html">Mulai setup stok →</a></td></tr>`;
+
+    // dropdown transaksi
+    const sel = document.getElementById('tx-barang'); const v = sel.value;
+    sel.innerHTML = '<option value="">— pilih barang —</option>' + barangData.map(b => `<option value="${esc(b.id)}">${esc(b.nama)}</option>`).join('');
+    sel.value = v; infoBarangTx();
+
+    // notif ringkas
+    document.getElementById('notif-list').innerHTML = notifHTML(notifData.slice(0, 5)) || emptyBox('🎉', 'Tidak ada peringatan. Semua stok di atas ROP.');
+
+    // mendekati ROP
+    const dekat = urut.filter(b => Number(b.rop) > 0 && Number(b.stok) <= Number(b.rop) * 1.5).slice(0, 4);
+    document.getElementById('rop-grid').innerHTML = dekat.map(b => {
+      const st = statusStok(b);
+      return `<div class="rop-item">
+        <div class="rop-item-name">${esc(b.nama)}</div>
+        <div class="rop-row"><span class="rop-key">Stok</span><span class="rop-val" style="color:${st.kritis ? 'var(--red-500)' : 'var(--green-500)'}">${fmt(b.stok)} ${esc(b.satuan)}</span></div>
+        <div class="rop-row"><span class="rop-key">ROP</span><span class="rop-val amber">${fmt(b.rop)} ${esc(b.satuan)}</span></div>
+        <span class="rop-chip">${st.kritis ? '⚠️ Pesan Sekarang' : '✅ Masih di atas ROP'}</span>
+      </div>`;
+    }).join('') || emptyBox('✅', 'Tidak ada barang yang mendekati ROP.');
+
+    // aktivitas
+    document.getElementById('activity-feed').innerHTML = txData.slice(0, 6).map(t => `
+      <div class="activity-item">
+        <div class="activity-dot ${t.jenis}"></div>
+        <div class="activity-body">
+          <strong>${esc(namaBarang(t.barangId))} ${t.jenis === 'masuk' ? 'masuk' : 'keluar'}</strong>
+          <span>${esc(t.keterangan || '')}${t.keterangan ? ' · ' : ''}${esc(t.tanggal)}${t.oleh ? ' · ' + esc(t.oleh) : ''}</span>
+        </div>
+        <span class="activity-qty">${t.jenis === 'masuk' ? '+' : '−'}${fmt(t.jumlah)}</span>
+      </div>`).join('') || emptyBox('📋', 'Belum ada transaksi tercatat.');
+
+    renderChart();
+    const banner = document.getElementById('setup-banner');
+    banner.style.display = (!barangData.length && !sessionStorage.getItem('setup_banner_dismissed')) ? '' : 'none';
   }
 
-  /* ── HARI INI ── */
-  const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-  const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-  const now = new Date();
-  document.getElementById('today-date').textContent =
-    `${hari[now.getDay()]}, ${now.getDate()} ${bulan[now.getMonth()]} ${now.getFullYear()}`;
+  function rowStok(b) {
+    const st = statusStok(b);
+    const persen = Number(b.rop) > 0 ? Math.min(100, Math.round(Number(b.stok) / (Number(b.rop) * 2) * 100)) : 50;
+    return `<tr>
+      <td><div class="td-name">${esc(b.nama)}</div><div class="td-sku">${esc(b.sku || '')}</div></td>
+      <td>
+        <div style="font-weight:700;font-family:'DM Mono',monospace;">${fmt(b.stok)} <span style="font-weight:400;color:var(--slate-400);font-size:.72rem;">${esc(b.satuan)}</span></div>
+        <div class="stock-bar" style="margin-top:4px"><div class="stock-fill ${st.kelas}" style="width:${persen}%"></div></div>
+      </td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.8rem;">${Number(b.rop) > 0 ? fmt(b.rop) : '—'}</span></td>
+      <td><span class="badge badge-${st.kelas}">${st.label}</span></td>
+    </tr>`;
+  }
 
-  /* ── RENDER TABEL STOK ── */
-  function renderTabel() {
-    const tbody = document.getElementById('tabel-stok');
-    tbody.innerHTML = barangData.map(b => {
-      const persen = Math.min(100, Math.round(b.stok / (b.rop * 2) * 100));
-      let status, kelas;
-      if (b.stok <= b.rop * 0.4) { status = '🔴 Habis'; kelas = 'habis'; }
-      else if (b.stok <= b.rop)   { status = '🟡 Segera Pesan'; kelas = 'segera'; }
-      else                         { status = '🟢 Aman'; kelas = 'aman'; }
-      return `<tr>
-        <td>
-          <div class="td-name">${b.nama}</div>
-          <div class="td-sku">${b.sku}</div>
-        </td>
-        <td>
-          <div style="font-weight:700;font-family:'DM Mono',monospace;">${b.stok} <span style="font-weight:400;color:var(--slate-400);font-size:.72rem;">${b.satuan}</span></div>
-          <div class="stock-bar" style="margin-top:4px">
-            <div class="stock-fill ${kelas}" style="width:${persen}%"></div>
-          </div>
-        </td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:.8rem;">${b.rop}</span></td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--teal-600);">${b.eoq}</span></td>
-        <td><span class="badge badge-${kelas}">${status}</span></td>
-      </tr>`;
+  function notifHTML(list) {
+    const tipeMap = {
+      kritis:    { icon: '⚠️', bg: 'var(--red-100)',   color: 'var(--red-500)' },
+      perhatian: { icon: '🟡', bg: 'var(--amber-100)', color: '#b45309' },
+      sistem:    { icon: '🔄', bg: 'var(--slate-100)', color: 'var(--slate-500)' },
+    };
+    return list.map(n => {
+      const t = tipeMap[n.tipe] || tipeMap.sistem;
+      const judul = String(n.pesan || '').split('—')[0].replace(/^[^A-Za-z]+/, '').trim();
+      const ket = String(n.pesan || '').split('—').slice(1).join('—').trim() || n.pesan;
+      return `<div class="notif-item ${n.tipe === 'kritis' ? 'unread' : ''}">
+        <div class="notif-icon" style="background:${t.bg};color:${t.color}">${t.icon}</div>
+        <div class="notif-body"><strong>${esc(judul)}</strong><span>${esc(ket)}</span></div>
+        <span class="notif-time">${esc(String(n.waktu || '').split(' ')[1] || '')}</span>
+      </div>`;
     }).join('');
   }
+  const emptyBox = (ico, txt) => `<div style="padding:28px 20px;text-align:center;color:var(--slate-400);font-size:.82rem"><div style="font-size:1.6rem;margin-bottom:6px">${ico}</div>${txt}</div>`;
 
-  /* ── RENDER NOTIF ── */
-  function renderNotif() {
-    const el = document.getElementById('notif-list');
-    el.innerHTML = notifData.map(n => `
-      <div class="notif-item ${n.unread ? 'unread' : ''}">
-        <div class="notif-icon" style="background:${n.bg};color:${n.color}">${n.icon}</div>
-        <div class="notif-body">
-          <strong>${n.judul}</strong>
-          <span>${n.ket}</span>
-        </div>
-        <span class="notif-time">${n.waktu}</span>
-      </div>`).join('');
-  }
-
-  /* ── RENDER EOQ GRID ── */
-  function renderEoq() {
-    const el = document.getElementById('eoq-grid');
-    el.innerHTML = eoqData.map(e => `
-      <div class="eoq-item">
-        <div class="eoq-item-name">${e.nama}</div>
-        <div class="eoq-row">
-          <span class="eoq-key">EOQ</span>
-          <span class="eoq-val teal">${e.eoq} unit</span>
-        </div>
-        <div class="eoq-row">
-          <span class="eoq-key">ROP</span>
-          <span class="eoq-val amber">${e.rop} unit</span>
-        </div>
-        <div class="eoq-row">
-          <span class="eoq-key">Stok</span>
-          <span class="eoq-val" style="color:${e.kritis ? 'var(--red-500)':'var(--green-500)'}">${e.stok} unit</span>
-        </div>
-        <span class="eoq-chip">${e.kritis ? '⚠️ Pesan Sekarang' : '✅ Stok Cukup'}</span>
-      </div>`).join('');
-  }
-
-  /* ── RENDER ACTIVITY ── */
-  function renderActivity() {
-    const el = document.getElementById('activity-feed');
-    el.innerHTML = activityData.map(a => `
-      <div class="activity-item">
-        <div class="activity-dot ${a.type}"></div>
-        <div class="activity-body">
-          <strong>${a.text}</strong>
-          <span>${a.sub}</span>
-        </div>
-        <span class="activity-qty">${a.qty}</span>
-      </div>`).join('');
-  }
-
-  /* ── SPARKLINE CHART ── */
+  /* ── GRAFIK 7 HARI (dari data transaksi) ── */
   function renderChart() {
     const svg = document.getElementById('sparkline-svg');
-    const masukData  = [32, 18, 45, 28, 52, 40, 12];
-    const keluarData = [25, 30, 20, 35, 18, 22, 28];
-    const labels     = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      labels.push(`${d.getDate()}/${d.getMonth()+1}`);
-    }
-
-    // render labels
-    const labelContainer = document.getElementById('chart-labels');
-    labelContainer.innerHTML = labels.map(l => `<span>${l}</span>`).join('');
+    const hariList = [];
+    for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); hariList.push(API.tglISO(d.toISOString())); }
+    const masukData  = hariList.map(h => txData.filter(t => t.tanggal === h && t.jenis === 'masuk').length);
+    const keluarData = hariList.map(h => txData.filter(t => t.tanggal === h && t.jenis === 'keluar').length);
+    document.getElementById('chart-labels').innerHTML = hariList.map(h => `<span>${+h.slice(8)}/${+h.slice(5, 7)}</span>`).join('');
 
     const W = 600, H = 140, pad = 16;
-    const maxVal = Math.max(...masukData, ...keluarData) * 1.1;
-    const toX = i => pad + i * ((W - pad*2) / 6);
-    const toY = v => H - pad - (v / maxVal) * (H - pad*2);
-
-    const polyline = (data, color, fill) => {
+    const maxVal = Math.max(1, ...masukData, ...keluarData) * 1.15;
+    const toX = i => pad + i * ((W - pad * 2) / 6);
+    const toY = v => H - pad - (v / maxVal) * (H - pad * 2);
+    const line = (data, color, id) => {
       const pts = data.map((v, i) => `${toX(i)},${toY(v)}`).join(' ');
-      const areaPath = `M ${toX(0)},${H} L ${data.map((v,i) => `${toX(i)},${toY(v)}`).join(' L ')} L ${toX(6)},${H} Z`;
-      return `
-        <defs>
-          <linearGradient id="g${fill}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="${color}" stop-opacity=".18"/>
-            <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <path d="${areaPath}" fill="url(#g${fill})"/>
+      const area = `M ${toX(0)},${H} L ${data.map((v, i) => `${toX(i)},${toY(v)}`).join(' L ')} L ${toX(6)},${H} Z`;
+      return `<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".18"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+        <path d="${area}" fill="url(#g${id})"/>
         <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        ${data.map((v,i) => `<circle cx="${toX(i)}" cy="${toY(v)}" r="3.5" fill="${color}" stroke="white" stroke-width="1.5"/>`).join('')}`;
+        ${data.map((v, i) => `<circle cx="${toX(i)}" cy="${toY(v)}" r="3.5" fill="${color}" stroke="white" stroke-width="1.5"><title>${v} transaksi</title></circle>`).join('')}`;
     };
-
-    svg.innerHTML = polyline(keluarData, 'var(--amber-500)', 'amber') +
-                    polyline(masukData,  'var(--teal-400)',  'teal');
+    svg.innerHTML = line(keluarData, 'var(--amber-500)', 'amber') + line(masukData, 'var(--teal-400)', 'teal');
   }
 
-  /* ── TX TYPE TOGGLE ── */
+  /* ── PANEL DATA BARANG ── */
+  function isiFilter() {
+    const kats = [...new Set(barangData.map(b => b.kategori).filter(Boolean))];
+    const fk = document.getElementById('f-kat'), vk = fk.value;
+    fk.innerHTML = '<option value="">Semua</option>' + kats.map(k => `<option>${esc(k)}</option>`).join(''); fk.value = vk;
+    const tb = document.getElementById('t-barang'), vb = tb.value;
+    tb.innerHTML = '<option value="">Semua barang</option>' + barangData.map(b => `<option value="${esc(b.id)}">${esc(b.nama)}</option>`).join(''); tb.value = vb;
+  }
+  function renderBarangPanel() {
+    const q = document.getElementById('f-cari').value.trim().toLowerCase();
+    const k = document.getElementById('f-kat').value;
+    const st = document.getElementById('f-status').value;
+    const list = barangData.filter(b =>
+      (!q || String(b.nama).toLowerCase().includes(q) || String(b.sku || '').toLowerCase().includes(q)) &&
+      (!k || b.kategori === k) &&
+      (!st || (st === 'kritis') === statusStok(b).kritis));
+    document.getElementById('cnt-barang').textContent = `${list.length} dari ${barangData.length} barang`;
+    document.getElementById('tbl-barang').innerHTML = list.map(b => {
+      const s = statusStok(b);
+      return `<tr>
+        <td><div class="td-name">${esc(b.nama)}</div><div class="td-sku">${esc(b.sku || '')}</div></td>
+        <td>${esc(b.kategori || '—')}</td>
+        <td style="font-family:'DM Mono',monospace;font-weight:700">${fmt(b.stok)} <span style="font-weight:400;color:var(--slate-400);font-size:.72rem">${esc(b.satuan)}</span></td>
+        <td style="font-family:'DM Mono',monospace">${Number(b.rop) > 0 ? fmt(b.rop) : '—'}</td>
+        <td><span class="badge badge-${s.kelas}">${s.label}</span></td>
+      </tr>`;
+    }).join('') || `<tr class="empty-row"><td colspan="5">Tidak ada barang yang cocok.</td></tr>`;
+  }
+
+  /* ── PANEL TRANSAKSI ── */
+  function filterTx() {
+    const j = document.getElementById('t-jenis').value, d = document.getElementById('t-dari').value,
+          s = document.getElementById('t-sampai').value, b = document.getElementById('t-barang').value;
+    return txData.filter(t => (!j || t.jenis === j) && (!d || t.tanggal >= d) && (!s || t.tanggal <= s) && (!b || t.barangId === b));
+  }
+  function renderTxPanel() {
+    const list = filterTx();
+    document.getElementById('cnt-tx').textContent = `${list.length} transaksi`;
+    document.getElementById('tbl-tx').innerHTML = list.slice(0, 300).map(t => `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:.78rem">${esc(t.tanggal)}</td>
+      <td class="td-name">${esc(namaBarang(t.barangId))}</td>
+      <td><span class="tag tag-${t.jenis}">${t.jenis === 'masuk' ? '📥 Masuk' : '📤 Keluar'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-weight:700">${t.jenis === 'masuk' ? '+' : '−'}${fmt(t.jumlah)} ${esc(satuan(t.barangId))}</td>
+      <td style="white-space:normal">${esc(t.keterangan || '—')}</td>
+      <td>${esc(t.oleh || '—')}</td>
+    </tr>`).join('') || `<tr class="empty-row"><td colspan="6">Belum ada transaksi pada filter ini.</td></tr>`;
+  }
+
+  /* ── PANEL ROP ── */
+  function hitungKalk() {
+    const d = parseFloat(document.getElementById('k-d').value), l = parseFloat(document.getElementById('k-l').value);
+    const r = API.hitungRop(d, l);
+    document.getElementById('k-hasil').textContent = r ? fmt(r) + ' unit' : '—';
+    document.getElementById('k-ket').textContent = r ? `Pesan ulang saat sisa stok tinggal ${fmt(r)} unit atau kurang.` : 'Isi d dan L untuk menghitung.';
+  }
+  function renderRop() {
+    document.getElementById('tbl-rop').innerHTML = barangData.map(b => {
+      const s = statusStok(b);
+      const dHit = API.rataKeluarHarian(b.id, txData, 30);
+      const L = Number(b.lt || b.leadTime || 0);
+      return `<tr>
+        <td class="td-name">${esc(b.nama)}</td>
+        <td style="font-family:'DM Mono',monospace">${fmt(b.stok)} ${esc(b.satuan)}</td>
+        <td style="font-family:'DM Mono',monospace">${dHit ? fmt(dHit) : '—'}</td>
+        <td style="font-family:'DM Mono',monospace">${L ? fmt(L) : '—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-weight:700;color:#b45309">${Number(b.rop) > 0 ? fmt(b.rop) : '—'}</td>
+        <td><span class="badge badge-${s.kelas}">${s.label}</span></td>
+      </tr>`;
+    }).join('') || `<tr class="empty-row"><td colspan="6">Belum ada data barang.</td></tr>`;
+  }
+
+  /* ── PANEL LAPORAN ── */
+  function renderLaporan() {
+    const dEl = document.getElementById('r-dari'), sEl = document.getElementById('r-sampai');
+    if (!dEl.value && txData.length) dEl.value = txData.map(t => t.tanggal).sort()[0];
+    if (!sEl.value) sEl.value = today();
+    const r = API.rekapPenggunaan(barangData, txData, dEl.value, sEl.value);
+    window._rekap = r;
+    const rows = rekapRows(r);
+    document.getElementById('tbl-rekap').innerHTML = rows.map((x, i) => `<tr><td>${i + 1}</td><td>${esc(x[0])}</td><td>${esc(x[1])}</td></tr>`).join('');
+    const sumber = API.statusKoneksi() === 'live' ? 'Sumber: Google Sheets' : 'Sumber: DATA CONTOH';
+    document.getElementById('rekap-sumber').textContent = sumber + (tokoInfo ? ' · ' + tokoInfo.nama : '');
+    document.getElementById('rekap-sumber').style.color = API.statusKoneksi() === 'live' ? '' : '#b45309';
+
+    const kritis = barangData.filter(b => Number(b.rop) > 0 && Number(b.stok) <= Number(b.rop));
+    document.getElementById('tbl-kritis').innerHTML = kritis.map(b => `<tr>
+      <td class="td-name">${esc(b.nama)}</td>
+      <td style="font-family:'DM Mono',monospace">${fmt(b.stok)} ${esc(b.satuan)}</td>
+      <td style="font-family:'DM Mono',monospace">${fmt(b.rop)}</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--red-500)">${fmt(Number(b.rop) - Number(b.stok))} ${esc(b.satuan)}</td>
+    </tr>`).join('') || `<tr class="empty-row"><td colspan="4">Tidak ada barang di bawah ROP.</td></tr>`;
+  }
+  function rekapRows(r) {
+    return [
+      ['Periode pemantauan', r.periode],
+      ['Jumlah jenis barang yang tercatat di sistem', `${r.jenisBarang} jenis` + (r.barangTanpaRop ? ` (${r.barangTanpaRop} belum punya ROP)` : '')],
+      ['Jumlah transaksi barang masuk dan keluar', `${r.txTotal} transaksi (masuk ${r.txMasuk}, keluar ${r.txKeluar})`],
+      ['Jumlah hari dengan pencatatan', `${r.hariTercatat} hari`],
+      ['Jumlah pengguna yang aktif mencatat', r.pengguna === null ? 'Tidak tersedia — data transaksi belum menyimpan nama pencatat' : `${r.pengguna} orang (${r.namaPengguna.join(', ')})`],
+      ['Jumlah peringatan reorder point yang muncul', `${r.peringatanRop} kali, pada ${r.barangPernahDiBawahRop} jenis barang`],
+      ['Barang di bawah ROP saat ini', `${r.saatIniDiBawahRop} jenis`],
+    ];
+  }
+  function unduhRekap() {
+    const r = window._rekap; if (!r) return;
+    const rows = rekapRows(r).map((x, i) => ({ no: i + 1, ind: x[0], hasil: x[1] }));
+    rows.push({ no: '', ind: 'Sumber data', hasil: API.statusKoneksi() === 'live' ? 'Google Sheets' : 'DATA CONTOH (bukan data asli)' });
+    rows.push({ no: '', ind: 'Diunduh pada', hasil: new Date().toLocaleString('id-ID') });
+    API.unduhCSV(`rekap-penggunaan-${today()}.csv`, rows, [{ label: 'No', key: 'no' }, { label: 'Indikator', key: 'ind' }, { label: 'Hasil', key: 'hasil' }]);
+  }
+  function unduhStok() {
+    API.unduhCSV(`stok-barang-${today()}.csv`, barangData, [
+      { label: 'Kode', key: 'sku' }, { label: 'Nama Barang', key: 'nama' }, { label: 'Kategori', key: 'kategori' },
+      { label: 'Stok', key: 'stok' }, { label: 'Satuan', key: 'satuan' }, { label: 'ROP', key: 'rop' },
+      { label: 'Status', get: b => statusStok(b).label.replace(/^\S+\s/, '') },
+    ]);
+  }
+  function unduhTransaksi(semua) {
+    const list = semua ? txData : filterTx();
+    API.unduhCSV(`transaksi-${today()}.csv`, list, [
+      { label: 'Tanggal', key: 'tanggal' }, { label: 'Barang', get: t => namaBarang(t.barangId) },
+      { label: 'Jenis', key: 'jenis' }, { label: 'Jumlah', key: 'jumlah' }, { label: 'Satuan', get: t => satuan(t.barangId) },
+      { label: 'Keterangan', key: 'keterangan' }, { label: 'Dicatat oleh', key: 'oleh' },
+    ]);
+  }
+  function cetakLaporan() {
+    const p = document.getElementById('panel-laporan');
+    p.classList.add('print-target'); window.print();
+    setTimeout(() => p.classList.remove('print-target'), 500);
+  }
+
+  /* ── PANEL PERINGATAN ── */
+  function renderNotifAll() {
+    document.getElementById('cnt-notif').textContent = `${notifData.length} peringatan`;
+    document.getElementById('notif-all').innerHTML = notifHTML(notifData) || emptyBox('🎉', 'Tidak ada peringatan. Semua stok di atas ROP.');
+  }
+
+  /* ── PANEL PROFIL ── */
+  function renderProfil() {
+    const t = tokoInfo || {};
+    const item = (k, v) => `<div class="profil-item"><div class="k">${k}</div><div class="v">${esc(v || '—')}</div></div>`;
+    document.getElementById('profil-grid').innerHTML =
+      item('Nama Toko', t.nama) + item('Pemilik', t.pemilik) + item('No. WhatsApp', t.noHp) +
+      item('Kecamatan', t.kecamatan) + item('Jenis Usaha', t.jenis) + item('Status', t.status);
+    document.getElementById('akun-grid').innerHTML =
+      item('Nama', user.nama) + item('Email', user.email) + item('Peran', ROLE_LABEL[user.role] || user.role) +
+      item('Tampilan', SI.L.nama);
+  }
+
+  /* ── FORM TRANSAKSI ── */
   let txType = 'masuk';
   function setTxType(type) {
     txType = type;
-    document.getElementById('btn-masuk').className  = `tx-type-btn ${type === 'masuk'  ? 'active masuk'  : ''}`;
-    document.getElementById('btn-keluar').className = `tx-type-btn ${type === 'keluar' ? 'active keluar' : ''}`;
+    document.getElementById('btn-masuk').className  = `tx-type-btn masuk ${type === 'masuk'  ? 'active' : ''}`;
+    document.getElementById('btn-keluar').className = `tx-type-btn keluar ${type === 'keluar' ? 'active' : ''}`;
+    document.getElementById('tx-ket').placeholder = type === 'masuk' ? SI.L.contohMasuk : SI.L.contohKeluar;
   }
-
-  /* ── SIMPAN TRANSAKSI ── */
+  function infoBarangTx() {
+    const b = barangData.find(x => x.id === document.getElementById('tx-barang').value);
+    document.getElementById('tx-info').textContent = b ? `Stok sekarang ${fmt(b.stok)} ${b.satuan} · ROP ${Number(b.rop) > 0 ? fmt(b.rop) : '—'}` : '';
+  }
   async function simpanTransaksi() {
-    const selBarang = document.getElementById('tx-barang');
-    const jumlah    = document.getElementById('tx-jumlah').value;
-    const ket       = document.getElementById('tx-ket').value;
-    if (!selBarang.value || !jumlah) { alert('Lengkapi pilihan barang dan jumlah dulu ya!'); return; }
-
-    const user   = JSON.parse(sessionStorage.getItem('si_user') || '{}');
-    const tokoId = user.tokoId || 'TOKO-001';
-    const btn    = document.querySelector('.btn-submit');
-    btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite"></span> Menyimpan...';
-    btn.disabled = true;
-
-    const res = await API.simpanTransaksi(tokoId, selBarang.value, txType, Number(jumlah), ket);
+    const sel = document.getElementById('tx-barang');
+    const jumlah = Number(document.getElementById('tx-jumlah').value);
+    const ket = document.getElementById('tx-ket').value;
+    if (!sel.value || !(jumlah > 0)) { showToast('Lengkapi pilihan barang dan jumlah dulu ya!', 'warning'); return; }
+    const b = barangData.find(x => x.id === sel.value);
+    if (txType === 'keluar' && b && jumlah > Number(b.stok)) {
+      if (!confirm(`Jumlah keluar (${jumlah}) lebih besar dari stok tercatat (${b.stok}). Tetap simpan?`)) return;
+    }
+    const btn = document.getElementById('btn-simpan');
+    btn.innerHTML = '⏳ Menyimpan…'; btn.disabled = true;
+    const res = await API.simpanTransaksi(tokoId, sel.value, txType, jumlah, ket, user.nama || '');
     btn.disabled = false;
     if (res.success) {
-      btn.innerHTML = '✅ Tersimpan!';
-      btn.style.background = 'var(--green-500)';
-      setTimeout(async () => {
-        btn.innerHTML = '💾 Simpan Transaksi';
-        btn.style.background = '';
-        selBarang.value = '';
-        document.getElementById('tx-jumlah').value = '';
-        document.getElementById('tx-ket').value = '';
-        await loadDashboardData();
-      }, 1500);
+      btn.innerHTML = '✅ Tersimpan!'; btn.style.background = 'var(--green-500)';
+      showToast(res.msg || 'Transaksi tersimpan.', 'success');
+      document.getElementById('tx-jumlah').value = ''; document.getElementById('tx-ket').value = '';
+      await loadDashboardData();
+      setTimeout(() => { btn.innerHTML = '💾 Simpan Transaksi'; btn.style.background = ''; }, 1200);
     } else {
-      btn.innerHTML = '❌ Gagal — coba lagi';
-      btn.style.background = 'var(--red-500)';
+      btn.innerHTML = '❌ Gagal — coba lagi'; btn.style.background = 'var(--red-500)';
+      showToast(res.msg || 'Gagal menyimpan.', 'error');
       setTimeout(() => { btn.innerHTML = '💾 Simpan Transaksi'; btn.style.background = ''; }, 2000);
     }
   }
 
-  /* ── NAV ── */
+  /* ── NAVIGASI PANEL ── */
+  const TITLES = {
+    dashboard: ['Dashboard Utama', null],
+    barang:    ['Data Barang', 'Semua barang beserta sisa stok dan batas ROP'],
+    transaksi: ['Transaksi', 'Riwayat barang masuk dan keluar'],
+    rop:       ['Titik Pesan Ulang (ROP)', 'Kapan setiap barang perlu dipesan lagi'],
+    laporan:   ['Laporan', 'Rekap penggunaan sistem dan unduh data'],
+    notif:     ['Peringatan Stok', 'Barang yang sudah atau hampir menyentuh ROP'],
+    profil:    ['Profil Toko', 'Data toko dan akun'],
+  };
+  function setSub(page) {
+    const t = TITLES[page];
+    document.getElementById('page-sub').textContent = t[1] || `Selamat datang, ${user.nama || ROLE_LABEL.pemilik}${tokoInfo ? ' · ' + tokoInfo.nama : ''}`;
+  }
   function setPage(page) {
-    const titles = {
-      dashboard: ['Dashboard Utama', 'Selamat datang, Pak Ahmad · Toko Berkah Jaya'],
-      barang:    ['Data Barang', 'Kelola semua barang di toko Anda'],
-      transaksi: ['Transaksi', 'Riwayat barang masuk dan keluar'],
-      eoq:       ['Kalkulator EOQ/ROP', 'Analisis otomatis dari data transaksi 30 hari'],
-      laporan:   ['Laporan', 'Unduh dan lihat laporan persediaan'],
-      notif:     ['Notifikasi', 'Peringatan dan informasi sistem'],
-      profil:    ['Profil Toko', 'Pengaturan toko dan akun'],
-    };
-    if (titles[page]) {
-      document.getElementById('page-title').textContent = titles[page][0];
-      document.getElementById('page-sub').textContent   = titles[page][1];
-    }
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    if (!TITLES[page]) return;
+    document.querySelectorAll('.page-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + page));
+    document.querySelectorAll('.nav-item[data-panel]').forEach(el => el.classList.toggle('active', el.dataset.panel === page));
+    document.getElementById('page-title').textContent = TITLES[page][0];
+    setSub(page);
     if (window.innerWidth <= 768) toggleSidebar(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (location.hash !== '#' + page) history.replaceState(null, '', '#' + page);
   }
 
   /* ── SIDEBAR MOBILE ── */
   function toggleSidebar(force) {
-    const sb = document.getElementById('sidebar');
-    const ov = document.getElementById('overlay');
-    const isOpen = sb.classList.contains('open');
-    const open = force !== undefined ? force : !isOpen;
-    sb.classList.toggle('open', open);
-    ov.classList.toggle('open', open);
+    const sb = document.getElementById('sidebar'), ov = document.getElementById('overlay');
+    const open = force !== undefined ? force : !sb.classList.contains('open');
+    sb.classList.toggle('open', open); ov.classList.toggle('open', open);
   }
 
   /* ── LOGOUT ── */
   function logout() {
-    if (confirm('Yakin ingin keluar dari akun?')) {
-      window.location.href = 'index.html';
-    }
-  }
-
-  /* ── SETUP BANNER ── */
-  function checkSetupBanner() {
-    // Sembunyikan banner jika sudah punya data stok (barangData > 0)
-    // atau jika pernah di-dismiss
-    const dismissed = sessionStorage.getItem('setup_banner_dismissed');
-    const punya_data = barangData.length > 0;
-    const banner = document.getElementById('setup-banner');
-    if (punya_data || dismissed) {
-      banner.style.display = 'none';
-    }
+    if (confirm('Yakin ingin keluar dari akun?')) { sessionStorage.removeItem('si_user'); window.location.href = 'index.html'; }
   }
 
   function dismissSetupBanner() {
     sessionStorage.setItem('setup_banner_dismissed', '1');
-    const banner = document.getElementById('setup-banner');
-    banner.style.transition = 'opacity .3s, transform .3s';
-    banner.style.opacity = '0';
-    banner.style.transform = 'translateY(-8px)';
-    setTimeout(() => banner.style.display = 'none', 300);
+    document.getElementById('setup-banner').style.display = 'none';
   }
 
   /* ── INIT ── */
-  renderChart();
-  loadDashboardData();
+  const now = new Date();
+  const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  document.getElementById('today-date').textContent = `${hari[now.getDay()]}, ${now.getDate()} ${bulan[now.getMonth()]} ${now.getFullYear()}`;
+  setTxType('masuk');
+  loadDashboardData().then(() => {
+    const h = location.hash.replace('#', '');
+    if (TITLES[h] && h !== 'dashboard') setPage(h);
+  });
 </script>
 </body>
 </html>

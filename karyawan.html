@@ -290,6 +290,7 @@
       .form-body { padding: 18px 20px; }
     }
   </style>
+  <script src="js/terms.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
 </head>
@@ -301,12 +302,12 @@
     <span class="nav-logo-ico">📦</span>
     <div class="nav-logo-txt">
       <strong>Smart Inventory</strong>
-      <span>Panel Karyawan</span>
+      <span>Panel Pencatatan</span>
     </div>
   </div>
   <div class="nav-right">
-    <span class="nav-store">🏪 Berkah Jaya</span>
-    <div class="nav-avatar" title="Andi · Karyawan">😊</div>
+    <span class="nav-store" id="nav-store">—</span>
+    <div class="nav-avatar" id="nav-avatar" title="">😊</div>
   </div>
 </header>
 
@@ -315,8 +316,8 @@
 
   <!-- GREETING -->
   <div class="greeting">
-    <h2>Halo, Andi! 👋</h2>
-    <p id="greeting-date">Rabu, 03 Jun 2026 · Toko Berkah Jaya</p>
+    <h2 id="greeting-nama">Halo! 👋</h2>
+    <p id="greeting-date">—</p>
     <div class="greeting-stats">
       <div class="g-stat">
         <strong id="tx-today">0</strong>
@@ -324,23 +325,23 @@
       </div>
       <div class="g-divider"></div>
       <div class="g-stat">
-        <strong>47</strong>
+        <strong id="jml-barang">—</strong>
         <span>Jenis Barang</span>
       </div>
       <div class="g-divider"></div>
       <div class="g-stat">
-        <strong id="kritis-count" style="color:var(--or-300)">3</strong>
-        <span>Stok Kritis</span>
+        <strong id="kritis-count" style="color:var(--or-300)">—</strong>
+        <span>Di Bawah ROP</span>
       </div>
     </div>
   </div>
 
   <!-- ALERT STOK KRITIS -->
-  <div class="alert-kritis">
+  <div class="alert-kritis" id="alert-kritis" style="display:none">
     <span class="ak-ico">⚠️</span>
     <div class="ak-body">
-      <strong>3 barang perlu segera dipesan</strong>
-      <span>Minyak Goreng, Gula Pasir, Tepung Terigu stoknya di bawah batas minimum</span>
+      <strong id="ak-judul">—</strong>
+      <span id="ak-ket">—</span>
     </div>
   </div>
 
@@ -370,13 +371,7 @@
         <div class="fg">
           <label class="fl">Pilih Barang</label>
           <select class="fc" id="sel-barang" onchange="updateStokInfo()">
-            <option value="">— pilih barang —</option>
-            <option value="MGB-001" data-stok="8"   data-rop="20" data-sat="botol">Minyak Goreng Bimoli 1L</option>
-            <option value="GP-002"  data-stok="5"   data-rop="15" data-sat="kg">Gula Pasir 1Kg</option>
-            <option value="TT-003"  data-stok="12"  data-rop="25" data-sat="kg">Tepung Terigu 1Kg</option>
-            <option value="BP-004"  data-stok="60"  data-rop="30" data-sat="sak">Beras Premium 5Kg</option>
-            <option value="SL-005"  data-stok="35"  data-rop="20" data-sat="biji">Sabun Lifebuoy</option>
-            <option value="IG-006"  data-stok="120" data-rop="50" data-sat="biji">Indomie Goreng</option>
+            <option value="">— memuat barang… —</option>
           </select>
         </div>
 
@@ -406,14 +401,14 @@
           </div>
           <div class="fg">
             <label class="fl">Tanggal</label>
-            <input class="fc" type="date" id="inp-tgl" />
+            <input class="fc" type="date" id="inp-tgl" readonly title="Transaksi dicatat pada tanggal hari ini" style="background:var(--slate-50)" />
           </div>
         </div>
 
         <!-- KETERANGAN -->
         <div class="fg">
           <label class="fl">Keterangan</label>
-          <input class="fc" type="text" id="inp-ket" placeholder="cth: dari Pak Budi supplier" />
+          <input class="fc" type="text" id="inp-ket" placeholder="cth: dari penyalur" />
         </div>
 
         <button class="btn-submit" id="btn-submit" onclick="simpan()">
@@ -485,17 +480,25 @@
   let riwayatHariIni = [];
 
   const KAT_ICO = {
-    sembako:'🛒', minuman:'🥤', snack:'🍪', sabun:'🧴', bumbu:'🧂', rokok:'🚬', atk:'✏️'
+    sembako:'🛒', minuman:'🥤', snack:'🍪', sabun:'🧴', bumbu:'🧂', rokok:'🚬', atk:'✏️',
+    pupuk:'🧪', benih:'🌱', pestisida:'🧴', perlengkapan:'🧺'
   };
+  const user   = (() => { try { return JSON.parse(sessionStorage.getItem('si_user') || '{}'); } catch { return {}; } })();
+  const escH   = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   async function loadKaryawanData() {
-    const user   = JSON.parse(sessionStorage.getItem('si_user') || '{}');
     const tokoId = user.tokoId || 'TOKO-001';
 
-    const [resB, resTx] = await Promise.all([
+    const [resB, resTx, resToko] = await Promise.all([
       API.getBarang(tokoId),
-      API.getTransaksi(tokoId, 20),
+      API.getTransaksi(tokoId, 200),
+      API.getToko(tokoId),
     ]);
+    const toko = resToko.success && resToko.data[0] ? resToko.data[0] : null;
+    if (toko) {
+      document.getElementById('nav-store').textContent = `${SI.L.ikonUnit} ${toko.nama}`;
+      document.getElementById('greeting-date').textContent = `${tglPanjang()} · ${toko.nama}`;
+    }
 
     if (resB.success) {
       barangList = resB.data.map(b => ({
@@ -506,16 +509,17 @@
       // isi dropdown
       const sel = document.getElementById('sel-barang');
       sel.innerHTML = '<option value="">— pilih barang —</option>' +
-        barangList.map(b => `<option value="${b.id}" data-stok="${b.stok}" data-rop="${b.rop}" data-sat="${b.sat}">${b.nama}</option>`).join('');
+        barangList.map(b => `<option value="${escH(b.id)}" data-stok="${b.stok}" data-rop="${b.rop}" data-sat="${escH(b.sat)}">${escH(b.nama)}</option>`).join('');
+      document.getElementById('jml-barang').textContent = barangList.length;
     }
 
     if (resTx.success) {
-      const today = new Date().toISOString().split('T')[0];
+      const today = API.tglISO(new Date().toISOString());
       riwayatHariIni = resTx.data
-        .filter(t => t.tanggal === today)
+        .filter(t => API.tglISO(t.tanggal) === today)
         .map(t => {
           const brg = barangList.find(b => b.id === t.barangId);
-          return { type:t.jenis, nama: brg ? brg.nama : t.barangId, qty:t.jumlah, sat: brg ? brg.sat:'unit', waktu: t.waktu||'—', ket:t.keterangan||'' };
+          return { type:t.jenis, nama: brg ? brg.nama : t.barangId, qty:t.jumlah, sat: brg ? brg.sat:'unit', waktu: t.waktu || t.oleh || '', ket:t.keterangan||'' };
         });
       txCount = riwayatHariIni.length;
       document.getElementById('tx-today').textContent = txCount;
@@ -534,9 +538,11 @@
   const hArr = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
   const bArr = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
   const now  = new Date();
-  document.getElementById('greeting-date').textContent =
-    `${hArr[now.getDay()]}, ${now.getDate()} ${bArr[now.getMonth()]} ${now.getFullYear()} · Toko Berkah Jaya`;
-  document.getElementById('inp-tgl').value = now.toISOString().split('T')[0];
+  function tglPanjang() { return `${hArr[now.getDay()]}, ${now.getDate()} ${bArr[now.getMonth()]} ${now.getFullYear()}`; }
+  document.getElementById('greeting-date').textContent = tglPanjang();
+  document.getElementById('greeting-nama').textContent = `Halo, ${(user.nama || ROLE_LABEL.karyawan).split(' ')[0]}! 👋`;
+  document.getElementById('nav-avatar').title = `${user.nama || ''} · ${ROLE_LABEL.karyawan}`;
+  document.getElementById('inp-tgl').value = API.tglISO(now.toISOString());
   document.getElementById('tx-today').textContent = txCount;
   document.getElementById('bn-badge').textContent = txCount;
   document.getElementById('bn-badge').style.display = txCount > 0 ? 'grid' : 'none';
@@ -544,6 +550,7 @@
   /* ── TX TYPE ── */
   function setType(t) {
     txType = t;
+    document.getElementById('inp-ket').placeholder = t === 'masuk' ? SI.L.contohMasuk : SI.L.contohKeluar;
     const bM = document.getElementById('btn-masuk');
     const bK = document.getElementById('btn-keluar');
     bM.className = `tt-btn${t==='masuk' ? ' a-masuk' : ''}`;
@@ -582,13 +589,12 @@
       return;
     }
 
-    const user    = JSON.parse(sessionStorage.getItem('si_user') || '{}');
     const tokoId  = user.tokoId || 'TOKO-001';
     const btn     = document.getElementById('btn-submit');
     btn.innerHTML = '⏳ Menyimpan...';
     btn.disabled  = true;
 
-    const res = await API.simpanTransaksi(tokoId, selBarang.value, txType, parseInt(jumlah), ket);
+    const res = await API.simpanTransaksi(tokoId, selBarang.value, txType, parseInt(jumlah), ket, user.nama || '');
     btn.disabled = false;
 
     if (res.success) {
@@ -618,7 +624,7 @@
       if (b.stok <= b.rop * 0.4)   { numColor = 'var(--rose-500)'; barColor = 'var(--rose-500)'; dotClass = 's-kritis'; }
       else if (b.stok <= b.rop)    { numColor = 'var(--amber-500)'; barColor = 'var(--amber-500)'; dotClass = 's-segera'; }
       else                          { numColor = 'var(--green-500)'; barColor = 'var(--green-500)'; dotClass = 's-aman'; }
-      return `<div class="stok-card" onclick="prefillForm('${b.sku}')">
+      return `<div class="stok-card" onclick="prefillForm('${escH(b.id)}')">
         <div class="stok-card-ico" style="background:var(--or-100)">${b.ico}</div>
         <div class="stok-card-body">
           <div class="stok-card-name">${b.nama}</div>
@@ -634,10 +640,10 @@
   }
 
   /* ── PREFILL FORM ── */
-  function prefillForm(sku) {
+  function prefillForm(id) {
     const sel = document.getElementById('sel-barang');
     for (let i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value === sku) { sel.selectedIndex = i; break; }
+      if (sel.options[i].value === id) { sel.selectedIndex = i; break; }
     }
     updateStokInfo();
     document.getElementById('inp-jumlah').focus();
@@ -646,8 +652,14 @@
 
   /* ── RENDER KRITIS ── */
   function renderKritis() {
-    const kritis = barangList.filter(b => b.stok <= b.rop);
+    const kritis = barangList.filter(b => Number(b.rop) > 0 && b.stok <= b.rop);
     document.getElementById('kritis-count').textContent = kritis.length;
+    const ak = document.getElementById('alert-kritis');
+    if (kritis.length) {
+      document.getElementById('ak-judul').textContent = `${kritis.length} barang perlu segera dipesan`;
+      document.getElementById('ak-ket').textContent = `${kritis.slice(0,3).map(b => b.nama).join(', ')}${kritis.length > 3 ? ', dan lainnya' : ''} — stok sudah di bawah batas ROP. Sampaikan ke ${ROLE_LABEL.pemilik}.`;
+      ak.style.display = '';
+    } else ak.style.display = 'none';
     const el = document.getElementById('kritis-chips');
     if (kritis.length === 0) {
       el.innerHTML = `<div class="empty-state"><div class="e-ico">🎉</div><p>Semua stok dalam kondisi aman!</p></div>`;
