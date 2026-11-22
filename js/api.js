@@ -19,9 +19,25 @@
  */
 
 /* ── KONFIGURASI ─────────────────────────────────── */
+const SI_MODE = (window.SI && window.SI.mode) || "umkm";
+
 const API_CONFIG = {
-  // URL Web App Google Apps Script
-  url: "https://script.google.com/macros/s/AKfycbwoqRUaWoZMdRVl9tmRagqRv0YAvtuR1m0AJNrkl7_7Tk_BwSnigg0JqJFU1Xz5p9uxNw/exec",
+  /*
+   * Setiap mode punya Google Sheets sendiri, supaya data tidak tercampur.
+   *
+   * urlUmkm   : Apps Script untuk data UMKM (data lama, JANGAN diubah).
+   * urlPoktan : Apps Script untuk data KELOMPOK TANI.
+   *             Selama masih "ISI_URL_...", mode Kelompok Tani memakai
+   *             data contoh dan menampilkan banner "mode peragaan".
+   *             Cara membuatnya: lihat PANDUAN-KELOMPOK-TANI.md
+   */
+  urlUmkm:   "https://script.google.com/macros/s/AKfycbwoqRUaWoZMdRVl9tmRagqRv0YAvtuR1m0AJNrkl7_7Tk_BwSnigg0JqJFU1Xz5p9uxNw/exec",
+  urlPoktan: "ISI_URL_APPS_SCRIPT_KELOMPOK_TANI",
+
+  // URL yang dipakai sesuai mode yang dipilih di halaman masuk
+  get url() {
+    return SI_MODE === "poktan" ? this.urlPoktan : this.urlUmkm;
+  },
 
   // Jika true → pakai data contoh tanpa memanggil API
   get demoMode() {
@@ -30,8 +46,6 @@ const API_CONFIG = {
 
   timeout: 10000, // 10 detik
 };
-
-const SI_MODE = (window.SI && window.SI.mode) || "umkm";
 
 /* ── UTIL TANGGAL ────────────────────────────────── */
 function _today() {
@@ -527,7 +541,9 @@ function _tampilkanBanner(alasan) {
       "display:flex", "align-items:center", "gap:10px", "justify-content:center", "flex-wrap:wrap",
     ].join(";");
     const pesan = _koneksi === "demo"
-      ? "🧪 MODE PERAGAAN — menampilkan DATA CONTOH, belum terhubung ke Google Sheets"
+      ? (SI_MODE === "poktan"
+          ? "🧪 MODE PERAGAAN KELOMPOK TANI — menampilkan DATA CONTOH, Google Sheets kelompok tani belum disambungkan"
+          : "🧪 MODE PERAGAAN — menampilkan DATA CONTOH, belum terhubung ke Google Sheets")
       : "⚠️ Google Sheets tidak dapat dihubungi — yang tampil adalah DATA CONTOH, bukan data asli";
     bar.innerHTML = `<span>${pesan}</span>` +
       (alasan ? `<span style="opacity:.6;font-weight:400">(${String(alasan).slice(0, 80)})</span>` : "") +

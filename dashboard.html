@@ -1406,9 +1406,10 @@
       <div class="card-header"><h3>👤 Akun &amp; Tampilan</h3></div>
       <div class="profil-grid" id="akun-grid"></div>
       <div class="btn-row" data-noterm>
-        <button class="btn-sec" onclick="SI.setMode('umkm')">🏪 Tampilan UMKM</button>
-        <button class="btn-sec" onclick="SI.setMode('poktan')">🌾 Tampilan Kelompok Tani</button>
+        <button class="btn-sec" onclick="gantiMode('umkm')">🏪 Pindah ke UMKM</button>
+        <button class="btn-sec" onclick="gantiMode('poktan')">🌾 Pindah ke Kelompok Tani</button>
       </div>
+      <p class="info-note" data-noterm>Data UMKM dan data Kelompok Tani disimpan terpisah. Saat pindah mode, Anda akan keluar dan perlu masuk lagi dengan akun mode tersebut.</p>
     </div>
   </section>
 
@@ -1810,6 +1811,11 @@
   /* ── LOGOUT ── */
   function logout() {
     if (confirm('Yakin ingin keluar dari akun?')) { sessionStorage.removeItem('si_user'); window.location.href = 'index.html'; }
+  }
+
+  function gantiMode(m) {
+    if (m === SI.mode) { showToast('Anda sudah di mode ini.', ''); return; }
+    if (confirm('Data UMKM dan Kelompok Tani terpisah. Pindah mode akan mengeluarkan Anda dari akun ini. Lanjutkan?')) SI.setMode(m);
   }
 
   function dismissSetupBanner() {
